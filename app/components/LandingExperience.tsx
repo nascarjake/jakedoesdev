@@ -58,9 +58,12 @@ export function LandingExperience() {
           <span>41.8781° N</span>
           <span>87.6298° W</span>
         </div>
-        <div className="availability">
-          <i />
-          OPEN TO HARD PROBLEMS
+        <div className="landing-header-actions">
+          <Link href="/resume">READ RÉSUMÉ ↗</Link>
+          <div className="availability">
+            <i />
+            OPEN TO HARD PROBLEMS
+          </div>
         </div>
       </header>
 
@@ -80,6 +83,11 @@ export function LandingExperience() {
             maker. For over two decades, I&apos;ve turned strange ideas and hard
             problems into software that feels inevitable.
           </p>
+          <Link className="resume-fast-path reveal reveal-three" href="/resume">
+            <span>SHORT ON TIME?</span>
+            <b>READ THE 60-SECOND RÉSUMÉ</b>
+            <i>↗</i>
+          </Link>
           <div className="hero-actions reveal reveal-four">
             <button className="primary-cta" onClick={enterUniverse}>
               <span>SEE COOL STUFF</span>

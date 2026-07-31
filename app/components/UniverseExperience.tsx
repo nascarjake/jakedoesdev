@@ -2,19 +2,52 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { projects, timeline, type Project } from "../data/portfolio";
+import {
+  projects,
+  type Project,
+  type ProjectCategory,
+} from "../data/portfolio";
 import { AmbientField } from "./AmbientField";
 
-type View = "work" | "resume" | "signal";
+type View = "work" | "directory" | "signal";
 
 export function UniverseExperience() {
   const [rotation, setRotation] = useState(0);
   const [selected, setSelected] = useState<Project | null>(null);
   const [view, setView] = useState<View>("work");
   const [dragging, setDragging] = useState(false);
+  const [query, setQuery] = useState("");
+  const [category, setCategory] = useState<ProjectCategory | "All">("All");
   const dragStart = useRef({ x: 0, rotation: 0 });
+  const lastWheel = useRef(0);
 
   const step = 360 / projects.length;
+  const categories = useMemo(
+    () =>
+      ["All", ...Array.from(new Set(projects.map((project) => project.category)))] as const,
+    [],
+  );
+  const filteredProjects = useMemo(() => {
+    const needle = query.trim().toLowerCase();
+    return projects.filter((project) => {
+      const matchesCategory =
+        category === "All" || project.category === category;
+      const matchesQuery =
+        !needle ||
+        [
+          project.title,
+          project.eyebrow,
+          project.summary,
+          project.category,
+          project.role,
+          ...project.stack,
+        ]
+          .join(" ")
+          .toLowerCase()
+          .includes(needle);
+      return matchesCategory && matchesQuery;
+    });
+  }, [category, query]);
 
   const rotate = useCallback(
     (direction: number) => {
@@ -43,12 +76,23 @@ export function UniverseExperience() {
     return Math.round(normalized) % projects.length;
   }, [rotation, step]);
 
+  const openProject = (project: Project) => {
+    const index = projects.findIndex((item) => item.id === project.id);
+    setRotation(-index * step);
+    setView("work");
+    setSelected(project);
+  };
+
   return (
     <main
       className={`universe view-${view} ${dragging ? "is-dragging" : ""}`}
       onWheel={(event) => {
         if (view !== "work" || selected) return;
-        if (Math.abs(event.deltaY) > 8) rotate(event.deltaY > 0 ? -1 : 1);
+        const now = Date.now();
+        if (Math.abs(event.deltaY) > 8 && now - lastWheel.current > 420) {
+          lastWheel.current = now;
+          rotate(event.deltaY > 0 ? -1 : 1);
+        }
       }}
     >
       <AmbientField intensity={1.4} />
@@ -60,18 +104,34 @@ export function UniverseExperience() {
           <span>←</span> EXIT UNIVERSE
         </Link>
         <nav aria-label="Portfolio sections">
-          {(["work", "resume", "signal"] as View[]).map((item) => (
-            <button
-              key={item}
-              className={view === item ? "active" : ""}
-              onClick={() => {
-                setSelected(null);
-                setView(item);
-              }}
-            >
-              {item === "work" ? "THE WORK" : item.toUpperCase()}
-            </button>
-          ))}
+          <button
+            className={view === "work" ? "active" : ""}
+            onClick={() => {
+              setSelected(null);
+              setView("work");
+            }}
+          >
+            EXPLORE
+          </button>
+          <button
+            className={view === "directory" ? "active" : ""}
+            onClick={() => {
+              setSelected(null);
+              setView("directory");
+            }}
+          >
+            DIRECTORY <sup>{projects.length}</sup>
+          </button>
+          <Link href="/resume">RÉSUMÉ</Link>
+          <button
+            className={view === "signal" ? "active" : ""}
+            onClick={() => {
+              setSelected(null);
+              setView("signal");
+            }}
+          >
+            SIGNAL
+          </button>
         </nav>
         <div className="archive-status">
           <i />
@@ -113,18 +173,20 @@ export function UniverseExperience() {
         {projects.map((project, index) => {
           const angle = index * step + rotation;
           const radians = (angle * Math.PI) / 180;
-          const x = Math.sin(radians) * 38;
+          const outerRing = index % 2 === 1;
+          const x = Math.sin(radians) * (outerRing ? 44 : 34);
           const z = Math.cos(radians);
-          const y = Math.sin(radians * 1.35) * 7;
-          const scale = 0.66 + (z + 1) * 0.21;
-          const opacity = 0.25 + (z + 1) * 0.36;
+          const y =
+            Math.sin(radians * 1.35) * 6 + (outerRing ? 9 : -7);
+          const scale = 0.56 + (z + 1) * 0.22;
+          const opacity = 0.08 + (z + 1) * 0.43;
           const tilt = x / -15;
           const isActive = index === activeIndex;
 
           return (
             <button
               key={project.id}
-              className={`project-node accent-${project.accent} ${isActive ? "is-active" : ""}`}
+              className={`project-node accent-${project.accent} ${isActive ? "is-active" : ""} ${z < -0.25 ? "is-distant" : ""}`}
               style={
                 {
                   "--node-x": `${x}vw`,
@@ -162,6 +224,18 @@ export function UniverseExperience() {
         <button onClick={() => rotate(-1)} aria-label="Next project">→</button>
       </div>
 
+      <button
+        className="directory-shortcut"
+        onClick={() => {
+          setSelected(null);
+          setView("directory");
+        }}
+      >
+        <span>CAN&apos;T MISS A THING</span>
+        <b>OPEN COMPLETE DIRECTORY</b>
+        <i>{projects.length}</i>
+      </button>
+
       <div className="input-hint">
         <span>MOUSE / TOUCH</span>
         <b>DRAG TO ORBIT</b>
@@ -174,32 +248,79 @@ export function UniverseExperience() {
         <ProjectSignal project={selected} onClose={() => setSelected(null)} />
       )}
 
-      <section className={`system-panel resume-panel ${view === "resume" ? "is-open" : ""}`}>
-        <button className="panel-close" onClick={() => setView("work")} aria-label="Close resume">
+      <section
+        className={`directory-panel ${view === "directory" ? "is-open" : ""}`}
+        aria-label="Complete project directory"
+      >
+        <button
+          className="panel-close"
+          onClick={() => setView("work")}
+          aria-label="Close project directory"
+        >
           ×
         </button>
-        <div className="panel-kicker">CAREER TELEMETRY / 24+ YEARS</div>
-        <h2>LONG RANGE<br />THINKING.</h2>
-        <p className="panel-lead">
-          Two decades across shifting stacks, changing platforms, and one
-          constant: make the complicated feel natural.
-        </p>
-        <div className="timeline">
-          {timeline.map((item, index) => (
-            <article key={item.year}>
-              <span>0{index + 1}</span>
-              <time>{item.year}</time>
-              <div>
-                <h3>{item.title}</h3>
-                <p>{item.copy}</p>
-              </div>
-            </article>
-          ))}
+        <header className="directory-heading">
+          <div>
+            <span className="panel-kicker">
+              COMPLETE ARCHIVE / {projects.length} OBJECTS
+            </span>
+            <h2>PROJECT<br />DIRECTORY.</h2>
+          </div>
+          <p>
+            The universe is for wandering. This is the map. Every known
+            production project is indexed here—even when screenshots, video, or
+            a live URL haven&apos;t been connected yet.
+          </p>
+        </header>
+
+        <div className="directory-tools">
+          <label>
+            <span>SEARCH ARCHIVE</span>
+            <input
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Try AI, mobile, WebGL, enterprise…"
+            />
+          </label>
+          <div className="directory-filters" aria-label="Project categories">
+            {categories.map((item) => (
+              <button
+                key={item}
+                className={category === item ? "active" : ""}
+                onClick={() => setCategory(item)}
+              >
+                {item}
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="resume-dropzone">
-          <span>FULL RÉSUMÉ MODULE</span>
-          <p>Ready for your PDF and complete work history.</p>
-          <b>DATA PORT AVAILABLE</b>
+
+        <div className="directory-results" aria-live="polite">
+          <div className="directory-count">
+            SHOWING {filteredProjects.length} / {projects.length}
+          </div>
+          {filteredProjects.map((project) => (
+            <button
+              className={`directory-record accent-${project.accent}`}
+              key={project.id}
+              onClick={() => openProject(project)}
+            >
+              <span className="directory-index">{project.index}</span>
+              <span className="directory-title">
+                <b>{project.title}</b>
+                <small>{project.eyebrow}</small>
+              </span>
+              <span className="directory-category">{project.category}</span>
+              <span className="directory-status">{project.status}</span>
+              <span className="directory-open">OPEN OBJECT ↗</span>
+            </button>
+          ))}
+          {filteredProjects.length === 0 && (
+            <div className="directory-empty">
+              NO SIGNALS MATCH THAT SEARCH.
+            </div>
+          )}
         </div>
       </section>
 
@@ -214,9 +335,9 @@ export function UniverseExperience() {
           doesn&apos;t have a category yet.
         </p>
         <div className="signal-actions">
-          <button type="button" disabled>
-            EMAIL CHANNEL / ADD ADDRESS <span>○</span>
-          </button>
+          <a href="mailto:jakeleeclark@gmail.com">
+            SEND AN EMAIL <span>↗</span>
+          </a>
           <a href="https://discord.com/" target="_blank" rel="noreferrer">
             JOIN DISCORD <span>↗</span>
           </a>
@@ -264,16 +385,21 @@ function ProjectSignal({
           <span>ROLE</span>
           <b>{project.role}</b>
         </div>
-        <div className="signal-stack">
+      <div className="signal-stack">
           {project.stack.map((item) => <span key={item}>{item}</span>)}
         </div>
       </div>
+      <ul className="signal-highlights">
+        {project.highlights.map((highlight) => (
+          <li key={highlight}>{highlight}</li>
+        ))}
+      </ul>
       <div className="case-file">
-        <span>CASE FILE STATUS</span>
-        <b>READY FOR PROJECT DETAILS</b>
+        <span>OBJECT STATUS</span>
+        <b>{project.status.toUpperCase()}</b>
         <p>
-          Drop the real screenshots, metrics, story, and links into this modular
-          record when the archive is connected.
+          Narrative loaded. Screenshots, video, metrics, and live links can be
+          connected to this record when available.
         </p>
       </div>
     </aside>
