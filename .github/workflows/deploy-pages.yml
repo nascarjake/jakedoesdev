@@ -35,6 +35,8 @@ jobs:
 
       - name: Build static site
         run: npm run build:pages
+        env:
+          PAGES_BASE_PATH: /jakedoesdev
 
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v4
