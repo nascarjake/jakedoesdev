@@ -115,6 +115,10 @@ export function LandingExperience() {
             <div className="orbit orbit-a"><i /><i /><i /></div>
             <div className="orbit orbit-b"><i /><i /></div>
             <div className="orbit orbit-c"><i /></div>
+            <div className="era-marker era-web"><b>02</b><span>WEB</span></div>
+            <div className="era-marker era-mobile"><b>11</b><span>MOBILE</span></div>
+            <div className="era-marker era-engine"><b>15</b><span>3D + TOOLS</span></div>
+            <div className="era-marker era-ai"><b>26</b><span>AI SYSTEMS</span></div>
             <div className="core-sphere">
               <div className="sphere-grid" />
               <div className="sphere-glow" />

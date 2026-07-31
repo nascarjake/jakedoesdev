@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { experiences, skillGroups } from "../data/portfolio";
+import { experiences, skillGroups, timeline } from "../data/portfolio";
 import { AmbientField } from "./AmbientField";
+import { ExperienceScene, MocapLab } from "./VisualStory";
 
 const sourceResume =
   "https://docs.google.com/document/d/1kvA9sHy8pTBD7Y3VXrZazCPcAgISGe47uS0tOqPPiBc/edit?usp=sharing";
@@ -75,6 +76,33 @@ export function ResumeExperience() {
         </article>
       </section>
 
+      <section className="career-map" aria-labelledby="career-map-title">
+        <header>
+          <span className="resume-section-label">CAREER TRAJECTORY / LIVE MAP</span>
+          <h2 id="career-map-title">THE STACK CHANGED.<br />THE INSTINCT DIDN&apos;T.</h2>
+          <p>
+            Find the problem nobody has made approachable yet. Build the missing
+            tool. Follow it all the way into production.
+          </p>
+        </header>
+        <div className="career-map-track">
+          <div className="career-map-line" aria-hidden="true">
+            <i />
+          </div>
+          {timeline.map((milestone, index) => (
+            <article key={milestone.year}>
+              <div className="career-map-node" aria-hidden="true">
+                <i />
+                <span>{String(index + 1).padStart(2, "0")}</span>
+              </div>
+              <time>{milestone.year}</time>
+              <h3>{milestone.title}</h3>
+              <p>{milestone.copy}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
       <div className="resume-layout">
         <aside className="resume-sidebar">
           <div>
@@ -126,6 +154,7 @@ export function ResumeExperience() {
                 </ul>
                 {experience.stack && <div>{experience.stack}</div>}
               </div>
+              <ExperienceScene company={experience.company} />
             </article>
           ))}
         </section>
@@ -147,6 +176,7 @@ export function ResumeExperience() {
             custom motion-capture system built from six PlayStation Eye cameras.
           </p>
         </div>
+        <MocapLab />
       </section>
 
       <footer className="resume-footer">

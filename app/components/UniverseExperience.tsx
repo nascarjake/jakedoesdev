@@ -8,6 +8,7 @@ import {
   type ProjectCategory,
 } from "../data/portfolio";
 import { AmbientField } from "./AmbientField";
+import { ProjectScene } from "./VisualStory";
 
 type View = "work" | "directory" | "signal";
 
@@ -377,6 +378,7 @@ function ProjectSignal({
         <span>{project.year}</span>
       </div>
       <div className="signal-number">{project.index}</div>
+      <ProjectScene project={project} />
       <div className="signal-body">
         <span className="signal-eyebrow">{project.eyebrow}</span>
         <h2>{project.title}</h2>
