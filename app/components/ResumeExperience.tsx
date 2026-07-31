@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { experiences, skillGroups, timeline } from "../data/portfolio";
 import { AmbientField } from "./AmbientField";
-import { ExperienceScene, MocapLab } from "./VisualStory";
+import { CareerAtlas, MocapLab } from "./VisualStory";
 
 const sourceResume =
   "https://docs.google.com/document/d/1kvA9sHy8pTBD7Y3VXrZazCPcAgISGe47uS0tOqPPiBc/edit?usp=sharing";
@@ -101,6 +101,7 @@ export function ResumeExperience() {
             </article>
           ))}
         </div>
+        <CareerAtlas />
       </section>
 
       <div className="resume-layout">
@@ -154,7 +155,6 @@ export function ResumeExperience() {
                 </ul>
                 {experience.stack && <div>{experience.stack}</div>}
               </div>
-              <ExperienceScene company={experience.company} />
             </article>
           ))}
         </section>

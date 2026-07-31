@@ -1,328 +1,203 @@
 "use client";
 
 import type { Project } from "../data/portfolio";
-
-type SceneKind =
-  | "decision"
-  | "ai"
-  | "market"
-  | "broadcast"
-  | "documents"
-  | "engine"
-  | "biopsy"
-  | "imaging"
-  | "travel"
-  | "field-sales"
-  | "service"
-  | "restaurant"
-  | "voxel"
-  | "puzzle"
-  | "handoff"
-  | "streaming"
-  | "leasing";
+import { WebGLStage, type WebGLMode } from "./WebGLStage";
 
 type SceneSpec = {
-  kind: SceneKind;
+  kind: WebGLMode;
   kicker: string;
   caption: string;
-  labels: [string, string, string];
+  readouts: [string, string, string];
 };
 
 const projectScenes: Record<string, SceneSpec> = {
   "ignite-dialogue": {
     kind: "decision",
-    kicker: "LIVE DECISION TOPOLOGY",
-    caption: "One answer opens the next useful path.",
-    labels: ["CUSTOMER", "DECISION TREE", "RIGHT PRODUCT"],
+    kicker: "DECISION GRAPH / LIVE",
+    caption: "A branching product conversation rendered as a traversable system.",
+    readouts: ["VARIABLE DEPTH", "SELF-DEFINING MODEL", "ENTERPRISE SCALE"],
   },
   "ignite-ai": {
     kind: "ai",
-    kicker: "HUMAN-IN-THE-MIDDLE",
-    caption: "Machines accelerate the work. People keep control.",
-    labels: ["MESSY INPUT", "AI + HUMAN", "READY TO SHIP"],
+    kicker: "HUMAN CONTROL PLANE",
+    caption: "Machine intelligence orbiting a deliberate human checkpoint.",
+    readouts: ["OCR INGEST", "AGENT WORKFLOW", "HUMAN APPROVAL"],
   },
   tradelab: {
     kind: "market",
-    kicker: "STRATEGY EXECUTION LOOP",
-    caption: "Signals become rules. Rules become timed action.",
-    labels: ["MARKET DATA", "NO-CODE RULES", "AUTOMATION"],
+    kicker: "MARKET EXECUTION SURFACE",
+    caption: "Live data, composable rules, and automation on one timing loop.",
+    readouts: ["STREAMING DATA", "RULE GRAPH", "SYNC WORKERS"],
   },
   "stream-elixir": {
     kind: "broadcast",
-    kicker: "CREATOR GROWTH ORCHESTRATOR",
-    caption: "One desktop app coordinated a scattered audience.",
-    labels: ["CREATOR", "AUTOMATION", "4 CHANNELS"],
+    kicker: "MULTI-CHANNEL ORCHESTRATOR",
+    caption: "A creator at the center of a synchronized platform network.",
+    readouts: ["TWITCH", "YOUTUBE", "SOCIAL APIS"],
   },
   ezforms: {
     kind: "documents",
-    kicker: "DOCUMENT LIFECYCLE",
-    caption: "Build once, execute anywhere, learn from the result.",
-    labels: ["DRAG + DROP", "FIELD APP", "REPORTING"],
+    kicker: "DOCUMENTS AS SOFTWARE",
+    caption: "Structured pages spiral from authoring into mobile execution.",
+    readouts: ["VISUAL BUILDER", "FIELD CAPTURE", "REPORTING"],
   },
   "eternus-tools": {
     kind: "engine",
     kicker: "LIVE ENGINE BRIDGE",
-    caption: "Web tools edited a running C++ world in real time.",
-    labels: ["8 EDITORS", "WEBGL BRIDGE", "C++ ENGINE"],
+    caption: "Eight browser-based editors surrounding a running C++ world.",
+    readouts: ["8 EDITORS", "WEBGL VIEWPORT", "C++ RUNTIME"],
   },
   "tumor-identifier": {
     kind: "biopsy",
-    kicker: "SCAN-TO-VOLUME RECONSTRUCTION",
-    caption: "Two-dimensional detections rebuilt as a 3D tumor map.",
-    labels: ["BIOPSY SLICES", "DETECTION", "3D MODEL"],
+    kicker: "VOLUMETRIC RECONSTRUCTION",
+    caption: "Scan slices assemble around a detected three-dimensional mass.",
+    readouts: ["18 SLICES", "TENSOR DETECTION", "3D VOLUME"],
   },
   ziprad: {
     kind: "imaging",
-    kicker: "EHR-TO-IMAGING PIPELINE",
-    caption: "Old systems, paper-shaped data, one automated order.",
-    labels: ["EHR RECORD", "OCR + PDF", "IMAGING ORDER"],
+    kicker: "EHR → IMAGING",
+    caption: "Legacy patient data passes through a normalized imaging tunnel.",
+    readouts: ["EHR INPUT", "OCR / PDF", "RADIOLOGY ORDER"],
   },
   traxo: {
     kind: "travel",
-    kicker: "ITINERARY CONSTELLATION",
-    caption: "Every leg, reward, and reminder followed the traveler.",
-    labels: ["TRIP DATA", "PHONE", "WRIST"],
+    kicker: "TRAVEL DATA ORBIT",
+    caption: "A trip model shared across globe, phone, and wrist.",
+    readouts: ["ITINERARY", "REWARDS", "ANDROID WEAR"],
   },
   "trails-end": {
     kind: "field-sales",
-    kicker: "FIELD SALE NETWORK",
-    caption: "Schedule, locate, sell, and pay from anywhere.",
-    labels: ["EVENT MAP", "MOBILE SALE", "PAYMENT"],
+    kicker: "FIELD COMMERCE MAP",
+    caption: "Distributed sales events converging on a secure payment surface.",
+    readouts: ["EVENT LOCATION", "NATIVE PAYMENT", "MILLIONS OF USERS"],
   },
   callsmart: {
     kind: "service",
-    kicker: "SERVICE CALL FLOW",
-    caption: "The whole job traveled with the technician.",
-    labels: ["CUSTOMER", "WORK ORDER", "PAID"],
+    kicker: "SERVICE CALL / END TO END",
+    caption: "Customer, work order, and payment resolved in one mobile flow.",
+    readouts: ["CUSTOMER", "EQUIPMENT", "PAYMENT"],
   },
   "foodtronix-mobile-pos": {
     kind: "restaurant",
-    kicker: "TABLE-TO-KITCHEN LOOP",
-    caption: "The order left the table before the server did.",
-    labels: ["TABLET", "POS LOGIC", "KITCHEN"],
+    kicker: "TABLE → KITCHEN",
+    caption: "A live restaurant network routing tableside orders into production.",
+    readouts: ["TABLET ORDER", "POS ENGINE", "KITCHEN PRINT"],
   },
   tug: {
     kind: "voxel",
-    kicker: "WORLD-BUILDING TOOLCHAIN",
-    caption: "A smooth voxel world surrounded by tools built for makers.",
-    labels: ["SCRIPT", "EDITOR SUITE", "LIVING WORLD"],
+    kicker: "SMOOTH VOXEL TOOLCHAIN",
+    caption: "A procedural world wrapped in the tools required to build it.",
+    readouts: ["TYPESCRIPT", "8 TOOL SURFACES", "C++ WORLD"],
   },
   daho: {
     kind: "puzzle",
-    kicker: "HUMAN VS. CUSTOM AI",
-    caption: "A compact number game with a thinking opponent.",
-    labels: ["BOARD", "SEARCH", "COUNTERMOVE"],
+    kicker: "CUSTOM SEARCH OPPONENT",
+    caption: "A number field evaluating moves and counter-moves in depth.",
+    readouts: ["BOARD STATE", "SEARCH TREE", "AI RESPONSE"],
   },
   jumpstart: {
     kind: "handoff",
-    kicker: "DESIGN-TO-CODE COMPILER",
-    caption: "Photoshop layers transformed into an iPhone foundation.",
-    labels: ["PSD LAYERS", "JAVASCRIPT", "NATIVE UI"],
+    kicker: "PSD → NATIVE UI",
+    caption: "Design layers travel through a compiler-like handoff into a phone.",
+    readouts: ["LAYER PARSE", "ASSET SLICE", "IOS FOUNDATION"],
   },
   hubster: {
     kind: "streaming",
-    kicker: "AVAILABILITY RESOLVER",
-    caption: "One title searched across a fragmented streaming world.",
-    labels: ["WHAT TO WATCH", "INDEX", "WHERE TO WATCH"],
+    kicker: "STREAMING RESOLVER",
+    caption: "One query interrogating a fragmented field of media providers.",
+    readouts: ["TITLE QUERY", "SERVICE INDEX", "AVAILABILITY"],
   },
   "dm-auto-leasing": {
     kind: "leasing",
-    kicker: "MOBILE LEASING JOURNEY",
-    caption: "Inventory, terms, and intent compressed into a native app.",
-    labels: ["VEHICLE", "TERMS", "DRIVE"],
+    kicker: "NATIVE LEASING JOURNEY",
+    caption: "Vehicle, terms, and intent assembled into an app-store experience.",
+    readouts: ["INVENTORY", "LEASE TERMS", "NATIVE ANDROID"],
   },
 };
-
-const experienceScenes: Record<
-  string,
-  { kind: SceneKind; label: string; metric: string }
-> = {
-  "Ignite Sales": {
-    kind: "decision",
-    label: "ENTERPRISE DECISIONS AT SCALE",
-    metric: "AWS / MULTI-CLUSTER",
-  },
-  "Alchemist Technologies": {
-    kind: "market",
-    label: "IDEAS TURNED INTO PRODUCTS",
-    metric: "2 FOUNDER PRODUCTS",
-  },
-  EZFORMS: {
-    kind: "documents",
-    label: "DOCUMENTS BECAME SOFTWARE",
-    metric: "WEB / IOS / ANDROID",
-  },
-  "Nerd Kingdom": {
-    kind: "engine",
-    label: "TOOLS AROUND A LIVING ENGINE",
-    metric: "8 CONNECTED EDITORS",
-  },
-  "Lucent Mobile": {
-    kind: "travel",
-    label: "MANY PRODUCTS, MANY SURFACES",
-    metric: "WEEKLY DELIVERY",
-  },
-  FoodTronix: {
-    kind: "restaurant",
-    label: "SUPPORT PAIN BECAME A PRODUCT",
-    metric: "+45% PRODUCTIVITY",
-  },
-  "Real World Web Design": {
-    kind: "streaming",
-    label: "THE WEB BEFORE THE PLAYBOOK",
-    metric: "HTML / PHP / MYSQL",
-  },
-};
-
-function SceneMachine({
-  kind,
-  labels,
-}: {
-  kind: SceneKind;
-  labels: [string, string, string];
-}) {
-  return (
-    <div className={`scene-machine scene-${kind}`} aria-hidden="true">
-      <div className="scene-grid" />
-      <div className="scene-route route-a" />
-      <div className="scene-route route-b" />
-      <div className="scene-route route-c" />
-
-      <div className="scene-terminal terminal-a">
-        <i />
-        <span>{labels[0]}</span>
-      </div>
-      <div className="scene-terminal terminal-b">
-        <i />
-        <span>{labels[1]}</span>
-      </div>
-      <div className="scene-terminal terminal-c">
-        <i />
-        <span>{labels[2]}</span>
-      </div>
-
-      <div className="scene-object">
-        <div className="object-core" />
-        <div className="object-ring ring-a" />
-        <div className="object-ring ring-b" />
-        <div className="object-layer layer-a" />
-        <div className="object-layer layer-b" />
-        <div className="object-layer layer-c" />
-        {Array.from({ length: 12 }, (_, index) => (
-          <i
-            className="object-particle"
-            key={index}
-            style={{ "--particle": index } as React.CSSProperties}
-          />
-        ))}
-      </div>
-
-      <div className="scene-pulse pulse-a" />
-      <div className="scene-pulse pulse-b" />
-      <span className="scene-coordinate coordinate-a">X.042</span>
-      <span className="scene-coordinate coordinate-b">LIVE / 60FPS</span>
-    </div>
-  );
-}
 
 export function ProjectScene({ project }: { project: Project }) {
   const scene = projectScenes[project.id];
   if (!scene) return null;
 
   return (
-    <figure className={`project-story accent-${project.accent}`}>
+    <figure className={`project-story webgl-story accent-${project.accent}`}>
       <figcaption>
         <span>{scene.kicker}</span>
         <p>{scene.caption}</p>
       </figcaption>
-      <SceneMachine kind={scene.kind} labels={scene.labels} />
+      <WebGLStage
+        mode={scene.kind}
+        label={`${project.title}: ${scene.caption}`}
+      />
+      <div className="webgl-readouts" aria-hidden="true">
+        {scene.readouts.map((readout, index) => (
+          <span key={readout}>
+            <i>0{index + 1}</i>
+            {readout}
+          </span>
+        ))}
+      </div>
+      <div className="webgl-interaction-hint">MOVE POINTER / INSPECT SYSTEM</div>
     </figure>
   );
 }
 
-export function ExperienceScene({ company }: { company: string }) {
-  const scene = experienceScenes[company];
-  if (!scene) return null;
-
+export function CareerAtlas() {
   return (
-    <div className={`experience-scene scene-${scene.kind}`}>
-      <div className="experience-scene-copy">
-        <span>{scene.label}</span>
-        <b>{scene.metric}</b>
-      </div>
-      <SceneMachine
-        kind={scene.kind}
-        labels={["INPUT", "SYSTEM", "OUTCOME"]}
+    <div className="career-atlas">
+      <header>
+        <span>24-YEAR SIGNAL PATH / 2002—NOW</span>
+        <b>THE MEDIUM CHANGED. THE BUILDER KEPT MOVING.</b>
+      </header>
+      <WebGLStage
+        mode="career"
+        label="Interactive three-dimensional career path from early web development through mobile, creative tooling, cloud systems, and AI"
       />
+      <div className="career-atlas-labels" aria-hidden="true">
+        <span>WEB / 02</span>
+        <span>PRODUCT / 11</span>
+        <span>TOOLS / 15</span>
+        <span>FOUNDER / 18</span>
+        <span>AI / NOW</span>
+      </div>
     </div>
   );
 }
 
 export function MocapLab() {
   return (
-    <figure className="mocap-lab">
+    <figure className="mocap-lab webgl-mocap">
       <figcaption>
         <span>2009—2013 / HOMEMADE OPTICAL STAGE</span>
-        <b>SIX CAMERAS. ONE MOVING HUMAN. ZERO OFF-THE-SHELF PIPELINE.</b>
+        <b>
+          SIX CONSUMER CAMERAS. SYNCHRONIZED VIEWS. A HOME-BUILT 3D
+          RECONSTRUCTION PIPELINE.
+        </b>
       </figcaption>
-      <div
-        className="mocap-stage"
-        role="img"
-        aria-label="Animated diagram of six PlayStation Eye cameras recording a performer for a custom three-dimensional motion capture system"
-      >
-        <div className="mocap-floor">
-          {Array.from({ length: 8 }, (_, index) => (
-            <i key={index} />
-          ))}
-        </div>
-        <div className="capture-volume">
-          <div className="capture-ring ring-a" />
-          <div className="capture-ring ring-b" />
-        </div>
-
-        {Array.from({ length: 6 }, (_, index) => (
-          <div
-            className="eye-camera"
-            key={index}
-            style={{ "--camera": index } as React.CSSProperties}
-          >
-            <div className="camera-body">
-              <i />
-              <span>EYE {String(index + 1).padStart(2, "0")}</span>
-            </div>
-            <div className="camera-beam" />
-          </div>
-        ))}
-
-        <div className="mocap-human">
-          <i className="joint joint-head" />
-          <i className="bone bone-spine" />
-          <i className="joint joint-chest" />
-          <i className="bone bone-arm-l" />
-          <i className="bone bone-arm-r" />
-          <i className="joint joint-hand-l" />
-          <i className="joint joint-hand-r" />
-          <i className="bone bone-leg-l" />
-          <i className="bone bone-leg-r" />
-          <i className="joint joint-foot-l" />
-          <i className="joint joint-foot-r" />
-          {Array.from({ length: 18 }, (_, index) => (
-            <b
-              className="capture-point"
-              key={index}
-              style={{ "--point": index } as React.CSSProperties}
-            />
-          ))}
-        </div>
-
-        <div className="mocap-readout readout-left">
-          <span>CAMERAS</span>
-          <b>06 / SYNCED</b>
-        </div>
-        <div className="mocap-readout readout-right">
-          <span>SOLVE</span>
-          <b>3D SKELETON / LIVE</b>
-        </div>
+      <WebGLStage
+        mode="mocap"
+        label="Interactive WebGL reconstruction of six PlayStation Eye cameras capturing a moving performer as a volumetric point cloud"
+      />
+      <div className="mocap-hud hud-top">
+        <span>CAPTURE VOLUME</span>
+        <b>4.2M × 4.2M × 3.1M</b>
+      </div>
+      <div className="mocap-hud hud-left">
+        <span>OPTICAL INPUT</span>
+        <b>06 PS EYE / SYNCED</b>
+      </div>
+      <div className="mocap-hud hud-right">
+        <span>RECONSTRUCTION</span>
+        <b>2,846 VERTICES / LIVE</b>
+      </div>
+      <div className="mocap-timeline" aria-hidden="true">
+        <span>RAW VIEWS</span>
+        <i />
+        <span>SILHOUETTE</span>
+        <i />
+        <span>TRIANGULATE</span>
+        <i />
+        <span>ANIMATE</span>
       </div>
     </figure>
   );
