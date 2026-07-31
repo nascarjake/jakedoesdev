@@ -8,8 +8,8 @@
   --ice: #a9e8ff;
   --muted: #858b7b;
   --line: rgba(240, 238, 230, 0.14);
-  --mono: var(--font-geist-mono), "SFMono-Regular", Consolas, monospace;
-  --sans: var(--font-geist-sans), Arial, sans-serif;
+  --mono: "SFMono-Regular", "Cascadia Code", Consolas, monospace;
+  --sans: "Arial Narrow", "Helvetica Neue", Arial, sans-serif;
 }
 
 * {
