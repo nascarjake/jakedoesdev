@@ -29,6 +29,217 @@ body {
   overflow-x: hidden;
 }
 
+.journal-shell {
+  min-height: 100svh;
+  padding: 0 5vw 8rem;
+  background:
+    linear-gradient(rgba(216, 255, 62, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(216, 255, 62, 0.045) 1px, transparent 1px),
+    var(--ink);
+  background-size: 3rem 3rem;
+}
+
+.journal-header {
+  min-height: 5.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--mono);
+}
+
+.journal-mark {
+  display: grid;
+  place-items: center;
+  width: 2.3rem;
+  height: 2.3rem;
+  background: var(--acid);
+  color: var(--ink);
+  font-size: 0.77rem;
+  font-weight: 900;
+  letter-spacing: -0.08em;
+  text-decoration: none;
+}
+
+.journal-nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 1.2rem;
+  color: var(--muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.journal-nav a,
+.journal-card,
+.arcade-card a {
+  text-decoration: none;
+}
+
+.journal-nav a:hover,
+.arcade-card a:hover {
+  color: var(--acid);
+}
+
+.journal-heading {
+  max-width: 64rem;
+  padding: clamp(5rem, 12vw, 10rem) 0 clamp(3.5rem, 8vw, 6rem);
+}
+
+.journal-heading p,
+.arcade-card > p,
+.journal-card > span {
+  margin: 0 0 1rem;
+  color: var(--acid);
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.journal-heading h1 {
+  max-width: 12ch;
+  margin: 0;
+  font-size: clamp(3.5rem, 9vw, 8.5rem);
+  font-weight: 800;
+  letter-spacing: -0.075em;
+  line-height: 0.83;
+  text-transform: uppercase;
+}
+
+.journal-list,
+.arcade-grid,
+.markdown-article {
+  max-width: 64rem;
+}
+
+.journal-card,
+.arcade-card,
+.journal-empty {
+  display: block;
+  border-top: 1px solid var(--line);
+  padding: 2rem 0;
+}
+
+.journal-card {
+  transition: padding-left 160ms ease, background-color 160ms ease;
+}
+
+.journal-card:hover {
+  padding-left: 1rem;
+  background: rgba(216, 255, 62, 0.04);
+}
+
+.journal-card h2,
+.arcade-card h2 {
+  margin: 0;
+  font-size: clamp(1.8rem, 4vw, 3.1rem);
+  letter-spacing: -0.045em;
+}
+
+.journal-card p,
+.arcade-card > span,
+.markdown-article p,
+.markdown-article li {
+  color: color-mix(in srgb, var(--paper) 78%, var(--muted));
+  font-size: 1.1rem;
+  line-height: 1.65;
+}
+
+.journal-card p {
+  max-width: 46rem;
+  margin: 0.75rem 0 1.15rem;
+}
+
+.journal-card b,
+.arcade-card a {
+  color: var(--acid);
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.journal-empty p {
+  margin: 0 0 0.5rem;
+  color: var(--acid);
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.journal-empty span {
+  color: var(--muted);
+}
+
+.arcade-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0 3rem;
+}
+
+.arcade-card > span {
+  display: block;
+  margin: 1rem 0 1.5rem;
+}
+
+.arcade-card > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.2rem;
+}
+
+.markdown-article {
+  padding-top: 1rem;
+}
+
+.markdown-article h2,
+.markdown-article h3 {
+  margin: 3.5rem 0 1rem;
+  letter-spacing: -0.04em;
+}
+
+.markdown-article h2 {
+  font-size: clamp(2rem, 4vw, 3.4rem);
+}
+
+.markdown-article h3 {
+  font-size: 1.5rem;
+}
+
+.markdown-article p,
+.markdown-article ul {
+  max-width: 46rem;
+  margin: 0 0 1.35rem;
+}
+
+.markdown-article ul {
+  padding-left: 1.3rem;
+}
+
+@media (max-width: 640px) {
+  .journal-shell {
+    padding: 0 1.5rem 5rem;
+  }
+
+  .journal-header {
+    align-items: flex-start;
+    padding: 1.25rem 0;
+  }
+
+  .journal-nav {
+    gap: 0.7rem 1rem;
+  }
+
+  .arcade-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 button,
 a {
   color: inherit;

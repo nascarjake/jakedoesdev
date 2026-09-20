@@ -40,3 +40,7 @@ next-env.d.ts
 /.wrangler/
 /outputs/
 /work/
+
+# Personal weekly worklogs stay on this machine. They are source material for
+# public posts, never public-site content.
+/.worklog/
