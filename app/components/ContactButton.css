@@ -1,0 +1,164 @@
+.contact-dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  padding: 0;
+  width: min(540px, calc(100vw - 32px));
+  max-height: calc(100dvh - 32px);
+  border: 1px solid #b8aa95;
+  border-radius: 12px;
+  color: var(--ink);
+  background: var(--paper);
+  box-shadow: 0 30px 100px #0c1b3a60;
+  overflow: auto;
+}
+.contact-dialog::backdrop {
+  background: #15253e75;
+  backdrop-filter: blur(5px);
+}
+.contact-dialog-inner {
+  position: relative;
+  padding: 39px;
+  background: radial-gradient(ellipse at top right, #eed9bb88, transparent 60%);
+}
+.contact-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  background: #f9f5e9;
+}
+.contact-close:hover {
+  background: #ecddcb;
+}
+.contact-dialog-mark {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  margin-bottom: 25px;
+  border: 1px solid #ccab8b;
+  background: #edd3ba;
+  border-radius: 9px;
+  color: #8f4d33;
+  transform: rotate(-6deg);
+}
+.contact-dialog .eyebrow {
+  font-size: 8px;
+  letter-spacing: 0.9px;
+  color: #89674c;
+}
+.contact-dialog h2 {
+  font-size: 34px;
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -1.2px;
+  margin: 13px 0 18px;
+}
+.contact-dialog h2 em {
+  color: #b2533e;
+  font-family: Georgia, serif;
+  font-weight: 400;
+}
+.contact-dialog h2 + p {
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--muted);
+  margin-bottom: 28px;
+}
+.contact-address-label {
+  display: block;
+  font: 9px var(--mono);
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+  color: #655c4f;
+}
+.contact-address {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid #beb6a8;
+  border-radius: 5px;
+  overflow: hidden;
+  background: #fffaf0;
+}
+.contact-address input {
+  width: 100%;
+  min-width: 0;
+  padding: 14px 12px;
+  font-size: 13px;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+}
+.contact-address button {
+  flex-shrink: 0;
+  padding: 10px 12px;
+  background: #e9dfcf;
+  border-left: 1px solid #beb6a8;
+  font-size: 11px;
+  font-weight: 650;
+}
+.contact-address button:hover {
+  background: #ddc9af;
+}
+.contact-copy-status {
+  min-height: 38px;
+  padding-top: 10px;
+  font-size: 11px;
+  line-height: 1.7;
+  color: #6c665b;
+}
+.contact-options {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+.contact-options .button {
+  flex: 1;
+  font-size: 11px;
+  gap: 10px;
+  white-space: nowrap;
+}
+.contact-discord {
+  border-color: #c6bcd6;
+  background: #e7e0f1;
+  color: #51405c;
+}
+@media (max-width: 620px) {
+  .contact-dialog-inner {
+    padding: 30px 23px;
+  }
+  .contact-dialog h2 {
+    font-size: 30px;
+  }
+  .contact-dialog .eyebrow {
+    font-size: 7px;
+  }
+  .contact-address {
+    flex-direction: column;
+  }
+  .contact-address input {
+    font-size: 15px;
+    padding: 14px;
+  }
+  .contact-address button {
+    border-left: 0;
+    border-top: 1px solid #beb6a8;
+    min-height: 42px;
+    font-size: 12px;
+  }
+  .contact-options {
+    flex-direction: column;
+  }
+}
+@media print {
+  .contact-dialog {
+    display: none !important;
+  }
+}

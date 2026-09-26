@@ -129,7 +129,7 @@ export const projects: Project[] = [
     highlights: [
       "Designed and iterated on the core drag-and-drop document builder.",
       "Delivered native and hybrid iOS and Android form applications.",
-      "Built for enterprise users including major hospitality and civic organizations.",
+      "Used by FedEx, Taco Bueno, Dave & Buster’s, Yellow Tail Wines, Boy Scouts of America, and city municipalities, as listed in my résumé.",
     ],
   },
   {
@@ -215,7 +215,7 @@ export const projects: Project[] = [
     title: "Trails End: Show N’ Sell",
     eyebrow: "Field sales at enormous scale",
     summary:
-      "A mobile experience for scouts and leaders to schedule sale events and take payments in the field.",
+      "A popcorn fundraising app for Boy Scouts of America scouts and leaders to schedule sales events and take payments in the field.",
     role: "Mobile Product Engineer",
     year: "Mobile archive",
     stack: ["Ionic", "Kotlin", "Stripe", "Google Maps"],
@@ -233,7 +233,7 @@ export const projects: Project[] = [
     id: "callsmart",
     index: "11",
     title: "CallSmart",
-    eyebrow: "Mobile field-service POS",
+    eyebrow: "Callahan Roach · later became ProfitRhino",
     summary:
       "A cross-platform tool for repair professionals to manage customers and equipment, create orders, and accept payment on site.",
     role: "Mobile Engineer",

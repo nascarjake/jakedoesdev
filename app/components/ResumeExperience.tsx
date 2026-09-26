@@ -1,191 +1,188 @@
 "use client";
 
 import Link from "next/link";
-import { experiences, skillGroups, timeline } from "../data/portfolio";
-import { AmbientField } from "./AmbientField";
-import { CareerAtlas, MocapLab } from "./VisualStory";
+import {
+  experiences,
+  projects,
+  skillGroups,
+  timeline,
+} from "../data/portfolio";
+import { Icon } from "./WorkbenchIcons";
+import { ContactButton } from "./ContactButton";
+import { WorkbenchShell, WorkspaceToolbar } from "./WorkbenchShell";
 
 const sourceResume =
   "https://docs.google.com/document/d/1kvA9sHy8pTBD7Y3VXrZazCPcAgISGe47uS0tOqPPiBc/edit?usp=sharing";
 
 export function ResumeExperience() {
   return (
-    <main className="resume-page">
-      <AmbientField intensity={0.45} />
-      <div className="noise" aria-hidden="true" />
-
-      <header className="resume-header">
-        <Link href="/" className="resume-wordmark">
-          <span>JC</span>
-          <b>JACOB CLARK</b>
-        </Link>
-        <nav aria-label="Résumé actions">
-          <Link href="/universe">EXPLORE PROJECTS ↗</Link>
-          <a href={sourceResume} target="_blank" rel="noreferrer">
-            OPEN SOURCE RÉSUMÉ ↗
-          </a>
-          <button onClick={() => window.print()}>PRINT / SAVE PDF</button>
-        </nav>
-      </header>
-
-      <section className="resume-hero">
-        <div className="resume-hero-kicker">
-          <span>CAREER SIGNAL / 24+ YEARS</span>
-          <span>UPDATED FROM SOURCE RÉSUMÉ</span>
-        </div>
-        <h1>
-          BUILDER.
-          <br />
-          LEADER.
-          <br />
-          <span>SYSTEMS THINKER.</span>
-        </h1>
-        <div className="resume-summary">
-          <p>
-            I&apos;m Jacob Clark, a lead backend engineer, product builder, and
-            founder who has spent more than two decades turning complicated
-            ideas into software people can actually use.
-          </p>
+    <WorkbenchShell section="resume">
+      <WorkspaceToolbar label="About the builder">
+        <button className="toolbar-link" onClick={() => window.print()}>
+          <Icon name="file" size={15} /> Print / save PDF
+        </button>
+      </WorkspaceToolbar>
+      <article className="resume-content">
+        <header className="about-hero">
+          <div>
+            <p className="eyebrow">JACOB CLARK / THE 60-SECOND INTRODUCTION</p>
+            <h1>
+              Builder by trade.
+              <br />
+              <em>Curious by default.</em>
+            </h1>
+            <p>
+              I’m a lead backend engineer, product builder, and founder. For
+              more than two decades, I’ve turned complicated ideas into software
+              people can actually use.
+            </p>
+            <div className="about-actions">
+              <ContactButton className="button button-ink">
+                Let’s make something <Icon name="arrow" size={16} />
+              </ContactButton>
+              <a
+                className="text-link"
+                href={sourceResume}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Source résumé <Icon name="external" size={14} />
+              </a>
+            </div>
+          </div>
+          <div className="builder-card">
+            <span>THE PERSON BEHIND THE PIXELS</span>
+            <strong>
+              jc<span>.</span>
+            </strong>
+            <p>
+              Engineer.
+              <br />
+              Systems thinker.
+              <br />
+              Relentless maker.
+            </p>
+            <span>
+              EST. 2002 <Icon name="code" size={22} />
+            </span>
+          </div>
+        </header>
+        <section className="career-stats" aria-label="Career highlights">
+          <div>
+            <strong>
+              24<span>+</span>
+            </strong>
+            <span>YEARS OF BUILDING</span>
+          </div>
+          <div>
+            <strong>{projects.length}</strong>
+            <span>PROJECTS IN THE ARCHIVE</span>
+          </div>
+          <div>
+            <strong>
+              WEB <span>→</span> AI
+            </strong>
+            <span>ALWAYS EXPLORING WHAT’S NEXT</span>
+          </div>
+        </section>
+        <section className="about-practice">
+          <p className="eyebrow">HOW I THINK ABOUT THE WORK</p>
+          <h2>
+            Own the problem.
+            <br />
+            Build the missing piece.
+          </h2>
           <p>
             My range runs from enterprise cloud infrastructure and AI-assisted
-            workflows to game-engine tooling, mobile products, realtime
-            interfaces, and the early web.
+            workflows to game-engine tooling, mobile products, and realtime
+            interfaces. The common thread is staying close to a problem, making
+            it approachable, and following the work all the way into production.
           </p>
-          <a href="mailto:jakeleeclark@gmail.com">
-            jakeleeclark@gmail.com <span>↗</span>
-          </a>
-        </div>
-      </section>
-
-      <section className="resume-fast-facts" aria-label="Career highlights">
-        <article>
-          <b>24+</b>
-          <span>YEARS BUILDING</span>
-        </article>
-        <article>
-          <b>17</b>
-          <span>PRODUCTION PROJECTS IN THIS ARCHIVE</span>
-        </article>
-        <article>
-          <b>45%</b>
-          <span>MEASURED SUPPORT PRODUCTIVITY GAIN</span>
-        </article>
-        <article>
-          <b>WEB → AI</b>
-          <span>A CAREER ACROSS GENERATIONS OF THE STACK</span>
-        </article>
-      </section>
-
-      <section className="career-map" aria-labelledby="career-map-title">
-        <header>
-          <span className="resume-section-label">CAREER TRAJECTORY / LIVE MAP</span>
-          <h2 id="career-map-title">THE STACK CHANGED.<br />THE INSTINCT DIDN&apos;T.</h2>
-          <p>
-            Find the problem nobody has made approachable yet. Build the missing
-            tool. Follow it all the way into production.
-          </p>
-        </header>
-        <div className="career-map-track">
-          <div className="career-map-line" aria-hidden="true">
-            <i />
+        </section>
+        <section className="resume-experience">
+          <div className="section-heading">
+            <p className="eyebrow">THE EXPERIENCE</p>
+            <span>2004 — PRESENT</span>
           </div>
-          {timeline.map((milestone, index) => (
-            <article key={milestone.year}>
-              <div className="career-map-node" aria-hidden="true">
-                <i />
-                <span>{String(index + 1).padStart(2, "0")}</span>
-              </div>
-              <time>{milestone.year}</time>
-              <h3>{milestone.title}</h3>
-              <p>{milestone.copy}</p>
-            </article>
-          ))}
-        </div>
-        <CareerAtlas />
-      </section>
-
-      <div className="resume-layout">
-        <aside className="resume-sidebar">
-          <div>
-            <span className="resume-section-label">CURRENT MODE</span>
-            <h2>Lead Backend Engineer</h2>
-            <p>Enterprise systems · Product architecture · AI automation</p>
-          </div>
-
-          <div className="resume-skills">
-            {skillGroups.map((group) => (
-              <section key={group.title}>
-                <h3>{group.title}</h3>
-                <div>
-                  {group.items.map((item) => (
-                    <span key={item}>{item}</span>
-                  ))}
-                </div>
-              </section>
-            ))}
-          </div>
-        </aside>
-
-        <section className="experience-list">
-          <div className="experience-heading">
-            <span className="resume-section-label">EXPERIENCE / SELECTED</span>
-            <p>
-              The through-line is product ownership: understand the real
-              problem, build the system, ship it, and stay close enough to make
-              it better.
-            </p>
-          </div>
-
           {experiences.map((experience, index) => (
-            <article className="experience-record" key={experience.company}>
-              <div className="experience-index">
-                {String(index + 1).padStart(2, "0")}
-              </div>
-              <div className="experience-company">
+            <article className="experience-entry" key={experience.company}>
+              <span className="experience-number">0{index + 1}</span>
+              <div className="experience-title">
                 <span>{experience.period}</span>
                 <h2>{experience.company}</h2>
                 <h3>{experience.role}</h3>
               </div>
-              <div className="experience-copy">
+              <div className="experience-body">
                 <p>{experience.summary}</p>
                 <ul>
                   {experience.highlights.map((highlight) => (
                     <li key={highlight}>{highlight}</li>
                   ))}
                 </ul>
-                {experience.stack && <div>{experience.stack}</div>}
+                {experience.stack && (
+                  <span className="experience-stack">{experience.stack}</span>
+                )}
               </div>
             </article>
           ))}
         </section>
-      </div>
-
-      <section className="resume-education">
-        <div>
-          <span className="resume-section-label">EDUCATION / ORIGIN STORY</span>
-          <h2>GAME &amp; SIMULATION PROGRAMMING</h2>
-          <p>DeVry University · Irving, Texas · 2009—2013</p>
-        </div>
-        <div className="education-copy">
-          <p>
-            Built a DirectX rendering pipeline, a 3D drag-and-drop level editor,
-            and a custom DX3D interface framework.
-          </p>
-          <p>
-            The senior project team created animated organic models with a
-            custom motion-capture system built from six PlayStation Eye cameras.
-          </p>
-        </div>
-        <MocapLab />
-      </section>
-
-      <footer className="resume-footer">
-        <div>
-          <span>THE SHORT VERSION</span>
-          <h2>I MAKE HARD THINGS FEEL POSSIBLE.</h2>
-        </div>
-        <Link href="/universe">ENTER THE PROJECT UNIVERSE ↗</Link>
-      </footer>
-    </main>
+        <section className="skills-section">
+          <div className="section-heading">
+            <p className="eyebrow">TOOLS OF THE TRADE</p>
+            <span>A FEW FAVORITES IN THE TOOLBOX</span>
+          </div>
+          <div className="skills-grid">
+            {skillGroups.map((group) => (
+              <div key={group.title}>
+                <h3>{group.title}</h3>
+                <div className="tags">
+                  {group.items.map((item) => (
+                    <span className="tag" key={item}>
+                      {item}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+        <section className="career-timeline">
+          <p className="eyebrow">SAME CURIOSITY. DIFFERENT CHAPTERS.</p>
+          <div>
+            {timeline.map((item) => (
+              <article key={item.year}>
+                <time>{item.year}</time>
+                <h3>{item.title}</h3>
+                <p>{item.copy}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+        <section className="education-card">
+          <Icon name="code" size={34} />
+          <div>
+            <p className="eyebrow">WHERE A LOT OF IT STARTED</p>
+            <h2>Game &amp; Simulation Programming</h2>
+            <p>DeVry University · Irving, Texas · 2009—2013</p>
+            <p>
+              DirectX rendering, custom 3D tools, and a homemade motion-capture
+              system built with six PlayStation Eye cameras. The instinct to
+              make things has always been there.
+            </p>
+          </div>
+        </section>
+        <footer className="about-footer">
+          <h2>
+            Good things start
+            <br />
+            with a conversation.
+          </h2>
+          <ContactButton className="button button-coral">
+            Say hello <Icon name="arrow" size={18} />
+          </ContactButton>
+          <Link href="/">Or, back to the arcade ↗</Link>
+        </footer>
+      </article>
+    </WorkbenchShell>
   );
 }

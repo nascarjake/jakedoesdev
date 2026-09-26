@@ -1,5 +1,5 @@
-import Link from "next/link";
 import type { ReactNode } from "react";
+import { WorkbenchShell, WorkspaceToolbar } from "./WorkbenchShell";
 
 type JournalShellProps = {
   eyebrow: string;
@@ -9,23 +9,17 @@ type JournalShellProps = {
 
 export function JournalShell({ eyebrow, title, children }: JournalShellProps) {
   return (
-    <main className="journal-shell">
-      <header className="journal-header">
-        <Link href="/" className="journal-mark" aria-label="Jacob Clark, home">
-          JC
-        </Link>
-        <nav className="journal-nav" aria-label="Primary navigation">
-          <Link href="/universe">Projects</Link>
-          <Link href="/resume">Résumé</Link>
-          <Link href="/updates">Notes</Link>
-          <Link href="/arcade">Arcade</Link>
-        </nav>
-      </header>
-      <section className="journal-heading">
-        <p>{eyebrow}</p>
-        <h1>{title}</h1>
-      </section>
-      {children}
-    </main>
+    <WorkbenchShell section="notes">
+      <WorkspaceToolbar label="Field notes">
+        <span className="toolbar-label">FROM THE WORKBENCH</span>
+      </WorkspaceToolbar>
+      <div className="journal-shell">
+        <section className="journal-heading">
+          <p className="eyebrow">{eyebrow}</p>
+          <h1>{title}</h1>
+        </section>
+        {children}
+      </div>
+    </WorkbenchShell>
   );
 }

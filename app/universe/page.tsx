@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import { UniverseExperience } from "../components/UniverseExperience";
 
 export const metadata: Metadata = {
-  title: "The Developer Universe",
+  title: "Project Workbench",
   description:
-    "Explore Jacob Clark's work, experience, and experiments as a spatial archive.",
+    "Browse Jacob Clark’s project workbench: products, platforms, mobile applications, games, and developer tools.",
 };
 
 export default function UniversePage() {

@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#e9e6df"/>
+  <rect x="32" y="32" width="1136" height="566" rx="14" fill="#f6f3eb" stroke="#cfccc3"/>
+  <path d="M32 120h1136" stroke="#cfccc3"/>
+  <rect x="62" y="57" width="43" height="43" rx="6" fill="#222838"/>
+  <text x="70" y="88" font-family="Arial,sans-serif" font-size="31" font-weight="bold" letter-spacing="-3" fill="#f6f3eb">jc<tspan fill="#df5948">.</tspan></text>
+  <text x="123" y="78" font-family="monospace" font-size="14" font-weight="bold" letter-spacing="2" fill="#222838">JACOB CLARK</text>
+  <text x="123" y="97" font-family="monospace" font-size="9" letter-spacing="1" fill="#696a70">ENGINEER. BUILDER. GAME MAKER.</text>
+  <text x="1010" y="85" font-family="monospace" font-size="12" fill="#696a70">jakedoesdev.com</text>
+  <text x="71" y="190" font-family="monospace" font-size="11" letter-spacing="2" fill="#a74f39">SERIOUS CODE. PLAYFUL INSTINCTS.</text>
+  <text x="68" y="278" font-family="Arial,sans-serif" font-size="66" font-weight="bold" letter-spacing="-3" fill="#222838">Welcome to</text>
+  <text x="68" y="350" font-family="Georgia,serif" font-style="italic" font-size="75" letter-spacing="-3" fill="#bc4e3d">the workbench.</text>
+  <text x="71" y="409" font-family="Arial,sans-serif" font-size="19" fill="#696a70">Products, tools, and a little bit of play.</text>
+  <text x="71" y="439" font-family="Arial,sans-serif" font-size="19" fill="#696a70">24+ years of following the interesting problems.</text>
+  <rect x="72" y="492" width="168" height="43" rx="5" fill="#222838"/>
+  <text x="92" y="519" font-family="monospace" font-size="11" fill="#f6f3eb">COME EXPLORE  →</text>
+  <g transform="translate(663 166) rotate(3 220 190)">
+    <rect width="434" height="375" rx="13" fill="#344356" stroke="#172132" stroke-width="3"/>
+    <rect x="10" y="10" width="414" height="88" rx="5" fill="#3053a5"/>
+    <path d="m42 29-16 49m31-49-16 49m31-49-16 49" stroke="#f7cf61" stroke-width="7"/>
+    <text x="86" y="68" font-family="Arial,sans-serif" font-weight="900" font-style="italic" font-size="39" letter-spacing="-2" fill="#fff4d6">THE ARCADE</text>
+    <rect x="10" y="105" width="414" height="204" fill="#202d41"/>
+    <g transform="translate(28 125)">
+      <rect width="119" height="165" rx="5" fill="#e9be58" stroke="#ffe4a0"/>
+      <rect x="8" y="13" width="103" height="131" fill="#f7d36c" stroke="#c59840"/>
+      <text x="15" y="40" font-family="Arial,sans-serif" font-size="23" font-weight="900" font-style="italic" fill="#283248">GOOSE</text>
+      <text x="15" y="65" font-family="Arial,sans-serif" font-size="23" font-weight="900" font-style="italic" fill="#283248">GAMES</text>
+      <path d="M24 111c12 9 29 4 31-9l2-21c1-15 26-16 29-2 2 8-3 12-8 15-6 4-2 12 0 16 3 20-30 36-50 18Z" fill="#fff6da" stroke="#283248" stroke-width="3"/>
+      <path d="m85 82 17 6-19 5" fill="#df7953" stroke="#283248" stroke-width="2"/>
+      <path d="m64 78 22-1-2 11-8-1-2-5-3 5-7-1Z" fill="#283248"/>
+      <circle cx="12" cy="154" r="3" fill="#456249"/>
+    </g>
+    <g transform="translate(158 129)">
+      <rect width="119" height="161" rx="5" fill="#b8bec1"/>
+      <rect x="8" y="12" width="103" height="131" fill="#da7656"/>
+      <text x="17" y="48" font-family="Arial,sans-serif" font-size="36" font-weight="900" font-style="italic" fill="#fff4d6">TUG</text>
+      <circle cx="83" cy="78" r="19" fill="#fbd493"/>
+      <path d="m8 125 34-47 23 32 17-15 29 38v10H8Z" fill="#284849"/>
+    </g>
+    <g transform="translate(288 129)">
+      <rect width="119" height="161" rx="5" fill="#b8bec1"/>
+      <rect x="8" y="12" width="103" height="131" fill="#b9abda"/>
+      <text x="15" y="48" font-family="Arial,sans-serif" font-size="30" font-weight="900" font-style="italic" fill="#33294a">DAHO</text>
+      <g transform="translate(28 72) rotate(-12)"><rect width="30" height="30" rx="3" fill="#e9e2f3" stroke="#5e517b"/><rect x="35" width="30" height="30" rx="3" fill="#f6ce76" stroke="#5e517b"/><rect y="35" width="30" height="30" rx="3" fill="#76649b"/><rect x="35" y="35" width="30" height="30" rx="3" fill="#e9e2f3" stroke="#5e517b"/><text x="10" y="22" font-family="monospace" font-size="17" fill="#33294a">4</text><text x="45" y="22" font-family="monospace" font-size="17" fill="#33294a">8</text></g>
+    </g>
+    <rect x="10" y="316" width="414" height="49" rx="3" fill="#c7c9c3"/>
+    <circle cx="44" cy="339" r="17" fill="#27344a"/><circle cx="44" cy="336" r="13" fill="#df5948"/>
+    <text x="74" y="344" font-family="monospace" font-size="8" fill="#263448">BUILT TO BE PLAYED WITH.</text>
+    <text x="365" y="345" font-family="monospace" font-size="18" fill="#263448">← →</text>
+  </g>
+</svg>

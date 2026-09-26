@@ -4,29 +4,29 @@ import "./globals.css";
 export const metadata: Metadata = {
   metadataBase: new URL("https://jakedoesdev.com"),
   title: {
-    default: "Jacob Clark — Creative Developer",
+    default: "Jacob Clark — The Workbench",
     template: "%s — Jacob Clark",
   },
   description:
-    "A spatial portfolio from Jacob Clark, a developer with 24+ years of experience building what's next.",
+    "The workbench of Jacob Clark. Products, tools, and a little bit of play, built with 24+ years of curiosity.",
   openGraph: {
     title: "Jacob Clark",
-    description: "24+ years building what's next.",
+    description: "Serious code. Playful instincts. Welcome to the workbench.",
     type: "website",
     images: [
       {
-        url: "/og.png",
-        width: 1732,
-        height: 909,
-        alt: "Jacob Clark — 24+ years building what's next",
+        url: "/og-workbench.png",
+        width: 1200,
+        height: 630,
+        alt: "Jacob Clark’s workbench — products, tools, and a little bit of play",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Jacob Clark",
-    description: "24+ years building what's next.",
-    images: ["/og.png"],
+    description: "Serious code. Playful instincts. Welcome to the workbench.",
+    images: ["/og-workbench.png"],
   },
 };
 

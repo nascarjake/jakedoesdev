@@ -25,8 +25,10 @@ export default function UpdatesPage() {
           ))
         ) : (
           <div className="journal-empty">
-            <p>Transmission queue is clear.</p>
-            <span>The first public field note is being prepared.</span>
+            <span className="empty-note-icon" aria-hidden="true">✳</span>
+            <h2>A fresh page.</h2>
+            <p>Notes on building, experimenting, and figuring things out along the way. The first entry is still on the workbench.</p>
+            <Link className="text-link" href="/universe">Explore the projects in the meantime →</Link>
           </div>
         )}
       </section>
