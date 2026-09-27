@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { projects, type Project } from "../data/portfolio";
 import { openWorkbenchPanel } from "../lib/workbench-navigation";
@@ -105,20 +105,34 @@ function ProjectIllustration({ project }: { project: Project }) {
 }
 
 export function UniverseExperience() {
+  const [catalog, setCatalog] = useState(projects);
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch("/api/projects", { signal: controller.signal })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("catalog unavailable");
+        return await response.json() as { projects?: Project[] };
+      })
+      .then((payload) => {
+        if (payload.projects?.length) setCatalog(payload.projects);
+      })
+      .catch(() => undefined);
+    return () => controller.abort();
+  }, []);
   const hash = useSyncExternalStore(
     subscribeToProject,
     getProjectHash,
     () => "",
   );
-  const view = projects.some((project) => project.id === hash) ? "preview" : "directory";
+  const view = catalog.some((project) => project.id === hash) ? "preview" : "directory";
   function setView(next: "preview" | "directory") {
     openWorkbenchPanel(next === "directory" ? "directory" : selected.id);
   }
   const [filter, setFilter] = useState("All projects");
   const [query, setQuery] = useState("");
   const selected =
-    projects.find((project) => project.id === hash) ?? projects[0];
-  const filtered = projects.filter(
+    catalog.find((project) => project.id === hash) ?? catalog[0];
+  const filtered = catalog.filter(
     (project) =>
       (filter === "All projects" || project.category === filter) &&
       `${project.title} ${project.summary} ${project.stack.join(" ")}`
@@ -159,7 +173,7 @@ export function UniverseExperience() {
             </h1>
             <p>{selected.eyebrow}</p>
           </header>
-          {selected.id === "tumor-identifier" ? <BiopsyDemo /> : projectMedia[selected.id] ? <ProjectMedia media={projectMedia[selected.id]} title={selected.title} /> : <ProjectIllustration project={selected} />}
+          {selected.id === "tumor-identifier" ? <BiopsyDemo /> : selected.media?.length || projectMedia[selected.id] ? <ProjectMedia media={projectMedia[selected.id]} assets={selected.media} title={selected.title} /> : <ProjectIllustration project={selected} />}
           {selected.id === "ezforms" && <EzformsClients />}
           <div className="project-facts">
             <div>
@@ -175,6 +189,33 @@ export function UniverseExperience() {
               <strong>{selected.status}</strong>
             </div>
           </div>
+          <section className="project-dossier" aria-label={`${selected.title} build record`}>
+            <div className="project-dossier-intro">
+              <p className="eyebrow">THE BUILD RECORD</p>
+              <h2>What the work involved.</h2>
+              <p>{selected.dossier.scope}</p>
+              {selected.dossier.source && (
+                <a href={selected.dossier.source.url} target="_blank" rel="noreferrer">
+                  {selected.dossier.source.label} <Icon name="arrow" size={15} />
+                </a>
+              )}
+            </div>
+            <div className="project-dossier-groups">
+              <div>
+                <p className="eyebrow">WHAT I OWNED</p>
+                <ul>
+                  {selected.dossier.ownership.map((item) => <li key={item}>{item}</li>)}
+                </ul>
+              </div>
+              <div>
+                <p className="eyebrow">SYSTEM SHAPE</p>
+                <ul>
+                  {selected.dossier.systems.map((item) => <li key={item}>{item}</li>)}
+                </ul>
+              </div>
+            </div>
+            {selected.dossier.note && <p className="project-dossier-note">{selected.dossier.note}</p>}
+          </section>
           <section className="project-story-copy">
             <div>
               <p className="eyebrow">THE SHORT VERSION</p>
@@ -186,6 +227,7 @@ export function UniverseExperience() {
             </div>
             <div>
               <p className="project-summary">{selected.summary}</p>
+              {selected.storyHtml && <div className="project-rich-story" dangerouslySetInnerHTML={{ __html: selected.storyHtml }} />}
               <ul>
                 {selected.highlights.map((highlight) => (
                   <li key={highlight}>{highlight}</li>
@@ -195,13 +237,13 @@ export function UniverseExperience() {
           </section>
           <footer className="project-detail-footer">
             <button className="text-link" onClick={() => setView("directory")}>
-              <Icon name="grid" size={17} /> See all {projects.length} projects
+              <Icon name="grid" size={17} /> See all {catalog.length} projects
             </button>
             <button
               className="text-link"
               onClick={() =>
                 select(
-                  projects[(projects.indexOf(selected) + 1) % projects.length],
+                  catalog[(catalog.indexOf(selected) + 1) % catalog.length],
                 )
               }
             >

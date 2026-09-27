@@ -16,15 +16,15 @@ export type ArcadeMediaHandle = { open: () => void };
 
 export const ArcadeMedia = forwardRef<ArcadeMediaHandle, { game: ArcadeGame }>(
   function ArcadeMedia({ game }, ref) {
-    const initialMode: Mode = game.screenshots.length
-      ? "gallery"
-      : game.video
-        ? "video"
+    const initialMode: Mode = game.video
+      ? "video"
+      : game.screenshots.length
+        ? "gallery"
         : "art";
     const [mode, setMode] = useState<Mode>(initialMode);
     const [slide, setSlide] = useState(0);
     const [slideshow, setSlideshow] = useState(false);
-    const [loaded, setLoaded] = useState(false);
+    const [loaded, setLoaded] = useState(Boolean(game.video));
     const [expanded, setExpanded] = useState(false);
     const [videoFailed, setVideoFailed] = useState(false);
     const dialog = useRef<HTMLDialogElement>(null);
@@ -72,7 +72,7 @@ export const ArcadeMedia = forwardRef<ArcadeMediaHandle, { game: ArcadeGame }>(
     }
     function changeMode(next: Mode) {
       setMode(next);
-      setLoaded(false);
+      setLoaded(next === "video");
       setSlideshow(false);
       setVideoFailed(false);
     }
@@ -149,7 +149,7 @@ export const ArcadeMedia = forwardRef<ArcadeMediaHandle, { game: ArcadeGame }>(
             </div>
           </div>
         );
-      if (!loaded || videoFailed)
+      if ((!loaded && mode !== "video") || videoFailed)
         return (
           <div className={styles.loadScreen}>
             <Image
@@ -202,6 +202,8 @@ export const ArcadeMedia = forwardRef<ArcadeMediaHandle, { game: ArcadeGame }>(
           <video
             src={game.video.src}
             controls
+            autoPlay
+            muted
             playsInline
             preload="metadata"
             aria-label={`${game.title} gameplay preview`}
@@ -211,7 +213,7 @@ export const ArcadeMedia = forwardRef<ArcadeMediaHandle, { game: ArcadeGame }>(
       return (
         <iframe
           title={`${game.title} gameplay video`}
-          src={game.video?.src}
+          src={`${game.video?.src}${game.video?.src.includes("?") ? "&" : "?"}autoplay=1&mute=1`}
           allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
           allowFullScreen
           referrerPolicy="strict-origin-when-cross-origin"

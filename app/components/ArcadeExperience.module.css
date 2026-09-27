@@ -71,6 +71,9 @@
   transform: rotate(-5deg);
   margin-top: 7px;
 }
+.studioPanel {
+  display: none;
+}
 .machine {
   position: relative;
   padding-top: 0;
@@ -931,6 +934,184 @@
 @media (max-width: 1100px) {
   .libraryGrid {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (min-width: 1101px) {
+  .studioPanel {
+    position: absolute;
+    top: 12%;
+    left: 4%;
+    z-index: 2;
+    display: block;
+    width: 39%;
+    padding: clamp(26px, 2.4vw, 42px);
+    color: #0b1f39;
+    background:
+      linear-gradient(135deg, #fff9e8 0 70%, #f6e7bd 100%);
+    border: 2px solid #142c4b;
+    border-radius: 7px;
+    box-shadow:
+      13px 13px 0 #ff5748,
+      25px 25px 0 #ffe15c,
+      32px 35px 24px #0b225859;
+    transform: rotate(-1.4deg);
+  }
+  .studioPanel::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background:
+      radial-gradient(#d0a55d4d 0.8px, transparent 1.4px),
+      linear-gradient(145deg, transparent 72%, #0d5fe712 72%);
+    background-size:
+      7px 7px,
+      100% 100%;
+  }
+  .studioTab {
+    position: absolute;
+    top: -17px;
+    left: 25px;
+    padding: 8px 13px 7px;
+    color: #fff8e8;
+    background: #0a2341;
+    border: 2px solid #183d68;
+    box-shadow: 4px 4px 0 #ffdf55;
+    font: 800 11px var(--mono);
+    letter-spacing: 0.11em;
+  }
+  .studioHeading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #173451;
+  }
+  .studioHeading p {
+    margin: 0 0 7px;
+    color: #bf4638;
+    font: 800 11px var(--mono);
+    letter-spacing: 0.12em;
+  }
+  .studioHeading h2 {
+    margin: 0;
+    font-family: Impact, "Arial Narrow", sans-serif;
+    font-size: clamp(42px, 4.2vw, 70px);
+    font-weight: 900;
+    line-height: 0.92;
+    letter-spacing: -0.03em;
+    text-transform: uppercase;
+  }
+  .studioHeading > span {
+    display: grid;
+    flex: 0 0 auto;
+    width: clamp(54px, 5vw, 76px);
+    aspect-ratio: 1;
+    place-items: center;
+    color: #fff6d9;
+    background: #1262eb;
+    border: 3px solid #092d79;
+    border-radius: 50%;
+    box-shadow: 5px 5px 0 #ffe05a;
+    font: 900 clamp(20px, 2vw, 30px) Impact, "Arial Narrow", sans-serif;
+  }
+  .studioBody {
+    display: grid;
+    grid-template-columns: minmax(112px, 31%) minmax(0, 1fr);
+    gap: clamp(20px, 2vw, 32px);
+    align-items: center;
+    padding: clamp(22px, 2.2vw, 34px) 0;
+  }
+  .studioCover {
+    position: relative;
+    aspect-ratio: 2 / 3;
+    overflow: hidden;
+    border: 6px solid #102b4c;
+    box-shadow:
+      7px 7px 0 #1262eb,
+      11px 11px 0 #ffdf55;
+    transform: rotate(2deg);
+  }
+  .studioCover img {
+    object-fit: cover;
+  }
+  .studioCopy > p {
+    margin: 0;
+    font-size: clamp(15px, 1.05vw, 18px);
+    line-height: 1.55;
+  }
+  .studioCopy .studioTagline {
+    margin-bottom: 10px;
+    color: #0b1f39;
+    font-size: clamp(18px, 1.4vw, 23px);
+    font-weight: 800;
+    line-height: 1.2;
+  }
+  .studioFacts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 18px;
+  }
+  .studioFacts span {
+    padding: 6px 8px;
+    color: #163452;
+    background: #efe4c8;
+    border: 1px solid #bcae8e;
+    font: 800 9px var(--mono);
+    letter-spacing: 0.04em;
+  }
+  .studioLink {
+    display: flex;
+    min-height: 48px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 12px 15px;
+    color: #0b1d30;
+    background: #ffe15b;
+    border: 2px solid #fff2a2;
+    border-right-color: #c39823;
+    border-bottom-color: #c39823;
+    box-shadow: 4px 4px 0 #102743;
+    font: 900 11px var(--mono);
+  }
+  .studioLink:hover {
+    background: #fff19b;
+    transform: translateY(-2px);
+  }
+  .studioActions {
+    display: flex;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .studioActions .studioLink {
+    flex: 1;
+  }
+  .studioDiscord {
+    display: grid;
+    place-items: center;
+    width: 50px;
+    flex: 0 0 50px;
+    color: #fff;
+    background: #5865f2;
+    border: 2px solid #838cff;
+    border-right-color: #363fa6;
+    border-bottom-color: #363fa6;
+    box-shadow: 4px 4px 0 #102743;
+  }
+  .studioDiscord:hover {
+    background: #707bff;
+    transform: translateY(-2px);
+  }
+  .machine {
+    container-type: inline-size;
+    width: 48.5%;
+    margin-left: auto;
+    margin-right: 0;
+    filter: drop-shadow(0 0.5cqw 0.2cqw #07121f88);
   }
 }
 @media (max-width: 620px) {

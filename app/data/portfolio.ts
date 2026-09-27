@@ -20,6 +20,33 @@ export type Project = {
   category: ProjectCategory;
   status: string;
   highlights: string[];
+  storyHtml?: string;
+  sortOrder?: number;
+  published?: boolean;
+  featured?: boolean;
+  version?: number;
+  media?: ProjectMediaAsset[];
+  dossier: {
+    scope: string;
+    ownership: string[];
+    systems: string[];
+    note?: string;
+    source?: { label: string; url: string };
+  };
+};
+
+export type ProjectMediaAsset = {
+  id: string;
+  kind: "video" | "image";
+  url: string;
+  storageKey?: string | null;
+  posterUrl?: string | null;
+  caption: string;
+  altText: string;
+  mimeType?: string | null;
+  sortOrder?: number;
+  autoplay: boolean;
+  preload: "none" | "metadata" | "auto";
 };
 
 export type Experience = {
@@ -53,6 +80,13 @@ export const projects: Project[] = [
       "Scaled infrastructure across AWS, Cloudflare, and multiple Mongo clusters.",
       "Built automated delivery with CloudFormation, Service Catalog, and CodePipeline.",
     ],
+    dossier: {
+      scope: "A modernization effort for a configurable guided-conversation product used in financial-services workflows.",
+      ownership: ["Reworked the aging decision-tree foundation for cloud-scale operation.", "Built an integration layer where models describe themselves and drive generated configuration UI.", "Supported enterprise theming, customer customization, guide publishing, and a staged MongoDB data migration."],
+      systems: ["Node.js services with a React application and legacy Scala", "AWS delivery and publishing workflows", "Cloudflare domains, observability, and separated MongoDB clusters"],
+      note: "The current product page describes the broader platform; this record focuses on the architecture and delivery work listed in my résumé.",
+      source: { label: "View current Ignite Dialogue context", url: "https://ignitesales.com/solutions/" },
+    },
   },
   {
     id: "ignite-ai",
@@ -72,6 +106,12 @@ export const projects: Project[] = [
       "Designed multi-step workflows that keep people in control of AI output.",
       "Combined LLMs, task agents, OCR, Puppeteer, and existing decision systems.",
     ],
+    dossier: {
+      scope: "A collection of operator-facing web and desktop tools for creating guides and collecting onboarding information with reviewable AI assistance.",
+      ownership: ["Designed human-in-the-middle flows so people can inspect and guide generated output.", "Connected language models, document OCR, decision trees, and task agents into a multi-step onboarding process.", "Built across browser and Electron surfaces rather than treating AI as a standalone chat feature."],
+      systems: ["Node.js and React", "OpenAI API, task agents, and OCR", "Electron and browser automation with Puppeteer"],
+      note: "This page intentionally describes the workflow pattern rather than customer data, prompts, or internal onboarding operations.",
+    },
   },
   {
     id: "tradelab",
@@ -92,6 +132,12 @@ export const projects: Project[] = [
       "Built synchronous worker pools for time-sensitive market events.",
       "Added an LLM conversation layer for authoring strategy rules.",
     ],
+    dossier: {
+      scope: "A founder-built strategy automation product that turns incoming market signals and webhooks into configurable rules and dashboards.",
+      ownership: ["Designed separate easy and advanced rule-building modes for different levels of technical comfort.", "Implemented synchronous worker pools for time-sensitive event processing.", "Created an AI-assisted authoring experience and TradingView-connected workflow for building strategy rules."],
+      systems: ["Angular 11, TypeScript, and Node.js", "Firebase Auth, Firestore, and Google Cloud CI/CD", "Webhooks, market-data pipes, worker pools, and custom dashboards"],
+      note: "The product is software for configuring workflows; it is not financial advice or a promise of market performance.",
+    },
   },
   {
     id: "stream-elixir",
@@ -111,6 +157,11 @@ export const projects: Project[] = [
       "Released for macOS, Windows, and Linux.",
       "Integrated Twitch, Facebook, Twitter, and YouTube APIs.",
     ],
+    dossier: {
+      scope: "A cross-platform desktop application for automating repetitive community and audience-management routines for live creators.",
+      ownership: ["Took the product from a 2018 Electron release through multi-platform desktop delivery.", "Integrated platform APIs for Twitch, Facebook, Twitter, and YouTube workflows.", "Built the product around common creator routines rather than a single-channel dashboard."],
+      systems: ["Electron desktop shell for macOS, Windows, and Linux", "Angular 9, Express, and MongoDB", "Third-party social and livestream platform APIs"],
+    },
   },
   {
     id: "ezforms",
@@ -131,6 +182,12 @@ export const projects: Project[] = [
       "Delivered native and hybrid iOS and Android form applications.",
       "Used by FedEx, Taco Bueno, Dave & Buster’s, Yellow Tail Wines, Boy Scouts of America, and city municipalities, as listed in my résumé.",
     ],
+    dossier: {
+      scope: "A full document-execution platform spanning a web builder, admin tools, mobile apps, reporting, and an integration SDK.",
+      ownership: ["Led design, implementation, testing, and scaling work across the front and back end.", "Designed and iterated on the drag-and-drop builder and the supporting administration portal.", "Shipped native and hybrid mobile execution experiences and helped shape data models for durable reporting."],
+      systems: ["Angular 9, Node.js, MongoDB, and Ionic", "AndroidX and Jetpack alongside iOS delivery", "PDF rendering pipeline and developer SDK"],
+      note: "Named organizations are those listed in my résumé; this archive does not expose their forms, data, or internal deployments.",
+    },
   },
   {
     id: "eternus-tools",
@@ -151,6 +208,12 @@ export const projects: Project[] = [
       "Designed caching to minimize expensive Electron remote-process calls.",
       "Rendered the C++ engine directly into a WebGL canvas at high frame rates.",
     ],
+    dossier: {
+      scope: "An eight-tool production suite for editing live game assets and data against an in-house C++ engine.",
+      ownership: ["Led a three-person full-stack tools team while also shipping tools and prototypes directly.", "Developed a cache-conscious bridge between Electron processes and the live engine.", "Helped evolve the tooling UI from Angular 1 to Angular 5 and built custom WebGL graphing and TypeScript scripting directives."],
+      systems: ["Electron, Angular, WebGL, and TypeScript", "Direct engine rendering in a WebGL canvas", "Asset, particle, UI, atlas, terrain, and animation/node-graph editors"],
+      note: "This is a retrospective of internal production tooling; implementation details are intentionally summarized.",
+    },
   },
   {
     id: "tumor-identifier",
@@ -170,6 +233,12 @@ export const projects: Project[] = [
       "Matched 2D scan regions to a three-dimensional biopsy model.",
       "Generated an outlined 3D representation of detected tumor tissue.",
     ],
+    dossier: {
+      scope: "An R&D visualization prototype for aligning scan slices with a three-dimensional biopsy model and reconstructing a marked region in context.",
+      ownership: ["Worked with 3D and 2D biopsy scan inputs as part of the prototype workflow.", "Mapped outlined regions across slices into a reconstructed 3D representation.", "Built an explorable browser visualization to communicate the scan-to-model process."],
+      systems: ["WebGL, Node.js, and custom browser JavaScript", "TensorFlow.js listed in the original project stack", "Slice alignment, contours, and 3D reconstruction"],
+      note: "The interactive demo on this site uses synthetic geometry only. It is a historical visualization prototype, not a diagnostic tool or clinical advice.",
+    },
   },
   {
     id: "ziprad",
@@ -189,6 +258,13 @@ export const projects: Project[] = [
       "Used a custom OCR print driver and PDF generation pipeline.",
       "Included a privately distributed native Android application.",
     ],
+    dossier: {
+      scope: "A healthcare operations workflow for translating EHR-originated information into imaging-center orders without requiring a manual re-entry step.",
+      ownership: ["Built the order-generation workflow around a custom OCR print driver and PDF generation.", "Worked across the Angular web application, Node/Mongo back end, and a privately distributed Kotlin Android app.", "Focused the product on bridging systems that did not share a direct connection."],
+      systems: ["Angular 8, Node.js, and MongoDB", "Custom OCR print driver and PDF pipeline", "Native Kotlin Android client"],
+      note: "The work is described at a systems level to avoid exposing health data, integrations, or operational details.",
+      source: { label: "View ZipData’s current product context", url: "https://www.zipdatasolutions.com/" },
+    },
   },
   {
     id: "traxo",
@@ -208,6 +284,13 @@ export const projects: Project[] = [
       "Delivered native Android and iOS applications.",
       "Migrated Android from the Support Library to AndroidX and Jetpack.",
     ],
+    dossier: {
+      scope: "Native mobile work for a travel product focused on keeping itineraries and reward information together, including a wearable companion.",
+      ownership: ["Delivered native Android and iOS applications for travel organization.", "Built an Android Wear component for upcoming travel appointments.", "Modernized the Android implementation from the Support Library to AndroidX and Jetpack during a rewrite."],
+      systems: ["Kotlin plus a proprietary Java SDK on Android", "Native iOS and Android delivery", "Android Wear, AndroidX, and Jetpack"],
+      note: "Traxo has since evolved into a broader corporate-travel platform; this page documents the earlier mobile product work in the archive.",
+      source: { label: "View current Traxo context", url: "https://www.traxo.com/" },
+    },
   },
   {
     id: "trails-end",
@@ -228,6 +311,12 @@ export const projects: Project[] = [
       "Used native Kotlin views for security-sensitive payment surfaces.",
       "Supported a large Square integration serving millions of users.",
     ],
+    dossier: {
+      scope: "A field-sales companion for popcorn fundraising events, allowing scouts and leaders to coordinate selling and accept card payments.",
+      ownership: ["Shipped hybrid iOS and Android applications with Ionic 3.", "Integrated Stripe and Google Maps for sales and event workflows.", "Used native Kotlin views for security-sensitive payment surfaces and supported a large Square integration."],
+      systems: ["Ionic 3 for iOS and Android", "Kotlin, MVVM, AndroidX, and Jetpack", "Stripe, Google Maps SDK, and Square integration"],
+      note: "This is historical product work. Current Trails End features and branding may differ from the version represented here.",
+    },
   },
   {
     id: "callsmart",
@@ -247,6 +336,12 @@ export const projects: Project[] = [
       "Built Android and iOS applications around an MVVM architecture.",
       "Designed for plumbers, HVAC teams, and pool-service professionals.",
     ],
+    dossier: {
+      scope: "A mobile point-of-sale and field-service tool for repair teams managing customer details, equipment, orders, and payments on site.",
+      ownership: ["Built Android and iOS experiences using a cross-platform PhoneGap/Cordova stack.", "Structured the app around Kendo UI and an MVVM architecture.", "Designed for practical field workflows across plumbing, HVAC, and pool-service teams."],
+      systems: ["PhoneGap and Cordova", "Kendo UI with MVVM", "Cross-platform Android and iOS delivery"],
+      note: "CallSmart later became ProfitRhino; this record documents the earlier mobile product rather than the current company product.",
+    },
   },
   {
     id: "foodtronix-mobile-pos",
@@ -266,6 +361,13 @@ export const projects: Project[] = [
       "Integrated with an established restaurant-management suite.",
       "Worked across receipt printers, payment gateways, tax, and discount logic.",
     ],
+    dossier: {
+      scope: "The first mobile ordering experience in a restaurant-management environment, built for tablet-based tableside service.",
+      ownership: ["Built an Android tablet workflow for taking orders at the table and routing them to kitchen printers.", "Integrated with a broader restaurant-management suite rather than creating a disconnected ordering app.", "Worked in the wider POS environment of ticket logic, payments, printers, taxes, and discounts."],
+      systems: ["Native Android tablet client", "MSSQL-connected restaurant-management suite", "Kitchen and receipt printer, payment, tax, and discount integrations"],
+      note: "The current FoodTronix offering has evolved; this project reflects the 2011–2012 mobile POS work.",
+      source: { label: "View current FoodTronix context", url: "https://www.foodtronix.com/" },
+    },
   },
   {
     id: "tug",
@@ -285,6 +387,12 @@ export const projects: Project[] = [
       "Created and maintained parts of the TypeScript scripting system.",
       "Built the engine-tool suite used by the production team.",
     ],
+    dossier: {
+      scope: "A smooth-voxel sandbox game created with the Nerd Kingdom team, paired with the production tooling needed to build it.",
+      ownership: ["Created and maintained portions of the TypeScript scripting system.", "Built the game-engine tools that supported the production team.", "Worked across a Windows game project and an in-house engine/toolchain."],
+      systems: ["TypeScript scripting", "Custom C++ game engine and production tooling", "3D smooth-voxel sandbox gameplay"],
+      note: "This archive records my tools and scripting contribution, not sole authorship of the game.",
+    },
   },
   {
     id: "daho",
@@ -304,6 +412,11 @@ export const projects: Project[] = [
       "Built the original proof of concept in native Android.",
       "Rebuilt the production version with Ionic and Angular.",
     ],
+    dossier: {
+      scope: "A number-based strategy puzzle inspired by the territory and planning dynamics of Go, built first as a native proof of concept and then as a production game.",
+      ownership: ["Prototyped the original game in native Android.", "Rebuilt the release version with Ionic 4 and Angular 7.", "Designed challenge modes and wrote the game’s custom AI behavior."],
+      systems: ["Native Android proof of concept", "Ionic 4 and Angular 7 production build", "Custom game AI and challenge-mode logic"],
+    },
   },
   {
     id: "jumpstart",
@@ -323,6 +436,11 @@ export const projects: Project[] = [
       "Automated repetitive design-to-development handoff work.",
       "Built in pure JavaScript using Adobe’s Photoshop framework.",
     ],
+    dossier: {
+      scope: "A Photoshop Cloud Edition plugin intended to reduce design-to-development repetition for early iPhone app workflows.",
+      ownership: ["Automated slicing of UI layers within Photoshop.", "Programmatically transformed design output into the foundation of an iPhone application.", "Built the plugin in pure JavaScript against Adobe’s Photoshop framework."],
+      systems: ["Adobe Photoshop Cloud Edition", "JavaScript and Adobe extension APIs", "Layer slicing and app-scaffolding automation"],
+    },
   },
   {
     id: "hubster",
@@ -341,6 +459,11 @@ export const projects: Project[] = [
     highlights: [
       "Unified fragmented streaming availability into a single browse experience.",
     ],
+    dossier: {
+      scope: "An early web product for answering a simple discovery question: where can a specific title be streamed?",
+      ownership: ["Designed a browse experience that brought fragmented streaming availability into one place.", "Built the product with the straightforward front-end stack of its era.", "Focused on reducing the hunt across multiple media services."],
+      systems: ["HTML5, CSS3, and JavaScript", "Bootstrap responsive UI", "Streaming availability browsing"],
+    },
   },
   {
     id: "dm-auto-leasing",
@@ -357,6 +480,13 @@ export const projects: Project[] = [
     category: "Mobile",
     status: "Shipped mobile app",
     highlights: ["Designed and delivered as a native Android application."],
+    dossier: {
+      scope: "A native Android application for a Texas auto-leasing company, released through the Android app store at the time.",
+      ownership: ["Designed and delivered the mobile application as a native Android product.", "Worked in Java and Android Studio for the app-store release.", "Built for a leasing business with a customer-facing vehicle workflow."],
+      systems: ["Java and Android Studio", "Native Android application delivery", "App-store release lifecycle"],
+      note: "The original Android app is no longer listed on Google Play. D&M’s current leasing website is linked as present-day company context.",
+      source: { label: "View current D&M Leasing context", url: "https://www.dmautoleasing.com/" },
+    },
   },
 ];
 

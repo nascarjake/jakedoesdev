@@ -15,7 +15,8 @@ export type IconName =
   | "mute"
   | "external"
   | "close"
-  | "terminal";
+  | "terminal"
+  | "discord";
 
 const paths: Record<IconName, string> = {
   folder: "M3 7V5h6l2 2h10v12H3Z M3 10h18",
@@ -33,6 +34,7 @@ const paths: Record<IconName, string> = {
   external: "M14 3h7v7 m0-7-12 12 M10 3H3v18h18v-7",
   close: "m5 5 14 14 M19 5 5 19",
   terminal: "m4 5 7 7-7 7 M13 19h7",
+  discord: "M20.3 4.4A19.8 19.8 0 0 0 15.8 3l-.6 1.2a17 17 0 0 0-6.4 0L8.2 3a19.8 19.8 0 0 0-4.5 1.4C.9 8.5.2 12.5.5 16.5A18 18 0 0 0 6 19.3l1.3-1.8a12 12 0 0 1-2.1-1 12 12 0 0 0 13.6 0 12 12 0 0 1-2.1 1l1.3 1.8a18 18 0 0 0 5.5-2.8c.4-4.7-.7-8.7-3.2-12.1ZM8.5 14.2c-1.1 0-2-1-2-2.3s.9-2.3 2-2.3 2 1 2 2.3-.9 2.3-2 2.3Zm7 0c-1.1 0-2-1-2-2.3s.9-2.3 2-2.3 2 1 2 2.3-.9 2.3-2 2.3Z",
 };
 
 export function Icon({
@@ -49,8 +51,8 @@ export function Icon({
       width={size}
       height={size}
       viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
+      fill={name === "discord" ? "currentColor" : "none"}
+      stroke={name === "discord" ? "none" : "currentColor"}
       strokeWidth="1.6"
       strokeLinecap="round"
       strokeLinejoin="round"

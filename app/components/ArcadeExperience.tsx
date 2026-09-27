@@ -3,7 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { arcadeCartridges as cartridges, arcadeGames } from "../data/arcade";
+import {
+  arcadeCartridges as cartridges,
+  arcadeGames,
+  studioCartridge,
+} from "../data/arcade";
 import { Icon } from "./WorkbenchIcons";
 import { WorkbenchShell, WorkspaceToolbar } from "./WorkbenchShell";
 import { ArcadeScreen } from "./ArcadeScreen";
@@ -23,6 +27,7 @@ function Screws() {
 
 export function ArcadeExperience() {
   const [selected, setSelected] = useState(0);
+  const [wideLayout, setWideLayout] = useState(false);
   const [sound, setSound] = useState(false);
   const [honks, setHonks] = useState(0);
   const [remaining, setRemaining] = useState(0);
@@ -34,11 +39,35 @@ export function ArcadeExperience() {
   const cabinet = useRef<HTMLElement>(null);
   const cartridge = cartridges[selected];
   const running = remaining > 0;
+  const shelfOffset = wideLayout ? 1 : 0;
+  const shelfCartridges = wideLayout ? arcadeGames : cartridges;
+  const shelfSelected = Math.max(0, selected - shelfOffset);
   const shelfStart = Math.min(
-    Math.floor(selected / 3) * 3,
-    cartridges.length - 3,
+    Math.floor(shelfSelected / 3) * 3,
+    Math.max(0, shelfCartridges.length - 3),
   );
-  const visibleCartridges = cartridges.slice(shelfStart, shelfStart + 3);
+  const visibleCartridges = shelfCartridges.slice(
+    shelfStart,
+    shelfStart + 3,
+  );
+  const currentNumber = wideLayout ? selected : selected + 1;
+  const totalCartridges = wideLayout ? arcadeGames.length : cartridges.length;
+
+  useEffect(() => {
+    const query = window.matchMedia("(min-width: 1101px)");
+    const syncLayout = () => {
+      setWideLayout(query.matches);
+      if (query.matches) {
+        setSelected((current) => (current === 0 ? 1 : current));
+        setRemaining(0);
+        setInserted(false);
+      }
+    };
+
+    syncLayout();
+    query.addEventListener("change", syncLayout);
+    return () => query.removeEventListener("change", syncLayout);
+  }, []);
 
   useEffect(() => {
     if (!remaining) return;
@@ -54,7 +83,10 @@ export function ArcadeExperience() {
   );
 
   function select(index: number) {
-    setSelected((index + cartridges.length) % cartridges.length);
+    const first = wideLayout ? 1 : 0;
+    const length = cartridges.length - first;
+    const normalized = ((index - first + length) % length) + first;
+    setSelected(normalized);
     setRemaining(0);
     setInserted(false);
     setAnnouncement("");
@@ -125,6 +157,60 @@ export function ArcadeExperience() {
           <br />› PLAY
           <br />› REPEAT
         </span>
+        <aside className={styles.studioPanel} aria-label="About Goose Games">
+          <span className={styles.studioTab}>THE STUDIO</span>
+          <div className={styles.studioHeading}>
+            <div>
+              <p>INDEPENDENT GAME STUDIO</p>
+              <h2>{studioCartridge.title}</h2>
+            </div>
+            <span aria-label={`${arcadeGames.length} games`}>
+              {String(arcadeGames.length).padStart(2, "0")}
+            </span>
+          </div>
+          <div className={styles.studioBody}>
+            <div className={styles.studioCover}>
+              <Image
+                src={studioCartridge.cover}
+                alt="Goose Games illustrated cartridge cover"
+                fill
+                sizes="160px"
+                priority
+                unoptimized
+              />
+            </div>
+            <div className={styles.studioCopy}>
+              <p className={styles.studioTagline}>
+                {studioCartridge.tagline}
+              </p>
+              <p>{studioCartridge.description}</p>
+              <div className={styles.studioFacts}>
+                <span>PLAY IN BROWSER</span>
+                <span>REAL GAMEPLAY</span>
+                <span>BUILT WITH CURIOSITY</span>
+              </div>
+            </div>
+          </div>
+          <div className={styles.studioActions}>
+            <a
+              className={styles.studioLink}
+              href={studioCartridge.playUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              VISIT GOOSEGAMES.DEV <Icon name="external" size={18} />
+            </a>
+            <a
+              className={styles.studioDiscord}
+              href="https://discord.gg/6BJTUpDSsE"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Join the Goose Games Discord"
+            >
+              <Icon name="discord" size={20} />
+            </a>
+          </div>
+        </aside>
         <section
           ref={cabinet}
           tabIndex={-1}
@@ -157,7 +243,7 @@ export function ArcadeExperience() {
               aria-label="Choose a cartridge"
             >
               {visibleCartridges.map((item, slot) => {
-                const index = shelfStart + slot;
+                const index = shelfOffset + shelfStart + slot;
                 return (
                   <button
                     key={item.id}
@@ -332,8 +418,9 @@ export function ArcadeExperience() {
       </div>
       <div className={styles.belowCabinet}>
         <span>
-          {String(selected + 1).padStart(2, "0")} / {cartridges.length}{" "}
-          CARTRIDGES · {arcadeGames.length} REAL GAMES
+          {String(currentNumber).padStart(2, "0")} / {totalCartridges}{" "}
+          {wideLayout ? "GAMES" : "CARTRIDGES"} · {arcadeGames.length} REAL
+          GAMES
         </span>
         <Link href="/universe">
           Explore my shipped projects <Icon name="arrow" size={15} />

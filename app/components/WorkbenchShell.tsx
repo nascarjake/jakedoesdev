@@ -110,6 +110,15 @@ export function WorkbenchShell({
             Field notes
           </Link>
         </nav>
+        <a
+          className="top-discord"
+          href="https://discord.gg/6BJTUpDSsE"
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Join the Discord"
+        >
+          <Icon name="discord" size={19} />
+        </a>
         <ContactButton />
       </header>
 

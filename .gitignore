@@ -30,6 +30,7 @@ yarn-error.log*
 
 # env files (can opt-in for committing if needed)
 .env*
+.deploy-secrets
 
 # vercel
 .vercel
@@ -40,7 +41,12 @@ next-env.d.ts
 /.wrangler/
 /outputs/
 /work/
+*.tsbuildinfo
+*.cpuprofile
 
 # Personal weekly worklogs stay on this machine. They are source material for
 # public posts, never public-site content.
 /.worklog/
+
+# Standalone Goose Games has its own source repository and deployment.
+/sites/goosegames/

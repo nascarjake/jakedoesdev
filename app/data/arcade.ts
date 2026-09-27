@@ -101,6 +101,8 @@ export const arcadeGames: ArcadeGame[] = [
   },
   {
     id: "rack-ruin",
+    playUrl: "https://nascarjake.github.io/rack-web/",
+    embedUrl: "https://nascarjake.github.io/rack-web/",
     title: "Rack & Ruin",
     genre: "Roguelike pool",
     cover: cover("rack-ruin"),
@@ -120,6 +122,8 @@ export const arcadeGames: ArcadeGame[] = [
   },
   {
     id: "pinfall",
+    playUrl: "https://nascarjake.github.io/bowling-web/",
+    embedUrl: "https://nascarjake.github.io/bowling-web/",
     title: "Pinfall",
     genre: "Roguelike bowling",
     cover: cover("pinfall"),
@@ -132,6 +136,8 @@ export const arcadeGames: ArcadeGame[] = [
   },
   {
     id: "netrunner",
+    playUrl: "https://nascarjake.github.io/netrunner/",
+    embedUrl: "https://nascarjake.github.io/netrunner/",
     title: "Netrunner",
     genre: "Network strategy",
     cover: cover("netrunner"),
@@ -145,6 +151,8 @@ export const arcadeGames: ArcadeGame[] = [
   },
   {
     id: "rift-riot",
+    playUrl: "https://nascarjake.github.io/fight-web/",
+    embedUrl: "https://nascarjake.github.io/fight-web/",
     title: "Rift Riot",
     genre: "Fighting",
     cover: cover("rift-riot"),
