@@ -9,7 +9,7 @@ The updates page is a GitHub Pages static export. It reads only reviewed Markdow
 3. The hourly **Sync approved updates to GitHub Pages** GitHub Actions workflow requests the published-only API response, writes only its own `source: "admin-review"` files under `content/updates/`, commits them, and triggers the existing Pages deployment.
 4. The next GitHub Pages build renders the approved post at `/updates/` without a browser API request.
 
-The sync never deletes posts and refuses to replace a hand-written post with the same slug.
+The sync never touches hand-written posts. It removes only its own `source: "admin-review"` files that no longer appear in the published API response, so an explicit unpublish is reflected in the next static build.
 
 ## Required deployment configuration
 

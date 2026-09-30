@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import styles from "./AdminPanel.module.css";
 
 type UpdateDraft = {
@@ -51,26 +51,23 @@ export function UpdatesStudio() {
   const [saving, setSaving] = useState(false);
   const [notice, setNotice] = useState<Notice | null>(null);
 
-  const load = useCallback(async (preferredId?: string) => {
-    setLoading(true);
-    try {
-      const [session, response] = await Promise.all([
-        api<{ user: { email: string } }>("/api/admin/session"),
-        api<{ updates: UpdateDraft[] }>("/api/admin/updates"),
-      ]);
+  useEffect(() => {
+    let active = true;
+    void Promise.all([
+      api<{ user: { email: string } }>("/api/admin/session"),
+      api<{ updates: UpdateDraft[] }>("/api/admin/updates"),
+    ]).then(([session, response]) => {
+      if (!active) return;
       setEmail(session.user.email);
       setUpdates(response.updates);
-      setSelected((current) => response.updates.find((item) => item.id === preferredId)?.id
-        ? response.updates.find((item) => item.id === preferredId) ?? null
-        : response.updates.find((item) => item.id === current?.id) ?? response.updates[0] ?? null);
-    } catch (caught) {
-      setNotice({ type: "error", text: caught instanceof Error ? caught.message : "Could not load updates." });
-    } finally {
-      setLoading(false);
-    }
+      setSelected(response.updates[0] ?? null);
+    }).catch((caught) => {
+      if (active) setNotice({ type: "error", text: caught instanceof Error ? caught.message : "Could not load updates." });
+    }).finally(() => {
+      if (active) setLoading(false);
+    });
+    return () => { active = false; };
   }, []);
-
-  useEffect(() => { void load(); }, [load]);
 
   const choose = (draft: UpdateDraft) => {
     if (selected && JSON.stringify(selected) !== JSON.stringify(updates.find((item) => item.id === selected.id)) && !window.confirm("Discard unsaved changes?")) return;
@@ -116,7 +113,7 @@ export function UpdatesStudio() {
       });
       setSelected(result.update);
       setUpdates((current) => [result.update, ...current.filter((item) => item.id !== result.update.id)]);
-      setNotice({ type: "success", text: publish ? "Approved and published on /updates." : "Draft saved in the review queue." });
+      setNotice({ type: "success", text: publish ? "Approved. It will appear on /updates after the next static sync." : "Draft saved in the review queue." });
     } catch (caught) {
       setNotice({ type: "error", text: caught instanceof Error ? caught.message : "Could not save this update." });
     } finally {
@@ -134,7 +131,7 @@ export function UpdatesStudio() {
       });
       setSelected(result.update);
       setUpdates((current) => current.map((item) => item.id === result.update.id ? result.update : item));
-      setNotice({ type: "success", text: "Update unpublished and returned to drafts." });
+      setNotice({ type: "success", text: "Unpublished. It will be removed from /updates after the next static sync." });
     } catch (caught) {
       setNotice({ type: "error", text: caught instanceof Error ? caught.message : "Could not unpublish this update." });
     } finally {
@@ -200,7 +197,7 @@ export function UpdatesStudio() {
           </div>
         </div>
         <div className={styles.section}>
-          <header className={styles.sectionHeader}><h2>{selected.published ? "Published" : "Approval"}</h2><p>{selected.published ? "This version appears on the public updates page." : "Only an approved post appears on the public updates page."}</p></header>
+          <header className={styles.sectionHeader}><h2>{selected.published ? "Published" : "Approval"}</h2><p>{selected.published ? "This version is queued for the next static updates sync." : "Only an approved post appears on the public updates page."}</p></header>
           <div className={styles.sectionBody}>
             <div className={styles.row}>
               <button className={styles.button} type="button" disabled={saving || !dirty} onClick={() => void save(false)}>{saving ? "Saving…" : selected.published ? "Save changes" : "Save draft"}</button>

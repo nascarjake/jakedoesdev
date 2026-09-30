@@ -4,16 +4,35 @@ The public portfolio remains statically exportable for GitHub Pages, while the
 Cloudflare Worker build adds D1 projects, R2 media, Workers AI, Browser Run,
 and the private `/admin/` editor.
 
-## 1. Create and deploy the Cloudflare resources
+## 1. Use the personal Cloudflare account
 
-Wrangler can provision the named D1 database and R2 bucket from `wrangler.jsonc`.
-Authenticate and deploy once to provision them, then apply the migrations:
+The production zone and Worker belong to the personal account pinned by
+`account_id` in `wrangler.jsonc`. Wrangler is the Cloudflare CLI used by the
+deploy and migration scripts. Its default login may belong to an unrelated
+account, so this project uses a named OAuth profile instead:
 
 ```bash
-npx wrangler login
-npm run deploy:cloudflare
+npx wrangler auth create jakedoesdev-personal --browser=false
+npx wrangler auth activate jakedoesdev-personal .
+node scripts/verify-cloudflare-account.mjs
 npm run db:migrate:remote
+npm run deploy:cloudflare
 ```
+
+Open the authentication URL in a browser session signed into the personal
+Cloudflare login. The verification script checks the login email, the
+`jakedoesdev.com` zone, and the configured D1 database before either remote
+script runs. Both scripts select `jakedoesdev-personal` explicitly, including
+when another Wrangler login is active elsewhere. The daily update draft sync
+uses that same profile; it does not use the older local API token file.
+
+The expected login email lives in the ignored local `.env.cloudflare-profile`
+file as `CLOUDFLARE_EXPECTED_EMAIL=your-personal-email@example.com`. Create it
+once in each checkout. This file must never be committed.
+
+For another Codex agent or Munder Difflin checkout, create or reuse this same
+named profile on that machine and run the project scripts from this repository.
+The pinned account ID travels with the code; OAuth credentials stay local.
 
 The production route is declared in `wrangler.jsonc`. Before relying on it,
 make sure the apex `jakedoesdev.com` DNS records are **Proxied** in Cloudflare;
@@ -21,7 +40,7 @@ DNS-only records bypass Workers routes and continue directly to the origin.
 Until that proxy switch, the GitHub Pages site continues to use its checked-in
 catalog fallback.
 
-The migrations create the content schema and import all 17 existing projects.
+The migrations create the content schema and import the existing projects.
 The D1 copy becomes the live source of truth; the checked-in TypeScript catalog
 remains a read-only fallback for the GitHub Pages build and transient API errors.
 

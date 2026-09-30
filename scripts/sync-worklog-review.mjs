@@ -4,11 +4,10 @@ import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { verifyCloudflareAccount } from "./verify-cloudflare-account.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const LEDGER_DIR = path.join(ROOT, ".worklog", "weeks");
-const CONFIG_PATH = path.join(ROOT, "wrangler.jsonc");
-const TOKEN_PATH = path.join(ROOT, ".env.cloudflare-access");
 const API_ROOT = "https://api.cloudflare.com/client/v4";
 const PUBLIC_UPDATES_API = "https://jakedoesdev.com/api/updates";
 
@@ -30,17 +29,6 @@ function localDate() {
   return Object.fromEntries(parts.map(({ type, value }) => [type, value]));
 }
 
-function readToken() {
-  if (process.env.CLOUDFLARE_API_TOKEN?.trim()) return process.env.CLOUDFLARE_API_TOKEN.trim();
-  try {
-    const source = readFileSync(TOKEN_PATH, "utf8");
-    const match = source.match(/^\s*(?:export\s+)?CLOUDFLARE_API_TOKEN\s*=\s*(.*?)\s*$/m);
-    return match?.[1]?.replace(/^(["'])(.*)\1$/, "$2") ?? "";
-  } catch {
-    return "";
-  }
-}
-
 function parseLedger(source) {
   return source.split(/^###\s+/m).slice(1).flatMap((block) => {
     const lines = block.trim().split(/\r?\n/);
@@ -54,13 +42,6 @@ function parseLedger(source) {
   });
 }
 
-function getDatabaseId() {
-  const source = readFileSync(CONFIG_PATH, "utf8");
-  const match = source.match(/"database_id"\s*:\s*"([0-9a-f-]{36})"/i);
-  if (!match) throw new Error("D1 database id is missing from wrangler.jsonc.");
-  return match[1];
-}
-
 async function cloudflare(pathname, token, init = {}) {
   const response = await fetch(`${API_ROOT}${pathname}`, {
     ...init,
@@ -70,26 +51,10 @@ async function cloudflare(pathname, token, init = {}) {
   if (!response.ok || body.success === false) {
     const code = body.errors?.[0]?.code;
     throw new Error(code === 10000 || response.status === 403
-      ? "Cloudflare token needs D1 Read and D1 Write access for this account."
+      ? "The personal Wrangler profile needs D1 Read and D1 Write access for this account."
       : `Cloudflare D1 request failed (${response.status}).`);
   }
   return body;
-}
-
-async function accountForDatabase(token, databaseId) {
-  const configuredId = process.env.CLOUDFLARE_ACCOUNT_ID?.trim();
-  const accounts = configuredId
-    ? [{ id: configuredId }]
-    : (await cloudflare("/accounts?per_page=50", token)).result ?? [];
-  for (const account of accounts) {
-    try {
-      const result = await cloudflare(`/accounts/${account.id}/d1/database/${databaseId}`, token);
-      if (result.result?.uuid === databaseId) return account.id;
-    } catch {
-      // Try the next account; no account metadata or credentials are logged.
-    }
-  }
-  throw new Error("The Cloudflare token could not locate this D1 database. Set CLOUDFLARE_ACCOUNT_ID if account discovery is unavailable.");
 }
 
 async function queryD1(token, accountId, databaseId, sql, params = []) {
@@ -123,10 +88,7 @@ async function main() {
     return;
   }
 
-  const token = readToken();
-  if (!token) throw new Error("Set CLOUDFLARE_API_TOKEN or add it to the existing private Cloudflare credential file.");
-  const databaseId = getDatabaseId();
-  const accountId = await accountForDatabase(token, databaseId);
+  const { token, accountId, databaseId } = await verifyCloudflareAccount();
   const id = `week-${week.toLowerCase()}`;
   const existing = await queryD1(token, accountId, databaseId,
     "SELECT bullets_json, source_keys_json, published FROM updates WHERE id = ? LIMIT 1", [id]);

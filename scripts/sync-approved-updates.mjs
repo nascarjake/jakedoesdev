@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -35,7 +35,7 @@ function markdown(update) {
 }
 
 function isManagedFile(filename) {
-  if (!existsSync(filename)) return true;
+  if (!existsSync(filename)) return false;
   return /^source:\s*["']?admin-review["']?\s*$/m.test(readFileSync(filename, "utf8"));
 }
 
@@ -55,10 +55,10 @@ export async function synchronizeApprovedUpdates({
   const duplicate = updates.find((update, index) => updates.findIndex((candidate) => candidate.id === update.id) !== index);
   if (duplicate) throw new Error(`Approved updates API returned duplicate slug ${duplicate.id}.`);
 
-  const result = { created: [], updated: [], unchanged: [] };
+  const result = { created: [], updated: [], unchanged: [], removed: [] };
   for (const update of updates) {
     const destination = path.join(outputDirectory, `${update.id}.md`);
-    if (!isManagedFile(destination)) throw new Error(`Refusing to replace the manually managed public post ${destination}.`);
+    if (existsSync(destination) && !isManagedFile(destination)) throw new Error(`Refusing to replace the manually managed public post ${destination}.`);
     const next = markdown(update);
     const current = existsSync(destination) ? readFileSync(destination, "utf8") : null;
     if (current === next) {
@@ -72,6 +72,18 @@ export async function synchronizeApprovedUpdates({
     } else {
       result.updated.push(update.id);
       if (!dryRun) writeFileSync(destination, next);
+    }
+  }
+  const publishedIds = new Set(updates.map((update) => update.id));
+  if (existsSync(outputDirectory)) {
+    for (const filename of readdirSync(outputDirectory)) {
+      if (!filename.endsWith(".md")) continue;
+      const id = filename.slice(0, -3);
+      const destination = path.join(outputDirectory, filename);
+      if (!publishedIds.has(id) && isManagedFile(destination)) {
+        result.removed.push(id);
+        if (!dryRun) unlinkSync(destination);
+      }
     }
   }
   return result;
@@ -90,7 +102,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     outputDirectory: process.env.UPDATES_OUTPUT_DIRECTORY?.trim() || path.join(ROOT, "content", "updates"),
     dryRun,
   }).then((result) => {
-    console.log(`Approved update sync: ${result.created.length} created, ${result.updated.length} updated, ${result.unchanged.length} unchanged${dryRun ? " (dry run)" : ""}.`);
+    console.log(`Approved update sync: ${result.created.length} created, ${result.updated.length} updated, ${result.unchanged.length} unchanged, ${result.removed.length} removed${dryRun ? " (dry run)" : ""}.`);
   }).catch((caught) => {
     console.error(caught instanceof Error ? caught.message : "Approved update sync failed.");
     process.exitCode = 1;

@@ -1,6 +1,7 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "jakedoesdev-portfolio",
+  "account_id": "01f53095bb8f6eec6d75040c4232602a",
   "main": "./worker/index.ts",
   "compatibility_date": "2026-09-26",
   "compatibility_flags": ["nodejs_compat"],

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import test from "node:test";
@@ -23,7 +23,7 @@ test("approved updates become published static Markdown without private fields",
   const directory = mkdtempSync(path.join(os.tmpdir(), "jakedoesdev-updates-"));
   t.after(() => rmSync(directory, { recursive: true, force: true }));
   const result = await synchronizeApprovedUpdates({ outputDirectory: directory, fetchImpl: response() });
-  assert.deepEqual(result, { created: ["week-2026-w40"], updated: [], unchanged: [] });
+  assert.deepEqual(result, { created: ["week-2026-w40"], updated: [], unchanged: [], removed: [] });
   const source = readFileSync(path.join(directory, "week-2026-w40.md"), "utf8");
   assert.match(source, /published: true/);
   assert.match(source, /source: "admin-review"/);
@@ -41,4 +41,13 @@ test("a sync never overwrites a manually managed public post", async (t) => {
     /Refusing to replace the manually managed public post/,
   );
   assert.match(readFileSync(destination, "utf8"), /Hand-written post/);
+});
+
+test("unpublishing removes only the sync-managed static post", async (t) => {
+  const directory = mkdtempSync(path.join(os.tmpdir(), "jakedoesdev-updates-"));
+  t.after(() => rmSync(directory, { recursive: true, force: true }));
+  await synchronizeApprovedUpdates({ outputDirectory: directory, fetchImpl: response() });
+  const result = await synchronizeApprovedUpdates({ outputDirectory: directory, fetchImpl: response({ updates: [] }) });
+  assert.deepEqual(result, { created: [], updated: [], unchanged: [], removed: ["week-2026-w40"] });
+  assert.equal(existsSync(path.join(directory, "week-2026-w40.md")), false);
 });
