@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync, existsSync } from "node:fs";
 import test from "node:test";
 import { projectMedia, ezformsClients } from "../app/data/project-media.ts";
+import { projects } from "../app/data/portfolio.ts";
 import { SLICE_COUNT, CONTOUR_POINTS, sliceHeights, contourPoint, specimenRadius, reconstructionData } from "../app/lib/biopsy-model.ts";
 
 test("project media exports all eleven supplied images and five client logos", () => {
@@ -139,6 +140,17 @@ test("the full project archive is available without client JavaScript", () => {
   assert.match(html, /\/universe\/#traxo/);
 });
 
+test("every project has a fuller public build record", () => {
+  assert.equal(projects.length, 20);
+  for (const project of projects) {
+    assert.ok(project.dossier.scope.length > 45, `${project.title} has scope`);
+    assert.equal(project.dossier.ownership.length, 3, `${project.title} has ownership`);
+    assert.equal(project.dossier.systems.length, 3, `${project.title} has systems`);
+  }
+  assert.match(projects.find(project => project.id === "tumor-identifier").dossier.note, /synthetic geometry/);
+  assert.match(projects.find(project => project.id === "tradelab").dossier.note, /not financial advice/);
+});
+
 test("every public route exports the shared accessible workbench", () => {
   for (const route of [
     "index.html",
@@ -181,4 +193,13 @@ test("notes publish only the reviewed public content source", () => {
   assert.match(source, /frontmatter.published !== "true"/);
   assert.match(source, /"content", "updates"/);
   assert.doesNotMatch(source, /\.worklog/);
+});
+
+test("the static updates page has no runtime publishing dependency", () => {
+  const source = readFileSync(
+    new URL("../app/components/UpdatesFeed.tsx", import.meta.url),
+    "utf8",
+  );
+  assert.doesNotMatch(source, /fetch\(|\/api\/updates/);
+  assert.doesNotMatch(source, /"use client"/);
 });

@@ -27,10 +27,9 @@ function Screws() {
 
 export function ArcadeExperience() {
   const [selected, setSelected] = useState(0);
-  const [wideLayout, setWideLayout] = useState(false);
   const [sound, setSound] = useState(false);
-  const [honks, setHonks] = useState(0);
-  const [remaining, setRemaining] = useState(0);
+  const [playing, setPlaying] = useState(false);
+  const [runId, setRunId] = useState(0);
   const [inserted, setInserted] = useState(false);
   const [announcement, setAnnouncement] = useState("");
   const insertTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -38,10 +37,10 @@ export function ArcadeExperience() {
   const media = useRef<ArcadeMediaHandle>(null);
   const cabinet = useRef<HTMLElement>(null);
   const cartridge = cartridges[selected];
-  const running = remaining > 0;
-  const shelfOffset = wideLayout ? 1 : 0;
-  const shelfCartridges = wideLayout ? arcadeGames : cartridges;
-  const shelfSelected = Math.max(0, selected - shelfOffset);
+  const running = playing;
+  const shelfOffset = 0;
+  const shelfCartridges = cartridges;
+  const shelfSelected = selected;
   const shelfStart = Math.min(
     Math.floor(shelfSelected / 3) * 3,
     Math.max(0, shelfCartridges.length - 3),
@@ -50,30 +49,9 @@ export function ArcadeExperience() {
     shelfStart,
     shelfStart + 3,
   );
-  const currentNumber = wideLayout ? selected : selected + 1;
-  const totalCartridges = wideLayout ? arcadeGames.length : cartridges.length;
+  const currentNumber = selected + 1;
+  const totalCartridges = cartridges.length;
 
-  useEffect(() => {
-    const query = window.matchMedia("(min-width: 1101px)");
-    const syncLayout = () => {
-      setWideLayout(query.matches);
-      if (query.matches) {
-        setSelected((current) => (current === 0 ? 1 : current));
-        setRemaining(0);
-        setInserted(false);
-      }
-    };
-
-    syncLayout();
-    query.addEventListener("change", syncLayout);
-    return () => query.removeEventListener("change", syncLayout);
-  }, []);
-
-  useEffect(() => {
-    if (!remaining) return;
-    const timer = setTimeout(() => setRemaining((value) => value - 1), 1000);
-    return () => clearTimeout(timer);
-  }, [remaining]);
   useEffect(
     () => () => {
       if (insertTimer.current) clearTimeout(insertTimer.current);
@@ -83,11 +61,11 @@ export function ArcadeExperience() {
   );
 
   function select(index: number) {
-    const first = wideLayout ? 1 : 0;
+    const first = 0;
     const length = cartridges.length - first;
     const normalized = ((index - first + length) % length) + first;
     setSelected(normalized);
-    setRemaining(0);
+    setPlaying(false);
     setInserted(false);
     setAnnouncement("");
   }
@@ -112,7 +90,6 @@ export function ArcadeExperience() {
   }
   function insertCartridge() {
     setInserted(true);
-    setHonks((count) => count + 1);
     setAnnouncement(
       `${cartridge.title} inserted. ${selected === 0 ? "Welcome to the arcade." : "Opening preview."}`,
     );
@@ -126,11 +103,12 @@ export function ArcadeExperience() {
       media.current?.open();
       return;
     }
-    setRemaining(running ? 0 : 10);
+    setPlaying(!running);
+    if (!running) setRunId((id) => id + 1);
     setAnnouncement(
       running
-        ? "Demo stopped."
-        : `Playing a ten-second ${cartridge.title} visual demo.`,
+        ? "Run stopped early."
+        : `Goose Run started. Jump with Space or Up, duck with Down, or tap the screen.`,
     );
     if (!running) playSound();
   }
@@ -157,60 +135,6 @@ export function ArcadeExperience() {
           <br />› PLAY
           <br />› REPEAT
         </span>
-        <aside className={styles.studioPanel} aria-label="About Goose Games">
-          <span className={styles.studioTab}>THE STUDIO</span>
-          <div className={styles.studioHeading}>
-            <div>
-              <p>INDEPENDENT GAME STUDIO</p>
-              <h2>{studioCartridge.title}</h2>
-            </div>
-            <span aria-label={`${arcadeGames.length} games`}>
-              {String(arcadeGames.length).padStart(2, "0")}
-            </span>
-          </div>
-          <div className={styles.studioBody}>
-            <div className={styles.studioCover}>
-              <Image
-                src={studioCartridge.cover}
-                alt="Goose Games illustrated cartridge cover"
-                fill
-                sizes="160px"
-                priority
-                unoptimized
-              />
-            </div>
-            <div className={styles.studioCopy}>
-              <p className={styles.studioTagline}>
-                {studioCartridge.tagline}
-              </p>
-              <p>{studioCartridge.description}</p>
-              <div className={styles.studioFacts}>
-                <span>PLAY IN BROWSER</span>
-                <span>REAL GAMEPLAY</span>
-                <span>BUILT WITH CURIOSITY</span>
-              </div>
-            </div>
-          </div>
-          <div className={styles.studioActions}>
-            <a
-              className={styles.studioLink}
-              href={studioCartridge.playUrl}
-              target="_blank"
-              rel="noreferrer"
-            >
-              VISIT GOOSEGAMES.DEV <Icon name="external" size={18} />
-            </a>
-            <a
-              className={styles.studioDiscord}
-              href="https://discord.gg/6BJTUpDSsE"
-              target="_blank"
-              rel="noreferrer"
-              aria-label="Join the Goose Games Discord"
-            >
-              <Icon name="discord" size={20} />
-            </a>
-          </div>
-        </aside>
         <section
           ref={cabinet}
           tabIndex={-1}
@@ -348,7 +272,11 @@ export function ArcadeExperience() {
                     <ArcadeScreen
                       selected={cartridge.id}
                       running={running}
-                      honks={honks}
+                      restartKey={runId}
+                      onGameOver={(score) => {
+                        setPlaying(false);
+                        setAnnouncement(`Run over. Final score ${String(score).padStart(5, "0")}.`);
+                      }}
                     />
                     <span className={styles.scanlines} />
                   </div>
@@ -373,9 +301,9 @@ export function ArcadeExperience() {
               >
                 <span className={styles.silverButton} />
                 {selected === 0
-                  ? running
-                    ? `STOP · ${remaining}s`
-                    : "10 SEC DEMO"
+                    ? running
+                    ? "STOP RUN"
+                    : "PLAY GOOSE RUN"
                   : "VIEW PREVIEW"}
               </button>
               <div className={styles.lampBoard}>
@@ -419,7 +347,7 @@ export function ArcadeExperience() {
       <div className={styles.belowCabinet}>
         <span>
           {String(currentNumber).padStart(2, "0")} / {totalCartridges}{" "}
-          {wideLayout ? "GAMES" : "CARTRIDGES"} · {arcadeGames.length} REAL
+          CARTRIDGES · {arcadeGames.length} REAL
           GAMES
         </span>
         <Link href="/universe">

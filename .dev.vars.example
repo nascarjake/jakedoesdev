@@ -1,0 +1,4 @@
+# Cloudflare Access application values. Keep the real file untracked.
+CF_ACCESS_TEAM_DOMAIN=your-team.cloudflareaccess.com
+CF_ACCESS_AUD=your-access-application-audience-tag
+ADMIN_EMAILS=you@example.com

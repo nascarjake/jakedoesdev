@@ -91,6 +91,15 @@ actions tied to the current ChatGPT user. Leave public content anonymous.
 - `npm run build`: verify the vinext build output
 - `npm test`: build the starter and verify its rendered loading skeleton
 - `npm run db:generate`: generate Drizzle migrations after schema changes
+- `npm run db:migrate:local`: apply project schema and seed data to local D1
+- `npm run deploy:cloudflare`: build and deploy the D1/R2/AI-enabled Worker
+
+## Project Studio
+
+The private `/admin/` workspace edits the D1-backed project catalog, uploads
+media to R2, and provides Workers AI drafting tools. See
+[`docs/project-studio-setup.md`](docs/project-studio-setup.md) for Cloudflare
+Access, migration, and deployment setup.
 
 ## Learn More
 

@@ -1,0 +1,46 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "jakedoesdev-portfolio",
+  "main": "./worker/index.ts",
+  "compatibility_date": "2026-09-26",
+  "compatibility_flags": ["nodejs_compat"],
+  "routes": [
+    {
+      "pattern": "jakedoesdev.com/*",
+      "zone_name": "jakedoesdev.com"
+    }
+  ],
+  "assets": {
+    "directory": "./dist/client",
+    "not_found_handling": "none",
+    "binding": "ASSETS"
+  },
+  "images": { "binding": "IMAGES" },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "jakedoesdev-portfolio",
+      "database_id": "26609868-e1a1-42b7-a650-5f077b911d4a",
+      "migrations_dir": "./drizzle"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "PROJECT_MEDIA",
+      "bucket_name": "jakedoesdev-project-media"
+    }
+  ],
+  "ai": { "binding": "AI" },
+  "browser": { "binding": "BROWSER" },
+  "secrets": {
+    "required": [
+      "CF_ACCESS_TEAM_DOMAIN",
+      "CF_ACCESS_AUD",
+      "ADMIN_EMAILS"
+    ]
+  },
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  }
+}

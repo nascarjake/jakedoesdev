@@ -164,8 +164,8 @@ export function UniverseExperience() {
         <article className="project-detail" key={selected.id}>
           <header className="detail-heading">
             <p className="eyebrow">
-              {selected.category} <span className="eyebrow-divider">/</span>{" "}
-              {selected.year}
+              {selected.year} <span className="eyebrow-divider">/</span>{" "}
+              {selected.category}
             </p>
             <h1>
               {selected.title}
@@ -173,8 +173,10 @@ export function UniverseExperience() {
             </h1>
             <p>{selected.eyebrow}</p>
           </header>
-          {selected.id === "tumor-identifier" ? <BiopsyDemo /> : selected.media?.length || projectMedia[selected.id] ? <ProjectMedia media={projectMedia[selected.id]} assets={selected.media} title={selected.title} /> : <ProjectIllustration project={selected} />}
-          {selected.id === "ezforms" && <EzformsClients />}
+          <div className="project-feature">
+            {selected.id === "tumor-identifier" ? <BiopsyDemo /> : selected.media?.length || projectMedia[selected.id] ? <ProjectMedia media={projectMedia[selected.id]} assets={selected.media} title={selected.title} /> : <ProjectIllustration project={selected} />}
+            {selected.id === "ezforms" && <EzformsClients />}
+          </div>
           <div className="project-facts">
             <div>
               <span>MY ROLE</span>

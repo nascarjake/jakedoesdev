@@ -5,7 +5,9 @@ import type { NextConfig } from "next";
 const pagesBasePath = process.env.PAGES_BASE_PATH ?? "";
 
 const nextConfig: NextConfig = {
-  output: "export",
+  // GitHub Pages keeps its static export. The Cloudflare Worker build retains
+  // server routing so D1, R2, Access, and Workers AI endpoints remain live.
+  output: process.env.npm_lifecycle_event === "build:pages" ? "export" : undefined,
   trailingSlash: true,
   basePath: pagesBasePath,
   turbopack: {

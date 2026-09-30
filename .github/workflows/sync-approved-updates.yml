@@ -1,0 +1,45 @@
+name: Sync approved updates to GitHub Pages
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-approved-updates
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    env:
+      UPDATES_API_URL: ${{ vars.UPDATES_API_URL || 'https://jakedoesdev.com/api/updates' }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v6
+        with:
+          ref: main
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Materialize approved public updates
+        run: npm run updates:sync
+
+      - name: Commit generated public updates
+        run: |
+          if git diff --quiet -- content/updates; then exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add content/updates
+          git commit -m "Publish approved updates"
+          git push

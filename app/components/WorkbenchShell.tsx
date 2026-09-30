@@ -23,6 +23,39 @@ const groups: {
   { title: "Developer tools", icon: "code", categories: ["Creative Tools"] },
 ];
 
+type DirectoryProject = {
+  id: string;
+  title: string;
+  category: ProjectCategory;
+  stack: string[];
+  accent: "acid" | "amber" | "ice";
+};
+
+const categories = new Set<ProjectCategory>([
+  "Enterprise",
+  "AI + Automation",
+  "Creative Tools",
+  "Mobile",
+  "Games",
+  "SaaS",
+]);
+
+function directoryProjectFromApi(value: unknown): DirectoryProject | null {
+  if (!value || typeof value !== "object") return null;
+  const project = value as Record<string, unknown>;
+  const id = typeof project.id === "string" ? project.id : "";
+  const title = typeof project.title === "string" ? project.title : "";
+  const category = typeof project.category === "string" && categories.has(project.category as ProjectCategory)
+    ? project.category as ProjectCategory
+    : null;
+  const accent = project.accent === "acid" || project.accent === "amber" || project.accent === "ice"
+    ? project.accent
+    : null;
+  if (!id || !title || !category || !accent || !Array.isArray(project.stack)) return null;
+  const stack = project.stack.filter((item): item is string => typeof item === "string");
+  return { id, title, category, stack, accent };
+}
+
 export function WorkbenchShell({
   children,
   section = "arcade",
@@ -34,6 +67,7 @@ export function WorkbenchShell({
 }) {
   const [query, setQuery] = useState("");
   const [directoryOpen, setDirectoryOpen] = useState(false);
+  const [catalog, setCatalog] = useState<DirectoryProject[]>(projects);
   const pathname = usePathname();
   const searchInput = useRef<HTMLInputElement>(null);
   useEffect(() => {
@@ -59,7 +93,22 @@ export function WorkbenchShell({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
-  const filtered = projects.filter((project) =>
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch("/api/projects", { signal: controller.signal })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("catalog unavailable");
+        return await response.json() as { projects?: unknown };
+      })
+      .then((payload) => {
+        if (!Array.isArray(payload.projects)) return;
+        const next = payload.projects.map(directoryProjectFromApi);
+        if (next.every((project): project is DirectoryProject => project !== null)) setCatalog(next);
+      })
+      .catch(() => undefined);
+    return () => controller.abort();
+  }, []);
+  const filtered = catalog.filter((project) =>
     `${project.title} ${project.category} ${project.stack.join(" ")}`
       .toLowerCase()
       .includes(query.toLowerCase()),
@@ -139,25 +188,33 @@ export function WorkbenchShell({
           aria-controls="project-directory"
           onClick={() => setDirectoryOpen(!directoryOpen)}
         >
-          <Icon name="folder" size={18} /> Browse the work{" "}
+          <Icon name="folder" size={18} /> Browse shipped work{" "}
           <span>{directoryOpen ? "−" : "+"}</span>
         </button>
         <aside
           className={`directory-sidebar ${directoryOpen ? "mobile-open" : ""}`}
           id="project-directory"
-          aria-label="Project directory"
+          aria-label="Shipped product directory"
         >
           <div className="sidebar-heading">
-            <span>THE WORKBENCH</span>
-            <span className="tiny-counter">{projects.length}</span>
+            <span>
+              THE WORKBENCH
+              <small>SHIPPED PRODUCT ARCHIVE</small>
+            </span>
+            <span
+              className="tiny-counter"
+              aria-label={`${catalog.length} shipped production products`}
+            >
+              {catalog.length}
+            </span>
           </div>
           <label className="sidebar-search">
             <Icon name="search" size={16} />
             <input
               ref={searchInput}
               type="search"
-              aria-label="Search projects"
-              placeholder="Find a project…"
+              aria-label="Search shipped production products"
+              placeholder="Find shipped work…"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
             />
@@ -178,56 +235,74 @@ export function WorkbenchShell({
             </span>
             <Icon name="arrow" size={16} />
           </Link>
-          <nav className="project-groups" aria-label="Projects by discipline">
-            {groups.map((group) => {
-              const items = filtered.filter((project) =>
-                group.categories.includes(project.category),
-              );
-              if (!items.length) return null;
-              return (
-                <section className="project-group" key={group.title}>
-                  <h2>
-                    <Icon name={group.icon} size={15} />
-                    {group.title}
-                    <span>{items.length}</span>
-                  </h2>
-                  {items.map((project) => (
-                    <Link
-                      href={`/universe#${project.id}`}
-                      className={
-                        selectedProject === project.id ? "selected" : ""
-                      }
-                      aria-current={
-                        selectedProject === project.id ? "true" : undefined
-                      }
-                      key={project.id}
-                      onClick={(event) => {
-                        setDirectoryOpen(false);
-                        if (
-                          pathname.replace(/\/$/, "") === "/universe" &&
-                          !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey
-                        ) {
-                          event.preventDefault();
-                          openWorkbenchPanel(project.id);
+          <section className="production-directory" aria-labelledby="production-directory-title">
+            <div className="production-directory-heading">
+              <h2 id="production-directory-title">Shipped production products</h2>
+              <p>Released apps, platforms, and tools.</p>
+            </div>
+            <nav className="project-groups" aria-label="Shipped production products by discipline">
+              {groups.map((group) => {
+                const items = filtered.filter((project) =>
+                  group.categories.includes(project.category),
+                );
+                if (!items.length) return null;
+                return (
+                  <section className="project-group" key={group.title}>
+                    <h2>
+                      <Icon name={group.icon} size={15} />
+                      {group.title}
+                      <span>{items.length}</span>
+                    </h2>
+                    {items.map((project) => (
+                      <Link
+                        href={`/universe#${project.id}`}
+                        className={
+                          selectedProject === project.id ? "selected" : ""
                         }
-                      }}
-                    >
-                      <span className={`project-dot dot-${project.accent}`} />
-                      <span>{project.title}</span>
-                      {selectedProject === project.id && (
-                        <Icon name="arrow" size={13} />
-                      )}
-                    </Link>
-                  ))}
-                </section>
-              );
-            })}
-            {!filtered.length && (
-              <p className="search-empty">
-                No projects found. Try a name or technology.
-              </p>
-            )}
-          </nav>
+                        aria-current={
+                          selectedProject === project.id ? "true" : undefined
+                        }
+                        key={project.id}
+                        onClick={(event) => {
+                          setDirectoryOpen(false);
+                          if (
+                            pathname.replace(/\/$/, "") === "/universe" &&
+                            !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey
+                          ) {
+                            event.preventDefault();
+                            openWorkbenchPanel(project.id);
+                          }
+                        }}
+                      >
+                        <span className={`project-dot dot-${project.accent}`} />
+                        <span>{project.title}</span>
+                        {selectedProject === project.id && (
+                          <Icon name="arrow" size={13} />
+                        )}
+                      </Link>
+                    ))}
+                  </section>
+                );
+              })}
+              {!filtered.length && (
+                <p className="search-empty">
+                  No shipped products found. Try a name or technology.
+                </p>
+              )}
+            </nav>
+          </section>
+          <section className="lab-directory" aria-labelledby="lab-directory-title">
+            <span className="lab-directory-icon">
+              <Icon name="code" size={17} />
+            </span>
+            <div>
+              <div className="lab-directory-heading">
+                <h2 id="lab-directory-title">Lab bench</h2>
+                <span>Next up</span>
+              </div>
+              <p>Experiments, prototypes, and utility tools will live here.</p>
+            </div>
+          </section>
           <div className="sidebar-bottom">
             <Link href="/resume">
               <Icon name="file" size={16} /> The 60-second résumé{" "}
@@ -259,7 +334,7 @@ export function WorkbenchShell({
           NATURE.
         </span>
         <span>
-          {projects.length} projects <i>/</i> Building since 2002
+          {catalog.length} projects <i>/</i> Building since 2002
         </span>
         <span>
           MADE WITH CURIOSITY <span className="footer-wave">⌁</span>
