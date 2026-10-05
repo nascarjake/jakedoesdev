@@ -31,4 +31,4 @@ The private work log is intentionally ignored by Git and cannot be read by GitHu
 /absolute/path/to/node /absolute/path/to/jakedoesdev/scripts/sync-worklog-review.mjs
 ```
 
-It needs the verified `jakedoesdev-personal` Wrangler OAuth profile described in [`project-studio-setup.md`](project-studio-setup.md). The command is idempotent: it adds only new source summaries to an unpublished weekly draft and leaves approved updates untouched.
+Run `npm run worklog:sync -- --all` once to add older weeks to the private review queue. The normal daily command checks only the current week and exits cleanly when its ledger does not exist yet. Both commands need the verified `jakedoesdev-personal` Wrangler OAuth profile described in [`project-studio-setup.md`](project-studio-setup.md). They are idempotent: they add only new source summaries to unpublished weekly drafts and leave approved updates untouched.

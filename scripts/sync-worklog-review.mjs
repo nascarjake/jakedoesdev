@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { createHash } from "node:crypto";
-import { readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { verifyCloudflareAccount } from "./verify-cloudflare-account.mjs";
@@ -27,6 +27,14 @@ function localDate() {
     day: "2-digit",
   }).formatToParts(new Date());
   return Object.fromEntries(parts.map(({ type, value }) => [type, value]));
+}
+
+function weekEndDate(week) {
+  const [year, number] = week.split("-W").map(Number);
+  const januaryFourth = new Date(Date.UTC(year, 0, 4));
+  const mondayOffset = (januaryFourth.getUTCDay() + 6) % 7;
+  januaryFourth.setUTCDate(januaryFourth.getUTCDate() - mondayOffset + (number - 1) * 7 + 6);
+  return januaryFourth.toISOString().slice(0, 10);
 }
 
 function parseLedger(source) {
@@ -66,29 +74,7 @@ async function queryD1(token, accountId, databaseId, sql, params = []) {
   return response.result?.[0]?.results ?? [];
 }
 
-async function main() {
-  const week = isoWeek();
-  const ledgerPath = path.join(LEDGER_DIR, `${week}.md`);
-  const ledger = readFileSync(ledgerPath, "utf8");
-  const entries = parseLedger(ledger);
-  if (!entries.length) {
-    console.log(`No non-private ledger summaries are ready for ${week}.`);
-    return;
-  }
-
-  let publicApi;
-  try {
-    publicApi = await fetch(PUBLIC_UPDATES_API, { signal: AbortSignal.timeout(10_000) });
-  } catch {
-    console.log("The portal review API could not be reached; the private ledger was left unchanged.");
-    return;
-  }
-  if (!publicApi.ok || !publicApi.headers.get("content-type")?.includes("application/json")) {
-    console.log("The portal review API is not live yet; the draft remains private until the site rollout is deployed.");
-    return;
-  }
-
-  const { token, accountId, databaseId } = await verifyCloudflareAccount();
+async function syncWeek(week, entries, { token, accountId, databaseId }) {
   const id = `week-${week.toLowerCase()}`;
   const existing = await queryD1(token, accountId, databaseId,
     "SELECT bullets_json, source_keys_json, published FROM updates WHERE id = ? LIMIT 1", [id]);
@@ -121,7 +107,7 @@ async function main() {
   }
 
   const { year, month, day } = localDate();
-  const date = `${year}-${month}-${day}`;
+  const date = week === isoWeek() ? `${year}-${month}-${day}` : weekEndDate(week);
   const title = `Field notes · ${week}`;
   const summary = "A running notebook of ideas, builds, and lessons from the week.";
   if (existing[0]) {
@@ -134,6 +120,39 @@ async function main() {
       [id, title, date, summary, JSON.stringify(bullets), JSON.stringify(sourceKeys), "daily work log"]);
   }
   console.log(`Sent ${additions.length} new summaries to the private ${week} portal draft.`);
+}
+
+async function main() {
+  const args = process.argv.slice(2);
+  if (args.length > 1 || (args.length === 1 && args[0] !== "--all")) {
+    throw new Error("Usage: sync-worklog-review.mjs [--all]");
+  }
+  const weeks = args[0] === "--all"
+    ? (existsSync(LEDGER_DIR) ? readdirSync(LEDGER_DIR).filter((name) => /^\d{4}-W\d{2}\.md$/.test(name)).map((name) => name.slice(0, -3)).sort() : [])
+    : [isoWeek()];
+  const batches = weeks.flatMap((week) => {
+    const ledgerPath = path.join(LEDGER_DIR, `${week}.md`);
+    return existsSync(ledgerPath) ? [{ week, entries: parseLedger(readFileSync(ledgerPath, "utf8")) }] : [];
+  }).filter(({ entries }) => entries.length > 0);
+  if (!batches.length) {
+    console.log("No non-private ledger summaries are ready for review.");
+    return;
+  }
+
+  let publicApi;
+  try {
+    publicApi = await fetch(PUBLIC_UPDATES_API, { signal: AbortSignal.timeout(10_000) });
+  } catch {
+    console.log("The portal review API could not be reached; the private ledger was left unchanged.");
+    return;
+  }
+  if (!publicApi.ok || !publicApi.headers.get("content-type")?.includes("application/json")) {
+    console.log("The portal review API is not live yet; the draft remains private until the site rollout is deployed.");
+    return;
+  }
+
+  const account = await verifyCloudflareAccount();
+  for (const { week, entries } of batches) await syncWeek(week, entries, account);
 }
 
 main().catch((caught) => {
