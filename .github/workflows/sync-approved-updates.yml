@@ -7,6 +7,8 @@ on:
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
 
 concurrency:
   group: sync-approved-updates
@@ -15,6 +17,8 @@ concurrency:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    outputs:
+      published_sha: ${{ steps.commit.outputs.published_sha }}
     env:
       UPDATES_API_URL: ${{ vars.UPDATES_API_URL || 'https://jakedoesdev.com/api/updates' }}
     steps:
@@ -24,7 +28,7 @@ jobs:
           ref: main
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
@@ -36,10 +40,19 @@ jobs:
         run: npm run updates:sync
 
       - name: Commit generated public updates
+        id: commit
         run: |
-          if git diff --quiet -- content/updates; then exit 0; fi
+          git add -A -- content/updates
+          if git diff --cached --quiet -- content/updates; then exit 0; fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add content/updates
           git commit -m "Publish approved updates"
           git push
+          echo "published_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+  publish:
+    needs: sync
+    if: needs.sync.outputs.published_sha != ''
+    uses: ./.github/workflows/deploy-pages.yml
+    with:
+      source_ref: ${{ needs.sync.outputs.published_sha }}

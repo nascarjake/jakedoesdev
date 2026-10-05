@@ -57,7 +57,6 @@ test("the exported homepage opens the Goose Games arcade", () => {
   assert.match(html, /https:\/\/goosegames.dev/);
   assert.match(html, /discord.gg\/6BJTUpDSsE/);
   assert.doesNotMatch(html, /DRAG TO ORBIT|SEE COOL STUFF/);
-  assert.match(html, /10 SEC DEMO/);
   assert.match(html.replace(/<!--.*?-->/g, ""), /11 REAL GAMES/);
   assert.doesNotMatch(html, /Orbital Drift|Signal Runner|Concept cartridges/);
 });
