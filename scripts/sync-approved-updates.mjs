@@ -39,6 +39,29 @@ function isManagedFile(filename) {
   return /^source:\s*["']?admin-review["']?\s*$/m.test(readFileSync(filename, "utf8"));
 }
 
+function publishedIndex(outputDirectory) {
+  if (!existsSync(outputDirectory)) return [];
+  return readdirSync(outputDirectory).filter((filename) => filename.endsWith(".md")).flatMap((filename) => {
+    const source = readFileSync(path.join(outputDirectory, filename), "utf8");
+    const match = source.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/);
+    if (!match || !/^published:\s*true\s*$/m.test(match[1])) return [];
+    const field = (name) => {
+      const value = match[1].match(new RegExp(`^${name}:\\s*(.*)$`, "m"))?.[1]?.trim() ?? "";
+      if (value.startsWith('"')) {
+        try { return JSON.parse(value); } catch { return ""; }
+      }
+      return value.replace(/^'|'$/g, "");
+    };
+    return [{
+      id: filename.slice(0, -3),
+      title: field("title") || filename.slice(0, -3),
+      date: field("date"),
+      summary: field("summary"),
+      bullets: match[2].split(/\r?\n/).map((line) => line.trim()).filter((line) => /^[-*]\s+/.test(line)).map((line) => line.replace(/^[-*]\s+/, "")),
+    }];
+  }).sort((left, right) => right.date.localeCompare(left.date));
+}
+
 export async function synchronizeApprovedUpdates({
   endpoint = DEFAULT_ENDPOINT,
   outputDirectory = path.join(ROOT, "content", "updates"),
@@ -85,6 +108,10 @@ export async function synchronizeApprovedUpdates({
         if (!dryRun) unlinkSync(destination);
       }
     }
+  }
+  if (!dryRun) {
+    mkdirSync(outputDirectory, { recursive: true });
+    writeFileSync(path.join(outputDirectory, "index.json"), `${JSON.stringify(publishedIndex(outputDirectory), null, 2)}\n`);
   }
   return result;
 }

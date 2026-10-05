@@ -113,7 +113,7 @@ export function UpdatesStudio() {
       });
       setSelected(result.update);
       setUpdates((current) => [result.update, ...current.filter((item) => item.id !== result.update.id)]);
-      setNotice({ type: "success", text: publish ? "Approved. It will appear on /updates after the next static sync." : "Draft saved in the review queue." });
+      setNotice({ type: "success", text: publish ? "Approved. It will appear on /updates after the next publishing sync." : "Draft saved in the review queue." });
     } catch (caught) {
       setNotice({ type: "error", text: caught instanceof Error ? caught.message : "Could not save this update." });
     } finally {
@@ -131,7 +131,7 @@ export function UpdatesStudio() {
       });
       setSelected(result.update);
       setUpdates((current) => current.map((item) => item.id === result.update.id ? result.update : item));
-      setNotice({ type: "success", text: "Unpublished. It will be removed from /updates after the next static sync." });
+      setNotice({ type: "success", text: "Unpublished. It will be removed from /updates after the next publishing sync." });
     } catch (caught) {
       setNotice({ type: "error", text: caught instanceof Error ? caught.message : "Could not unpublish this update." });
     } finally {
@@ -197,7 +197,7 @@ export function UpdatesStudio() {
           </div>
         </div>
         <div className={styles.section}>
-          <header className={styles.sectionHeader}><h2>{selected.published ? "Published" : "Approval"}</h2><p>{selected.published ? "This version is queued for the next static updates sync." : "Only an approved post appears on the public updates page."}</p></header>
+          <header className={styles.sectionHeader}><h2>{selected.published ? "Published" : "Approval"}</h2><p>{selected.published ? "This version is queued for the next publishing sync." : "Only an approved post appears on the public updates page."}</p></header>
           <div className={styles.sectionBody}>
             <div className={styles.row}>
               <button className={styles.button} type="button" disabled={saving || !dirty} onClick={() => void save(false)}>{saving ? "Saving…" : selected.published ? "Save changes" : "Save draft"}</button>
