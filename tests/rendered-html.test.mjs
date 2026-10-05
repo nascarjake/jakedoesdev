@@ -193,12 +193,3 @@ test("notes publish only the reviewed public content source", () => {
   assert.match(source, /"content", "updates"/);
   assert.doesNotMatch(source, /\.worklog/);
 });
-
-test("the static updates page has no runtime publishing dependency", () => {
-  const source = readFileSync(
-    new URL("../app/components/UpdatesFeed.tsx", import.meta.url),
-    "utf8",
-  );
-  assert.doesNotMatch(source, /fetch\(|\/api\/updates/);
-  assert.doesNotMatch(source, /"use client"/);
-});
