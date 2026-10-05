@@ -5,6 +5,7 @@ import { authenticateAdmin, isValidAdminWrite } from "./access";
 import { handleAdminGamesApi, handleGameMedia, handlePublicGames } from "./games-api";
 import { handleAdminApi, handleProjectMedia, handlePublicProjects } from "./projects-api";
 import { handleAdminUpdates, handlePublicUpdates, handleSyncControl } from "./updates-api";
+import { handleUpdatePage } from "./updates-page";
 
 // Image security config. SVG sources with .svg extension auto-skip the
 // optimization endpoint on the client side (served directly, no proxy).
@@ -36,6 +37,11 @@ const worker = {
 
     if (url.pathname === "/api/updates/sync-control") {
       return handleSyncControl(request, env);
+    }
+
+    const updatePage = url.pathname.match(/^\/updates\/([a-z0-9]+(?:-[a-z0-9]+)*)\/?$/);
+    if (updatePage && request.method === "GET") {
+      return handleUpdatePage(request, env, updatePage[1]);
     }
 
     if (url.pathname.startsWith("/api/media/")) {
