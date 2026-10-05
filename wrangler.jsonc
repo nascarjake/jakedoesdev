@@ -37,7 +37,8 @@
     "required": [
       "CF_ACCESS_TEAM_DOMAIN",
       "CF_ACCESS_AUD",
-      "ADMIN_EMAILS"
+      "ADMIN_EMAILS",
+      "UPDATES_SYNC_TOKEN"
     ]
   },
   "observability": {

@@ -4,7 +4,7 @@ import handler from "vinext/server/app-router-entry";
 import { authenticateAdmin, isValidAdminWrite } from "./access";
 import { handleAdminGamesApi, handleGameMedia, handlePublicGames } from "./games-api";
 import { handleAdminApi, handleProjectMedia, handlePublicProjects } from "./projects-api";
-import { handleAdminUpdates, handlePublicUpdates } from "./updates-api";
+import { handleAdminUpdates, handlePublicUpdates, handleSyncControl } from "./updates-api";
 
 // Image security config. SVG sources with .svg extension auto-skip the
 // optimization endpoint on the client side (served directly, no proxy).
@@ -32,6 +32,10 @@ const worker = {
       const response = await handlePublicUpdates(request, env);
       if (response.ok) response.headers.set("cache-control", "public, max-age=60, stale-while-revalidate=300");
       return response;
+    }
+
+    if (url.pathname === "/api/updates/sync-control") {
+      return handleSyncControl(request, env);
     }
 
     if (url.pathname.startsWith("/api/media/")) {

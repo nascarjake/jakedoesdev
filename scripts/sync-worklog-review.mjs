@@ -46,7 +46,10 @@ function parseLedger(source) {
     const summary = fields.summary.replace(/^(["'])(.*)\1$/, "$2").trim();
     if (!summary) return [];
     const sourceKey = createHash("sha256").update(`${heading}\n${summary}`).digest("hex");
-    return [{ summary, sourceKey }];
+    const project = heading.split(" · ").slice(1).join(" · ").trim() || "Unassigned";
+    const slug = project.toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 55) || "project";
+    const projectId = `${slug}-${createHash("sha256").update(project).digest("hex").slice(0, 10)}`;
+    return [{ summary, sourceKey, project, projectId }];
   });
 }
 
@@ -77,31 +80,72 @@ async function queryD1(token, accountId, databaseId, sql, params = []) {
 async function syncWeek(week, entries, { token, accountId, databaseId }) {
   const id = `week-${week.toLowerCase()}`;
   const existing = await queryD1(token, accountId, databaseId,
-    "SELECT bullets_json, source_keys_json, published FROM updates WHERE id = ? LIMIT 1", [id]);
+    "SELECT bullets_json, entries_json, source_keys_json, published FROM updates WHERE id = ? LIMIT 1", [id]);
 
+  for (const entry of entries) {
+    await queryD1(token, accountId, databaseId,
+      "INSERT INTO update_projects (id,name,excluded) VALUES (?,?,1) ON CONFLICT(id) DO NOTHING",
+      [entry.projectId, entry.project]);
+  }
   if (existing[0]?.published === 1) {
-    console.log(`The ${week} update is already published; the automation left it unchanged.`);
+    let previousItems = [];
+    try { previousItems = JSON.parse(existing[0].entries_json); } catch { previousItems = []; }
+    if (!Array.isArray(previousItems) || previousItems.length === 0) {
+      let previousBullets = [];
+      try { previousBullets = JSON.parse(existing[0].bullets_json); } catch { previousBullets = []; }
+      await queryD1(token, accountId, databaseId,
+        "INSERT INTO update_projects (id,name,excluded) VALUES ('previously-approved','Previously approved',0) ON CONFLICT(id) DO NOTHING");
+      const retained = previousBullets.filter((bullet) => typeof bullet === "string")
+        .map((bullet) => ({ projectId: "previously-approved", text: bullet }));
+      await queryD1(token, accountId, databaseId,
+        "UPDATE updates SET entries_json = ? WHERE id = ? AND published = 1 AND entries_json = '[]'",
+        [JSON.stringify(retained), id]);
+      console.log(`Preserved the already approved ${week} post in a legacy review group.`);
+    } else {
+      console.log(`The ${week} update is already published; the automation left it unchanged.`);
+    }
     return;
   }
-
   let bullets = [];
+  let items = [];
   let sourceKeys = [];
   if (existing[0]) {
     try { bullets = JSON.parse(existing[0].bullets_json); } catch { bullets = []; }
+    try { items = JSON.parse(existing[0].entries_json); } catch { items = []; }
     try { sourceKeys = JSON.parse(existing[0].source_keys_json); } catch { sourceKeys = []; }
   }
   if (!Array.isArray(bullets)) bullets = [];
+  if (!Array.isArray(items)) items = [];
   if (!Array.isArray(sourceKeys)) sourceKeys = [];
+  const migrating = Boolean(existing[0] && items.length === 0 && bullets.length > 0);
+  if (migrating) {
+    const bySummary = new Map();
+    for (const entry of entries) {
+      const ids = bySummary.get(entry.summary) ?? new Set();
+      ids.add(entry.projectId);
+      bySummary.set(entry.summary, ids);
+    }
+    const unassigned = entries.find((entry) => entry.project === "Unassigned");
+    const fallbackId = unassigned?.projectId ?? `unassigned-${createHash("sha256").update("Unassigned").digest("hex").slice(0, 10)}`;
+    if (!unassigned) await queryD1(token, accountId, databaseId,
+      "INSERT INTO update_projects (id,name,excluded) VALUES (?,'Unassigned',1) ON CONFLICT(id) DO NOTHING", [fallbackId]);
+    items = bullets.filter((bullet) => typeof bullet === "string").map((bullet) => ({
+      projectId: bySummary.get(bullet)?.size === 1 ? [...bySummary.get(bullet)][0] : fallbackId, text: bullet,
+    }));
+  }
   const knownKeys = new Set(sourceKeys.filter((key) => typeof key === "string"));
   const knownBullets = new Set(bullets.filter((bullet) => typeof bullet === "string"));
   const additions = entries.filter((entry) => !knownKeys.has(entry.sourceKey));
   for (const entry of additions) {
-    if (!knownBullets.has(entry.summary)) bullets.push(entry.summary);
+    if (!knownBullets.has(entry.summary)) {
+      bullets.push(entry.summary);
+      items.push({ projectId: entry.projectId, text: entry.summary });
+    }
     sourceKeys.push(entry.sourceKey);
     knownKeys.add(entry.sourceKey);
     knownBullets.add(entry.summary);
   }
-  if (!additions.length && existing[0]) {
+  if (!additions.length && existing[0] && !migrating) {
     console.log(`No new summaries for ${week}; the review draft is unchanged.`);
     return;
   }
@@ -112,12 +156,12 @@ async function syncWeek(week, entries, { token, accountId, databaseId }) {
   const summary = "A running notebook of ideas, builds, and lessons from the week.";
   if (existing[0]) {
     await queryD1(token, accountId, databaseId,
-      "UPDATE updates SET bullets_json = ?, source_keys_json = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND published = 0",
-      [JSON.stringify(bullets), JSON.stringify(sourceKeys), id]);
+      "UPDATE updates SET bullets_json = ?, entries_json = ?, source_keys_json = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND published = 0",
+      [JSON.stringify(bullets), JSON.stringify(items), JSON.stringify(sourceKeys), id]);
   } else {
     await queryD1(token, accountId, databaseId,
-      "INSERT INTO updates (id, title, date, summary, bullets_json, source_keys_json, published, created_by) VALUES (?, ?, ?, ?, ?, ?, 0, ?)",
-      [id, title, date, summary, JSON.stringify(bullets), JSON.stringify(sourceKeys), "daily work log"]);
+      "INSERT INTO updates (id, title, date, summary, bullets_json, entries_json, source_keys_json, published, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?)",
+      [id, title, date, summary, JSON.stringify(bullets), JSON.stringify(items), JSON.stringify(sourceKeys), "daily work log"]);
   }
   console.log(`Sent ${additions.length} new summaries to the private ${week} portal draft.`);
 }

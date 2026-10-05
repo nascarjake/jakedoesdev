@@ -11,6 +11,7 @@ const approved = {
     title: "Field notes · 2026-W40",
     date: "2026-09-29",
     summary: "A reviewed weekly development note.",
+    projects: [{ id: "portfolio", name: "Portfolio", bullets: ["Built a safe static publishing path."] }],
     bullets: ["Built a safe static publishing path."],
   }],
 };
@@ -28,7 +29,9 @@ test("approved updates become published static Markdown without private fields",
   assert.match(source, /published: true/);
   assert.match(source, /source: "admin-review"/);
   assert.doesNotMatch(source, /source_keys|created_by|createdBy/);
-  assert.deepEqual(JSON.parse(readFileSync(path.join(directory, "index.json"), "utf8")), approved.updates);
+  const publicPost = JSON.parse(readFileSync(path.join(directory, "index.json"), "utf8"))[0];
+  assert.equal(publicPost.projects[0].name, "Portfolio");
+  assert.deepEqual(publicPost.bullets, approved.updates[0].bullets);
 });
 
 test("a sync never overwrites a manually managed public post", async (t) => {
@@ -61,14 +64,15 @@ test("the public index includes only published Markdown posts", async (t) => {
   writeFileSync(path.join(directory, "draft.md"), "---\ntitle: Private draft\ndate: 2026-09-30\npublished: false\n---\n\n- Private bullet\n");
   await synchronizeApprovedUpdates({ outputDirectory: directory, fetchImpl: response({ updates: [] }) });
   assert.deepEqual(JSON.parse(readFileSync(path.join(directory, "index.json"), "utf8")), [{
-    id: "manual", title: "Manual note", date: "2026-09-30", summary: "Reviewed text", bullets: ["Public bullet"],
+    id: "manual", title: "Manual note", date: "2026-09-30", summary: "Reviewed text", projects: [{ id: "general", name: "General", bullets: ["Public bullet"] }], bullets: ["Public bullet"],
   }]);
 });
 
 test("a reviewed weekly draft with 87 entries can be synchronized", async (t) => {
   const directory = mkdtempSync(path.join(os.tmpdir(), "jakedoesdev-updates-"));
   t.after(() => rmSync(directory, { recursive: true, force: true }));
-  const update = { ...approved.updates[0], bullets: Array.from({ length: 87 }, (_, index) => `Reviewed item ${index + 1}`) };
+  const bullets = Array.from({ length: 87 }, (_, index) => `Reviewed item ${index + 1}`);
+  const update = { ...approved.updates[0], projects: [{ id: "portfolio", name: "Portfolio", bullets }], bullets };
   await synchronizeApprovedUpdates({ outputDirectory: directory, fetchImpl: response({ updates: [update] }) });
   assert.equal(JSON.parse(readFileSync(path.join(directory, "index.json"), "utf8"))[0].bullets.length, 87);
 });

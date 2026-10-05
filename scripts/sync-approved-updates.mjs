@@ -18,12 +18,15 @@ function validUpdate(value) {
   const title = cleanText(value.title, 140);
   const date = cleanText(value.date, 10);
   const summary = cleanText(value.summary, 500);
-  const bullets = Array.isArray(value.bullets)
-    ? value.bullets.map((bullet) => cleanText(bullet, 800)).filter(Boolean)
-    : [];
-  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id) || !title || !summary || bullets.length === 0 || bullets.length > 100) return null;
+  const projects = Array.isArray(value.projects) ? value.projects.map((project) => ({
+    id: cleanText(project?.id, 80),
+    name: cleanText(project?.name, 120),
+    bullets: Array.isArray(project?.bullets) ? project.bullets.map((bullet) => cleanText(bullet, 800)).filter(Boolean) : [],
+  })) : [];
+  const bullets = projects.flatMap((project) => project.bullets);
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id) || !title || !summary || bullets.length === 0 || bullets.length > 100 || projects.some((project) => !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(project.id) || !project.name || !project.bullets.length)) return null;
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(Date.parse(`${date}T00:00:00Z`))) return null;
-  return { id, title, date, summary, bullets };
+  return { id, title, date, summary, projects, bullets };
 }
 
 function quote(value) {
@@ -31,7 +34,7 @@ function quote(value) {
 }
 
 function markdown(update) {
-  return `---\ntitle: ${quote(update.title)}\ndate: ${quote(update.date)}\nsummary: ${quote(update.summary)}\npublished: true\nsource: ${quote(MANAGED_SOURCE)}\n---\n\n## This week\n\n${update.bullets.map((bullet) => `- ${bullet}`).join("\n")}\n`;
+  return `---\ntitle: ${quote(update.title)}\ndate: ${quote(update.date)}\nsummary: ${quote(update.summary)}\npublished: true\nsource: ${quote(MANAGED_SOURCE)}\n---\n\n${update.projects.map((project) => `## ${project.name}\n\n${project.bullets.map((bullet) => `- ${bullet}`).join("\n")}`).join("\n\n")}\n`;
 }
 
 function isManagedFile(filename) {
@@ -52,12 +55,28 @@ function publishedIndex(outputDirectory) {
       }
       return value.replace(/^'|'$/g, "");
     };
+    const projects = [];
+    let current = null;
+    for (const line of match[2].split(/\r?\n/)) {
+      const heading = line.match(/^##\s+(.+)$/);
+      if (heading) {
+        current = { id: heading[1].toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "general", name: heading[1], bullets: [] };
+        projects.push(current);
+      } else if (/^[-*]\s+/.test(line.trim())) {
+        if (!current) {
+          current = { id: "general", name: "General", bullets: [] };
+          projects.push(current);
+        }
+        current.bullets.push(line.trim().replace(/^[-*]\s+/, ""));
+      }
+    }
     return [{
       id: filename.slice(0, -3),
       title: field("title") || filename.slice(0, -3),
       date: field("date"),
       summary: field("summary"),
-      bullets: match[2].split(/\r?\n/).map((line) => line.trim()).filter((line) => /^[-*]\s+/.test(line)).map((line) => line.replace(/^[-*]\s+/, "")),
+      projects,
+      bullets: projects.flatMap((project) => project.bullets),
     }];
   }).sort((left, right) => right.date.localeCompare(left.date));
 }
