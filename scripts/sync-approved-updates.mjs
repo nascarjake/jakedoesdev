@@ -21,7 +21,7 @@ function validUpdate(value) {
   const bullets = Array.isArray(value.bullets)
     ? value.bullets.map((bullet) => cleanText(bullet, 800)).filter(Boolean)
     : [];
-  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id) || !title || !summary || bullets.length === 0 || bullets.length > 50) return null;
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id) || !title || !summary || bullets.length === 0 || bullets.length > 100) return null;
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(Date.parse(`${date}T00:00:00Z`))) return null;
   return { id, title, date, summary, bullets };
 }

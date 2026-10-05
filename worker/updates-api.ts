@@ -66,7 +66,7 @@ function cleanText(value: unknown, maxLength: number): string {
 }
 
 function cleanBullets(value: unknown): string[] | null {
-  if (!Array.isArray(value) || value.length > 50) return null;
+  if (!Array.isArray(value) || value.length > 100) return null;
   const bullets = value
     .filter((item): item is string => typeof item === "string")
     .map((item) => item.trim().slice(0, 800))
@@ -76,7 +76,7 @@ function cleanBullets(value: unknown): string[] | null {
 
 async function readInput(request: Request): Promise<UpdateInput | Response> {
   const contentLength = Number(request.headers.get("content-length") ?? 0);
-  if (contentLength > 64_000) return error("Update draft is too large.", 413);
+  if (contentLength > 100_000) return error("Update draft is too large.", 413);
   try {
     const value: unknown = await request.json();
     if (!value || typeof value !== "object" || Array.isArray(value)) return error("Send an update draft object.");
@@ -96,7 +96,7 @@ function validate(input: UpdateInput) {
   if (!title) return "Update title is required.";
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(Date.parse(`${date}T00:00:00Z`)) || new Date(`${date}T00:00:00Z`).toISOString().slice(0, 10) !== date) return "Use a valid YYYY-MM-DD date.";
   if (!summary) return "Add a short summary before saving.";
-  if (!bullets) return "Keep up to 50 non-empty bullets, each under 800 characters.";
+  if (!bullets) return "Keep up to 100 non-empty bullets, each under 800 characters.";
   if (input.published === true && bullets.length === 0) return "Add at least one bullet before publishing.";
   return { id, title, date, summary, bullets, published: input.published === true };
 }

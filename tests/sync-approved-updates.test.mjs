@@ -64,3 +64,11 @@ test("the public index includes only published Markdown posts", async (t) => {
     id: "manual", title: "Manual note", date: "2026-09-30", summary: "Reviewed text", bullets: ["Public bullet"],
   }]);
 });
+
+test("a reviewed weekly draft with 87 entries can be synchronized", async (t) => {
+  const directory = mkdtempSync(path.join(os.tmpdir(), "jakedoesdev-updates-"));
+  t.after(() => rmSync(directory, { recursive: true, force: true }));
+  const update = { ...approved.updates[0], bullets: Array.from({ length: 87 }, (_, index) => `Reviewed item ${index + 1}`) };
+  await synchronizeApprovedUpdates({ outputDirectory: directory, fetchImpl: response({ updates: [update] }) });
+  assert.equal(JSON.parse(readFileSync(path.join(directory, "index.json"), "utf8"))[0].bullets.length, 87);
+});
