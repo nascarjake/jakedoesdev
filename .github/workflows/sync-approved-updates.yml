@@ -74,8 +74,8 @@ jobs:
           MANUAL_REQUESTED_AT: ${{ steps.control.outputs.manual_requested_at }}
           RUN_URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          jq -n --argjson manualRequestedAt "$MANUAL_REQUESTED_AT" --arg runUrl "$RUN_URL" +            '{manualRequestedAt:$manualRequestedAt,runUrl:$runUrl}' > /tmp/update-sync-ack.json
-          curl --fail --silent --show-error --retry 3 -X POST "$SYNC_CONTROL_URL" +            -H "content-type: application/json" -H "x-updates-sync-token: $SYNC_ACK_TOKEN" +            --data-binary @/tmp/update-sync-ack.json > /dev/null
+          jq -n --argjson manualRequestedAt "$MANUAL_REQUESTED_AT" --arg runUrl "$RUN_URL" '{manualRequestedAt:$manualRequestedAt,runUrl:$runUrl}' > /tmp/update-sync-ack.json
+          curl --fail --silent --show-error --retry 3 -X POST "$SYNC_CONTROL_URL" -H "content-type: application/json" -H "x-updates-sync-token: $SYNC_ACK_TOKEN" --data-binary @/tmp/update-sync-ack.json > /dev/null
 
   publish:
     needs: sync
