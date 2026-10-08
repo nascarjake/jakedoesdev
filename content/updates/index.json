@@ -1,5 +1,331 @@
 [
   {
+    "id": "week-2026-w41",
+    "title": "Field notes · 2026-W41",
+    "date": "2026-10-05",
+    "summary": "A running notebook of ideas, builds, and lessons from the week.",
+    "projects": [
+      {
+        "id": "personal-portfolio",
+        "name": "Personal portfolio",
+        "bullets": [
+          "Repaired reviewed update publishing and deployment, verified public builds, and prepared older draft review.",
+          "Continued portfolio publishing maintenance and refreshed an associated game-site project.",
+          "Improved project-based update review and publishing controls, and verified the public site deployment."
+        ]
+      },
+      {
+        "id": "portal-application",
+        "name": "Portal application",
+        "bullets": [
+          "Expanded integration setup, onboarding, generation, administration, and release verification workflows."
+        ]
+      },
+      {
+        "id": "local-agent-platform",
+        "name": "Local agent platform",
+        "bullets": [
+          "Implemented desktop host isolation, scoped team access, agent context controls, and multi-office planning."
+        ]
+      },
+      {
+        "id": "music-game-prototype",
+        "name": "Music game prototype",
+        "bullets": [
+          "Continued the music-driven game prototype with implementation and supporting project updates."
+        ]
+      },
+      {
+        "id": "interactive-web-project",
+        "name": "Interactive web project",
+        "bullets": [
+          "Updated a public-facing web project and verified its current release branch state."
+        ]
+      }
+    ],
+    "bullets": [
+      "Repaired reviewed update publishing and deployment, verified public builds, and prepared older draft review.",
+      "Continued portfolio publishing maintenance and refreshed an associated game-site project.",
+      "Improved project-based update review and publishing controls, and verified the public site deployment.",
+      "Expanded integration setup, onboarding, generation, administration, and release verification workflows.",
+      "Implemented desktop host isolation, scoped team access, agent context controls, and multi-office planning.",
+      "Continued the music-driven game prototype with implementation and supporting project updates.",
+      "Updated a public-facing web project and verified its current release branch state."
+    ]
+  },
+  {
+    "id": "week-2026-w40",
+    "title": "Field notes · 2026-W40",
+    "date": "2026-10-04",
+    "summary": "A running notebook of ideas, builds, and lessons from the week.",
+    "projects": [
+      {
+        "id": "local-development-tooling",
+        "name": "Local development tooling",
+        "bullets": [
+          "Completed comparative product research and a phased implementation plan, with source reuse, integration reliability, and acceptance criteria reviewed."
+        ]
+      },
+      {
+        "id": "local-developer-tooling",
+        "name": "Local developer tooling",
+        "bullets": [
+          "Implemented and verified a simpler local interface for an existing developer workflow, with recovery controls and automated interaction coverage."
+        ]
+      },
+      {
+        "id": "local-agent-workspace",
+        "name": "local agent workspace",
+        "bullets": [
+          "Clarified per-agent engine and model selection, persisted visual identity settings, and recorded exact implementation and review models for each run.",
+          "Rebuilt an interactive office layout from reference plans and verified obstacle-aware movement, reachable workstations, and browser behavior."
+        ]
+      },
+      {
+        "id": "portfolio-publishing",
+        "name": "Portfolio publishing",
+        "bullets": [
+          "Changed the update workflow to a daily local review cadence while preserving explicit publication approval.",
+          "Built a daily review pipeline that syncs private work-log summaries into an admin approval queue, supports editing or removing individual bullets, and publishes only after an explicit portal action."
+        ]
+      },
+      {
+        "id": "bowling-web-project",
+        "name": "Bowling web project",
+        "bullets": [
+          "Published a protected static web build and verified the repository’s current release state."
+        ]
+      },
+      {
+        "id": "independent-game-development",
+        "name": "Independent game development",
+        "bullets": [
+          "Replaced a browser prototype with a Godot-based web edition and published the updated game experience.",
+          "Published a static game build and maintained a separate web game project with release-ready assets.",
+          "Polished run balance and hardened game-state handling while maintaining a repeatable static publisher."
+        ]
+      },
+      {
+        "id": "interactive-web-game",
+        "name": "Interactive web game",
+        "bullets": [
+          "Improved mobile sharing and save behavior, linked the full game experience, and refined visual patterns.",
+          "Added staged soak controls, expanded customization safety, and refined the final reveal interaction."
+        ]
+      },
+      {
+        "id": "application-tooling",
+        "name": "Application tooling",
+        "bullets": [
+          "Expanded review and release workflows to support multiple artifacts while preserving decisions and interactive findings."
+        ]
+      },
+      {
+        "id": "personal-game-studio",
+        "name": "Personal game studio",
+        "bullets": [
+          "Connected a standalone game site to a shared published catalog and continued static hosting integration."
+        ]
+      },
+      {
+        "id": "music-game-prototype",
+        "name": "Music game prototype",
+        "bullets": [
+          "Continued a music-driven game prototype with course content, launcher, and supporting documentation refinements."
+        ]
+      },
+      {
+        "id": "personal-game-site",
+        "name": "personal game site",
+        "bullets": [
+          "Diagnosed a stuck Pages certificate: the apex DNS is valid, while an existing proxied alternate-host record remains inconsistent with the intended GitHub Pages configuration."
+        ]
+      },
+      {
+        "id": "agent-platform-research",
+        "name": "agent platform research",
+        "bullets": [
+          "Compared two agent orchestration architectures and documented a path toward configurable teams, themed workspaces, and reusable integrations."
+        ]
+      },
+      {
+        "id": "private-application",
+        "name": "Private application",
+        "bullets": [
+          "Improved an internal application workflow and verified the changes with automated checks.",
+          "Identified a deployment configuration gap affecting an internal generation workflow and documented the corrective setting."
+        ]
+      },
+      {
+        "id": "local-software-project",
+        "name": "Local software project",
+        "bullets": [
+          "Researched a multi-workspace product direction, wrote a staged execution plan, and verified an initial workspace-switching improvement.",
+          "Improved a local application interface, access boundaries, and operational setup.",
+          "Improved a local application interface and operational safeguards with automated coverage."
+        ]
+      },
+      {
+        "id": "web-application",
+        "name": "web application",
+        "bullets": [
+          "Improved application administration and operational reporting, with validated calculations and interface behavior.",
+          "Refined application administration views for clearer reading and more useful contextual detail.",
+          "Added per-run AI cost visibility and summarized operational quality outcomes.",
+          "Improved role-based access administration with protected elevated-access controls.",
+          "Improved AI operations controls with persistent alert acknowledgements, ordered model fallbacks, and usage cost analysis.",
+          "Researched provider model rates and added editable published pricing defaults with per-call rate snapshots."
+        ]
+      },
+      {
+        "id": "personal-software-project",
+        "name": "Personal software project",
+        "bullets": [
+          "Improved a local software project's application structure and verification."
+        ]
+      },
+      {
+        "id": "personal-portfolio",
+        "name": "Personal portfolio",
+        "bullets": [
+          "Unified the arcade studio presentation across two sites and replaced a static score preview with a playable multi-level goose runner.",
+          "Diagnosed the update-review outage as an undeployed Worker revision; validated the Worker build and identified that the personal deployment profile requires reauthentication."
+        ]
+      },
+      {
+        "id": "public-portfolio",
+        "name": "Public portfolio",
+        "bullets": [
+          "Added project-scoped deployment identity checks and a daily review workflow guard; production rollout awaits verified authentication."
+        ]
+      },
+      {
+        "id": "music-tooling-research",
+        "name": "Music tooling research",
+        "bullets": [
+          "Reviewed public rhythm-chart generation research and outlined an evaluation-led roadmap for reusable creative tooling.",
+          "Developed a team-ready research and evaluation plan for human-quality rhythm chart generation.",
+          "Estimated likely gains and uncertainty for an evaluated rhythm-chart generation roadmap."
+        ]
+      },
+      {
+        "id": "portal-application",
+        "name": "Portal application",
+        "bullets": [
+          "Added an administrator workflow to remove a client from normal portal access while retaining its records.",
+          "Resolved model request credential routing and improved diagnostic logging.",
+          "Identified the upstream account authorization failure behind model request errors using a read-only credential check.",
+          "Confirmed a deployed model credential is rejected by the provider despite an active key listing and identified account access as the next investigation point."
+        ]
+      },
+      {
+        "id": "personal-publishing-operations",
+        "name": "Personal publishing operations",
+        "bullets": [
+          "Validated the private weekly ledger and checked the daily review-draft sync; the review portal was unavailable."
+        ]
+      },
+      {
+        "id": "creative-software",
+        "name": "creative software",
+        "bullets": [
+          "Audited an in-progress creation workflow, clarified version selection and comparison behavior, and documented remaining evaluation work.",
+          "Designed a community content import, comparison, and reviewed learning workflow with staged provider and format support.",
+          "Advanced a creative software project with safer local data import, provenance-preserving comparisons, and a documented review-first path for future model improvement."
+        ]
+      },
+      {
+        "id": "personal-publishing-workflow",
+        "name": "personal publishing workflow",
+        "bullets": [
+          "Validated the weekly private ledger and checked the unpublished update-review synchronization workflow.",
+          "Validated the private weekly ledger and attempted the daily review-draft sync; the portal workflow remains unavailable.",
+          "Validated the weekly private ledger and checked the unpublished update-review sync; portal review access remains unavailable."
+        ]
+      },
+      {
+        "id": "rhythm-game",
+        "name": "rhythm game",
+        "bullets": [
+          "Improved music discovery playback so switching tracks prioritizes the new preview and preserves resumable buffering progress.",
+          "Improved an embedded music catalog browser layout and retained its local sign-in session while navigating within the app.",
+          "Improved download organization and processing visibility in a music app.",
+          "Refined a discovery interface, improved content rotation, and corrected native embedded browser layout."
+        ]
+      },
+      {
+        "id": "rhythm-game",
+        "name": "Rhythm game",
+        "bullets": [
+          "Reviewed chart timing evidence and added a provisional, provenance-aware timing diagnostic with authored reference comparison.",
+          "Produced a staged, evidence-led roadmap for more expressive generated charts, with comparison gates and source-reviewed techniques."
+        ]
+      },
+      {
+        "id": "personal-game-project",
+        "name": "Personal game project",
+        "bullets": [
+          "Advanced a game development workflow with clearer review and validation steps."
+        ]
+      }
+    ],
+    "bullets": [
+      "Completed comparative product research and a phased implementation plan, with source reuse, integration reliability, and acceptance criteria reviewed.",
+      "Implemented and verified a simpler local interface for an existing developer workflow, with recovery controls and automated interaction coverage.",
+      "Clarified per-agent engine and model selection, persisted visual identity settings, and recorded exact implementation and review models for each run.",
+      "Rebuilt an interactive office layout from reference plans and verified obstacle-aware movement, reachable workstations, and browser behavior.",
+      "Changed the update workflow to a daily local review cadence while preserving explicit publication approval.",
+      "Built a daily review pipeline that syncs private work-log summaries into an admin approval queue, supports editing or removing individual bullets, and publishes only after an explicit portal action.",
+      "Published a protected static web build and verified the repository’s current release state.",
+      "Replaced a browser prototype with a Godot-based web edition and published the updated game experience.",
+      "Published a static game build and maintained a separate web game project with release-ready assets.",
+      "Polished run balance and hardened game-state handling while maintaining a repeatable static publisher.",
+      "Improved mobile sharing and save behavior, linked the full game experience, and refined visual patterns.",
+      "Added staged soak controls, expanded customization safety, and refined the final reveal interaction.",
+      "Expanded review and release workflows to support multiple artifacts while preserving decisions and interactive findings.",
+      "Connected a standalone game site to a shared published catalog and continued static hosting integration.",
+      "Continued a music-driven game prototype with course content, launcher, and supporting documentation refinements.",
+      "Diagnosed a stuck Pages certificate: the apex DNS is valid, while an existing proxied alternate-host record remains inconsistent with the intended GitHub Pages configuration.",
+      "Compared two agent orchestration architectures and documented a path toward configurable teams, themed workspaces, and reusable integrations.",
+      "Improved an internal application workflow and verified the changes with automated checks.",
+      "Identified a deployment configuration gap affecting an internal generation workflow and documented the corrective setting.",
+      "Researched a multi-workspace product direction, wrote a staged execution plan, and verified an initial workspace-switching improvement.",
+      "Improved a local application interface, access boundaries, and operational setup.",
+      "Improved a local application interface and operational safeguards with automated coverage.",
+      "Improved application administration and operational reporting, with validated calculations and interface behavior.",
+      "Refined application administration views for clearer reading and more useful contextual detail.",
+      "Added per-run AI cost visibility and summarized operational quality outcomes.",
+      "Improved role-based access administration with protected elevated-access controls.",
+      "Improved AI operations controls with persistent alert acknowledgements, ordered model fallbacks, and usage cost analysis.",
+      "Researched provider model rates and added editable published pricing defaults with per-call rate snapshots.",
+      "Improved a local software project's application structure and verification.",
+      "Unified the arcade studio presentation across two sites and replaced a static score preview with a playable multi-level goose runner.",
+      "Diagnosed the update-review outage as an undeployed Worker revision; validated the Worker build and identified that the personal deployment profile requires reauthentication.",
+      "Added project-scoped deployment identity checks and a daily review workflow guard; production rollout awaits verified authentication.",
+      "Reviewed public rhythm-chart generation research and outlined an evaluation-led roadmap for reusable creative tooling.",
+      "Developed a team-ready research and evaluation plan for human-quality rhythm chart generation.",
+      "Estimated likely gains and uncertainty for an evaluated rhythm-chart generation roadmap.",
+      "Added an administrator workflow to remove a client from normal portal access while retaining its records.",
+      "Resolved model request credential routing and improved diagnostic logging.",
+      "Identified the upstream account authorization failure behind model request errors using a read-only credential check.",
+      "Confirmed a deployed model credential is rejected by the provider despite an active key listing and identified account access as the next investigation point.",
+      "Validated the private weekly ledger and checked the daily review-draft sync; the review portal was unavailable.",
+      "Audited an in-progress creation workflow, clarified version selection and comparison behavior, and documented remaining evaluation work.",
+      "Designed a community content import, comparison, and reviewed learning workflow with staged provider and format support.",
+      "Advanced a creative software project with safer local data import, provenance-preserving comparisons, and a documented review-first path for future model improvement.",
+      "Validated the weekly private ledger and checked the unpublished update-review synchronization workflow.",
+      "Validated the private weekly ledger and attempted the daily review-draft sync; the portal workflow remains unavailable.",
+      "Validated the weekly private ledger and checked the unpublished update-review sync; portal review access remains unavailable.",
+      "Improved music discovery playback so switching tracks prioritizes the new preview and preserves resumable buffering progress.",
+      "Improved an embedded music catalog browser layout and retained its local sign-in session while navigating within the app.",
+      "Improved download organization and processing visibility in a music app.",
+      "Refined a discovery interface, improved content rotation, and corrected native embedded browser layout.",
+      "Reviewed chart timing evidence and added a provisional, provenance-aware timing diagnostic with authored reference comparison.",
+      "Produced a staged, evidence-led roadmap for more expressive generated charts, with comparison gates and source-reviewed techniques.",
+      "Advanced a game development workflow with clearer review and validation steps."
+    ]
+  },
+  {
     "id": "week-2026-w39",
     "title": "Field notes · 2026-W39",
     "date": "2026-09-27",
