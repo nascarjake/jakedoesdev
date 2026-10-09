@@ -153,12 +153,12 @@ export const arcadeGames: ArcadeGame[] = [
     id: "rift-riot",
     playUrl: "https://nascarjake.github.io/fight-web/",
     embedUrl: "https://nascarjake.github.io/fight-web/",
-    title: "Rift Riot",
-    genre: "Fighting",
+    title: "RIFT//RIOT",
+    genre: "3D fighting game",
     cover: cover("rift-riot"),
-    tagline: "Find your opening. Make it count.",
+    tagline: "Ten fighters. Three arenas. Make every opening count.",
     description:
-      "An arena fighter with CPU and local versus modes, an arcade circuit, and a combat lab for exploring moves frame by frame.",
+      "A 3D arena fighter with ten character-specific kits, CPU and local matches, a nine-bout arcade circuit, frame-by-frame Training, and cinematic supers.",
     screenshots: shots("rift-riot", [
       "Rift Riot main menu featuring Ivy and versus, local, and arcade modes.",
       "Rift Riot fighter selection featuring Rook and the character roster.",
