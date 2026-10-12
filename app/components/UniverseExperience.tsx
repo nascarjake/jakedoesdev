@@ -114,7 +114,12 @@ export function UniverseExperience() {
         return await response.json() as { projects?: Project[] };
       })
       .then((payload) => {
-        if (payload.projects?.length) setCatalog(payload.projects);
+        if (payload.projects?.length) {
+          const clipMyScreen = projects.find((project) => project.id === "clip-my-screen");
+          setCatalog(clipMyScreen && !payload.projects.some((project) => project.id === clipMyScreen.id)
+            ? [...payload.projects, clipMyScreen]
+            : payload.projects);
+        }
       })
       .catch(() => undefined);
     return () => controller.abort();

@@ -581,6 +581,32 @@ export const projects: Project[] = [
       note: "Details here follow the 2026 product description in my résumé; availability and capabilities can evolve.",
     },
   },
+  {
+    id: "clip-my-screen",
+    index: "21",
+    title: "Clip My Screen",
+    eyebrow: "Open-source instant replay",
+    summary:
+      "A local desktop clip tool with a rolling 15-minute replay buffer, global shortcuts, display selection, a searchable capture library, and share links.",
+    role: "Creator · Product Engineer",
+    year: "2026",
+    stack: ["Electron", "Node.js", "Swift", "FFmpeg"],
+    signal: "CMS",
+    accent: "amber",
+    category: "Creative Tools",
+    status: "Open-source desktop app",
+    highlights: [
+      "Built an always-ready replay buffer with 1-, 5-, and 15-minute saves.",
+      "Added display selection, screenshots, long recordings, and simple clip editing.",
+      "Packages portable Windows and Apple Silicon and Intel Mac releases.",
+    ],
+    dossier: {
+      scope: "A self-hosted screen capture and sharing app for saving recent moments without a subscription.",
+      ownership: ["Designed and implemented the desktop capture and clip library experience.", "Built local replay capture, display selection, keyboard shortcuts, and private share links.", "Set up cross-platform desktop packaging and public releases."],
+      systems: ["Electron and Node.js local service", "ScreenCaptureKit on macOS and FFmpeg capture on Windows", "GitHub Actions release builds"],
+      source: { label: "View source and downloads", url: "https://github.com/nascarjake/clip-my-screen" },
+    },
+  },
 ];
 
 export const experiences: Experience[] = [
