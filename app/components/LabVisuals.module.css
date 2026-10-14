@@ -1,0 +1,145 @@
+.djScene, .calendarScene, .clipScene, .podcastScene, .musicScene, .genericScene {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  min-height: 430px;
+  overflow: hidden;
+}
+.windowBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  min-height: 38px;
+  padding: 0 16px;
+  border-bottom: 1px solid #9fc6e548;
+  color: #aecbd5;
+  font: 800 9px var(--mono);
+  letter-spacing: .1em;
+}
+.windowBar span:first-child { display: flex; align-items: center; gap: 8px; }
+.windowBar i { width: 6px; height: 6px; background: #9af7d0; border-radius: 50%; box-shadow: 0 0 11px #9af7d0; }
+.waveform, .podcastWave { height: 68px; display: flex; align-items: center; justify-content: space-between; gap: 3px; overflow: hidden; }
+.waveform span, .podcastWave span { display: block; flex: 1; min-width: 2px; border-radius: 2px; background: linear-gradient(0deg, #5de0c2, #b5fff1); animation: wave 1.4s ease-in-out infinite alternate; }
+
+.djScene { display: grid; place-items: center; background: radial-gradient(circle at 50% 50%, #293d7b 0%, #10152e 43%, #060d1b 80%); }
+.sceneNoise { position: absolute; inset: 0; opacity: .35; background-image: radial-gradient(#9cccf566 1px, transparent 1px); background-size: 22px 22px; mask-image: radial-gradient(circle, black, transparent 68%); }
+.djHalo { position: absolute; width: 670px; height: 670px; border: 1px solid #b6a4ff70; border-radius: 50%; box-shadow: 0 0 0 50px #c0adff0b, 0 0 0 115px #7c74e80b, inset 0 0 65px #c9b5ff25; animation: haloTurn 28s linear infinite; }
+.djHalo::before, .djHalo::after { content: ""; position: absolute; border-radius: 50%; width: 10px; height: 10px; background: #9bfde8; box-shadow: 0 0 24px #9bfde8; top: 18%; left: 18%; }
+.djHalo::after { top: 74%; left: 88%; width: 5px; height: 5px; background: #ff9fd5; }
+.djConsole { position: relative; z-index: 2; width: min(82%, 750px); border: 1px solid #88c1e6a3; background: #0b162be8; box-shadow: 15px 19px 0 #050a17a6, 0 25px 90px #2a95d236; transform: rotate(-2deg); }
+.djConsole .windowBar span:last-child { color: #ff8eb1; }
+.djMain { display: grid; grid-template-columns: 235px 1fr; align-items: center; gap: 15px; min-height: 235px; padding: 12px 25px 5px 18px; }
+.recordWrap { position: relative; display: grid; place-items: center; width: 220px; height: 220px; }
+.record { display: grid; place-items: center; width: 191px; height: 191px; border-radius: 50%; border: 2px solid #516482; background: repeating-radial-gradient(circle, #11192c 0 3px, #263b54 4px 5px, #0b1528 6px 8px); box-shadow: 0 0 0 10px #122b46, 0 0 0 12px #6f83ac, 0 12px 35px #000a; animation: recordSpin 9s linear infinite; }
+.record span { display: grid; place-items: center; width: 69px; height: 69px; border-radius: 50%; background: radial-gradient(circle, #163c3b 0 5px, #a6f0da 6px 24px, #72cdb8 25px 27px, #a6f0da 28px); }
+.recordArm { position: absolute; z-index: 2; width: 112px; height: 7px; right: -16px; top: 35px; background: #bed3df; border-radius: 4px; transform: rotate(35deg); transform-origin: right center; box-shadow: 0 2px 0 #476275; }
+.djNow { min-width: 0; padding-left: 10px; }
+.djNow small { color: #8ef3ce; font: 800 10px var(--mono); letter-spacing: .14em; }
+.djNow strong { display: block; max-width: 320px; margin: 12px 0 8px; color: #f0f6fb; font-size: clamp(25px, 3vw, 40px); line-height: .99; letter-spacing: -.06em; }
+.djNow p { max-width: 300px; color: #a8bfd4; font-size: 12px; line-height: 1.5; }
+.djNow .waveform { margin-top: 15px; }
+.djQueue { display: flex; justify-content: space-around; gap: 10px; border-top: 1px solid #9fc6e53a; padding: 13px; color: #99cad4; font: 800 9px var(--mono); letter-spacing: .08em; }
+.sceneCorner { position: absolute; bottom: 17px; right: 21px; color: #a9cfdf; font: 800 9px var(--mono); letter-spacing: .1em; }
+
+.calendarScene { display: grid; place-items: center; background: linear-gradient(135deg, #0c2534, #163c5b 51%, #071926); }
+.calendarScene::before { content: ""; position: absolute; inset: 0; opacity: .28; background-image: linear-gradient(#8eebd82b 1px, transparent 1px), linear-gradient(90deg, #8eebd82b 1px, transparent 1px); background-size: 33px 33px; }
+.calendarBloom { position: absolute; width: 520px; height: 520px; right: -50px; top: -220px; border-radius: 50%; background: #67ddd588; filter: blur(85px); animation: float 8s ease-in-out infinite alternate; }
+.calendarWindow { position: relative; z-index: 1; width: min(82%, 780px); overflow: hidden; border: 1px solid #b0e4e9; background: #eaf6f1; color: #183e4b; box-shadow: 13px 15px 0 #0715208c; transform: rotate(-1.5deg); }
+.calendarHeader { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 22px 20px; }
+.calendarHeader > span:first-child { color: #207b73; font: 900 24px var(--sans); letter-spacing: -.08em; }
+.calendarHeader strong { font-size: 18px; letter-spacing: -.04em; }
+.calendarHeader > span:last-child { color: #658683; font: 800 9px var(--mono); }
+.calendarGrid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); margin: 0 20px; border-top: 1px solid #a7c7c0; border-left: 1px solid #a7c7c0; }
+.calendarDay { position: relative; height: 153px; padding: 9px 7px; border-right: 1px solid #a7c7c0; border-bottom: 1px solid #a7c7c0; }
+.calendarDay > span { display: block; color: #6f918b; font: 800 8px var(--mono); }
+.calendarDay b { display: block; margin-top: 5px; font-size: 20px; }
+.calendarDay i { position: absolute; left: 5px; right: 5px; bottom: 20px; padding: 6px 4px; border-radius: 3px; font: 800 7px var(--mono); text-align: center; font-style: normal; animation: cardLift 5s ease-in-out infinite alternate; }
+.eventMint { background: #bbf3dc; color: #21725b; }.eventBlue { background: #bfd6f8; color: #31558e; animation-delay: -2s !important; }.eventPeach { background: #f7d8c8; color: #995b47; animation-delay: -3s !important; }
+.calendarFooter { display: flex; justify-content: space-between; gap: 10px; padding: 14px 20px; color: #4f7976; font: 800 9px var(--mono); letter-spacing: .08em; }
+.calendarFloat { position: absolute; z-index: 2; right: 4%; bottom: 24px; display: flex; flex-direction: column; gap: 5px; padding: 13px 17px; border: 1px solid #9de9db; background: #0d3346; color: #96f6d3; box-shadow: 6px 7px 0 #071b2f; font: 800 10px var(--mono); transform: rotate(4deg); animation: float 6s ease-in-out infinite alternate; }
+.calendarFloat span { color: #cbe9e4; font: 500 12px var(--sans); }
+
+.clipScene { display: grid; place-items: center; background: radial-gradient(circle at 50% 20%, #8c512f, #3c2947 36%, #101725 76%); }
+.clipAura { position: absolute; width: 680px; height: 470px; border-radius: 50%; border: 1px solid #ffc88b70; box-shadow: 0 0 0 30px #ffbb6914, 0 0 0 74px #ef7d5f0b; transform: rotate(-19deg); }
+.clipWindow { z-index: 1; width: min(80%, 730px); overflow: hidden; border: 1px solid #d5c6c3; background: #121c2c; box-shadow: 12px 17px 0 #070c16ab, 0 20px 65px #ed965b40; transform: rotate(2deg); }
+.clipWindow .windowBar span:last-child { color: #ffc49f; }
+.recordDot { display: inline-block; margin-right: 6px; width: 7px; height: 7px; border-radius: 50%; background: #ff765d; box-shadow: 0 0 0 4px #ff765d29; animation: signal 1.5s infinite; }
+.clipCanvas { position: relative; height: 225px; margin: 14px 17px 8px; overflow: hidden; background: linear-gradient(130deg, #395aa2 5%, #8765a9 48%, #eab274 100%); }
+.clipCanvas::before { content: ""; position: absolute; width: 280px; height: 280px; border-radius: 50%; top: -170px; right: -20px; background: #fce3b66c; filter: blur(5px); }
+.clipCanvas::after { content: ""; position: absolute; inset: 0; background-image: linear-gradient(#fff2 1px, transparent 1px), linear-gradient(90deg, #fff2 1px, transparent 1px); background-size: 28px 28px; opacity: .4; }
+.clipWindowGhost { position: absolute; z-index: 1; top: 39px; left: 11%; width: 54%; height: 150px; padding: 20px; border: 1px solid #fff9; border-radius: 6px; background: #0e1d37b8; box-shadow: 10px 11px 0 #10203d3d; }
+.clipWindowGhost span { color: #d1e4f3; font-size: 12px; }.clipWindowGhost strong { display: block; margin-top: 12px; color: white; font-size: 41px; letter-spacing: -.07em; }
+.captureCorners { position: absolute; z-index: 2; inset: 13px; border: 2px dashed #fff9; animation: capturePulse 3s ease-in-out infinite; }
+.clipTimeline { display: flex; align-items: center; gap: 10px; padding: 4px 17px 11px; color: #c7d4e5; font: 800 9px var(--mono); }
+.clipTimeline > div { position: relative; flex: 1; height: 47px; display: flex; align-items: center; justify-content: space-between; gap: 2px; overflow: hidden; }
+.clipTimeline i { flex: 1; display: block; background: #e99880; opacity: .75; }
+.clipTimeline b { position: absolute; left: 69%; top: 0; width: 3px; height: 47px; background: white; box-shadow: 0 0 12px white; animation: timelineSweep 7s linear infinite; }
+.clipActions { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 11px 17px; border-top: 1px solid #ffffff3b; color: #aec6d5; font: 800 9px var(--mono); }
+.clipActions strong { padding: 8px 10px; background: #e7ad7c; color: #2d2430; font-size: 9px; }
+
+.podcastScene { display: grid; place-items: center; background: radial-gradient(circle at 50% 50%, #554879, #22213f 42%, #100e22 85%); }
+.podcastAura { position: absolute; width: 500px; height: 500px; border-radius: 50%; border: 1px solid #baabfb9c; box-shadow: 0 0 0 36px #baabfb10, 0 0 0 78px #baabfb0c, 0 0 80px #8c76e750; animation: haloTurn 25s linear infinite; }
+.podcastPanel { z-index: 1; width: min(84%, 750px); border: 1px solid #c2b1e6; background: #17172ae8; box-shadow: 12px 17px 0 #0807139c; transform: rotate(-1deg); }
+.podcastBody { display: grid; grid-template-columns: 1fr 1.65fr 1fr; align-items: stretch; gap: 12px; padding: 28px 22px; }
+.hostCard { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 207px; border: 1px solid #d9c6f855; background: #342d4b; }
+.hostCard > span { display: grid; place-items: center; width: 85px; height: 85px; margin-bottom: 13px; border-radius: 50%; background: linear-gradient(145deg, #e4d8f7, #8b80b8); color: #332947; font: 900 45px var(--sans); box-shadow: 0 0 0 7px #bdb2eb20; }
+.hostCard:last-child > span { background: linear-gradient(145deg, #c7f7e7, #679a9b); }
+.hostCard strong { font: 800 10px var(--mono); letter-spacing: .12em; }.hostCard small { margin-top: 5px; color: #b2abd4; font: 700 8px var(--mono); }
+.podcastCenter { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 17px; min-width: 0; color: #f7efff; text-align: center; }
+.podcastCenter > span { color: #c8b8eb; font: 800 9px var(--mono); letter-spacing: .12em; }
+.podcastWave { width: 100%; height: 59px; }.podcastWave span { background: linear-gradient(#ecc6ff, #9ff4dc); }
+.podcastCenter > div:nth-of-type(2) { display: flex; gap: 5px; width: 80%; }.podcastCenter i { flex: 1; height: 4px; background: #c6b8d48a; }.podcastCenter i:last-child { flex: .5; }
+.podcastCenter strong { font-size: 22px; letter-spacing: -.05em; }
+.podcastFooter { display: flex; justify-content: space-around; gap: 10px; padding: 14px 12px; border-top: 1px solid #c7b8e147; color: #cabce6; font: 800 9px var(--mono); letter-spacing: .08em; }
+
+.musicScene { display: grid; place-items: center; background: radial-gradient(circle at 50% 42%, #486849, #192e35 43%, #09181e 86%); }
+.musicGlow { position: absolute; width: 640px; height: 640px; border: 1px solid #a5eb9b7a; border-radius: 50%; box-shadow: 0 0 0 29px #91ed9412, 0 0 0 70px #91ed940b; animation: haloTurn 30s linear infinite; }
+.musicPanel { z-index: 1; width: min(83%, 750px); border: 1px solid #a3ddb6; background: #0e2029; box-shadow: 12px 17px 0 #061319b3; transform: rotate(1deg); }
+.musicSpectrum { display: flex; align-items: center; justify-content: space-between; gap: 3px; height: 75px; margin: 16px 22px 8px; }
+.musicSpectrum i { flex: 1; display: block; min-width: 2px; background: linear-gradient(0deg, #53bb85, #c6fb9d); border-radius: 2px; animation: spectrum 1.7s ease-in-out infinite alternate; }
+.musicSpectrum i:nth-child(3n) { animation-delay: -.8s; }.musicSpectrum i:nth-child(5n) { animation-delay: -1.2s; }
+.musicRoll { display: flex; height: 161px; margin: 0 22px 12px; border: 1px solid #7eb28b5c; }
+.musicKeys { display: flex; flex-direction: column; width: 42px; background: #dce9d9; color: #406a52; }
+.musicKeys span { flex: 1; display: grid; place-items: center; border-bottom: 1px solid #708e744d; font: 800 8px var(--mono); }
+.musicGrid { position: relative; flex: 1; overflow: hidden; background-image: linear-gradient(#9ac3982e 1px, transparent 1px), linear-gradient(90deg, #9ac39825 1px, transparent 1px); background-size: 100% 14.28%, 8.33% 100%; }
+.musicGrid i { position: absolute; display: block; height: 10%; border-radius: 2px; background: #a7f09e; box-shadow: inset 0 -3px 0 #5eaa79; }
+.musicGrid i:nth-child(even) { background: #81daca; box-shadow: inset 0 -3px 0 #408d86; }
+.musicGrid b { position: absolute; top: 0; bottom: 0; left: 0; width: 2px; background: #f7e79b; box-shadow: 0 0 15px #f7e79b; animation: playhead 7s linear infinite; }
+.musicFooter { display: flex; justify-content: space-around; gap: 10px; padding: 14px 10px; border-top: 1px solid #a6d49e44; color: #aad7b2; font: 800 9px var(--mono); letter-spacing: .08em; }
+
+.genericScene { display: grid; place-items: center; background: radial-gradient(circle, #174c60, #0a1c2a 70%); color: #aaf4d8; }
+.genericScene > span { position: relative; z-index: 1; font: 900 clamp(80px, 13vw, 160px) var(--mono); letter-spacing: -.15em; }
+.genericOrb { position: absolute; width: 280px; height: 280px; border-radius: 50%; border: 1px solid #98f4da; box-shadow: 0 0 0 30px #98f4da15, 0 0 0 70px #98f4da09; animation: haloTurn 18s linear infinite; }
+.genericScene small { position: absolute; bottom: 20px; color: #a4cfc7; font: 800 9px var(--mono); letter-spacing: .14em; }
+
+@keyframes recordSpin { to { transform: rotate(360deg); } }
+@keyframes haloTurn { to { transform: rotate(360deg); } }
+@keyframes wave { to { transform: scaleY(.43); opacity: .65; } }
+@keyframes spectrum { to { transform: scaleY(.62); opacity: .7; } }
+@keyframes float { to { transform: translateY(-10px) rotate(2deg); } }
+@keyframes cardLift { to { transform: translateY(-5px); } }
+@keyframes signal { 50% { opacity: .4; box-shadow: 0 0 0 7px #ff765d13; } }
+@keyframes capturePulse { 50% { opacity: .45; } }
+@keyframes timelineSweep { to { left: 98%; } }
+@keyframes playhead { to { left: 100%; } }
+
+@media (max-width: 900px) {
+  .djConsole, .calendarWindow, .clipWindow, .podcastPanel, .musicPanel { width: 88%; }
+}
+@media (max-width: 620px) {
+  .djScene, .calendarScene, .clipScene, .podcastScene, .musicScene, .genericScene { min-height: 340px; }
+  .djConsole, .calendarWindow, .clipWindow, .podcastPanel, .musicPanel { width: 91%; }
+  .windowBar { font-size: 6px; min-height: 30px; padding: 0 8px; }
+  .djMain { grid-template-columns: 105px 1fr; min-height: 210px; gap: 4px; padding: 8px; }
+  .recordWrap { width: 102px; height: 145px; }.record { width: 95px; height: 95px; box-shadow: 0 0 0 5px #122b46, 0 0 0 6px #6f83ac; }.record span { width: 41px; height: 41px; font-size: 10px; }.recordArm { width: 54px; right: -7px; top: 31px; height: 4px; }
+  .djNow { padding: 0 4px; }.djNow small { font-size: 7px; }.djNow strong { font-size: 22px; }.djNow p { font-size: 9px; }.djNow .waveform { height: 40px; margin-top: 7px; }.djQueue { font-size: 6px; }
+  .calendarHeader { padding: 13px 8px; }.calendarHeader > span:first-child { font-size: 17px; }.calendarHeader strong { font-size: 11px; }.calendarHeader > span:last-child { display: none; }
+  .calendarGrid { margin: 0 8px; }.calendarDay { height: 130px; padding: 5px 3px; }.calendarDay > span { font-size: 6px; }.calendarDay b { font-size: 13px; }.calendarDay i { left: 2px; right: 2px; padding: 4px 1px; font-size: 5px; }.calendarFooter { padding: 10px 8px; font-size: 6px; }.calendarFloat { bottom: 12px; right: 4%; padding: 8px; font-size: 7px; }.calendarFloat span { font-size: 8px; }
+  .clipCanvas { height: 180px; margin: 8px; }.clipWindowGhost { top: 29px; height: 120px; padding: 12px; }.clipWindowGhost span { font-size: 9px; }.clipWindowGhost strong { font-size: 27px; }.clipTimeline { padding: 2px 8px; font-size: 6px; }.clipActions { padding: 7px 8px; font-size: 6px; }.clipActions strong { font-size: 6px; }
+  .podcastBody { gap: 6px; padding: 13px 8px; grid-template-columns: .8fr 1.4fr .8fr; }.hostCard { min-height: 190px; }.hostCard > span { width: 45px; height: 45px; font-size: 26px; }.hostCard strong { font-size: 7px; }.hostCard small { display: none; }.podcastCenter > span { font-size: 6px; }.podcastCenter strong { font-size: 14px; }.podcastWave { height: 42px; }.podcastFooter { font-size: 6px; }
+  .musicSpectrum { margin: 10px 10px 6px; height: 60px; }.musicRoll { margin: 0 10px 9px; height: 145px; }.musicFooter { font-size: 6px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .waveform span, .podcastWave span, .djHalo, .record, .calendarBloom, .calendarDay i, .calendarFloat, .recordDot, .captureCorners, .clipTimeline b, .podcastAura, .musicGlow, .musicSpectrum i, .musicGrid b, .genericOrb { animation: none; }
+}

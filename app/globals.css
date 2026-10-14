@@ -3828,3 +3828,15 @@ svg {
   .project-story-copy,
   .project-detail-footer { grid-column: 1 / -1; }
 }
+
+/* The arcade gets its own canvas; the project directory belongs to Portfolio. */
+.workbench-app[data-mode="arcade"]{background:#ffe8ad}
+.workbench-app[data-mode="arcade"] .site-header{border-color:#163b6d55}
+.workbench-app[data-mode="arcade"] .intro-strip{background:#123f91;color:#fff2cf;padding-inline:18px}
+.workbench-app[data-mode="arcade"] .intro-strip a{color:#ffe26d}
+.workbench-app[data-mode="arcade"] .workbench-layout{grid-template-columns:minmax(0,1fr)}
+.workbench-app[data-mode="arcade"] .directory-sidebar,
+.workbench-app[data-mode="arcade"] .mobile-directory-toggle{display:none}
+.workbench-app[data-mode="arcade"] .workspace-main{background:#fff1cd;border-color:#174582}
+.workbench-app[data-mode="arcade"] .status-bar{background:#102c58;color:#e9f1fa;padding-inline:18px}
+@media(max-width:620px){.top-nav{gap:8px;padding:0 4px}.top-nav a{font-size:10px}}

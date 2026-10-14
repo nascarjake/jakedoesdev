@@ -6,6 +6,8 @@ export type ProjectCategory =
   | "Games"
   | "SaaS";
 
+export type ProjectMode = "portfolio" | "lab";
+
 export type Project = {
   id: string;
   index: string;
@@ -18,6 +20,7 @@ export type Project = {
   signal: string;
   accent: "acid" | "amber" | "ice";
   category: ProjectCategory;
+  mode?: ProjectMode;
   status: string;
   highlights: string[];
   storyHtml?: string;
@@ -222,26 +225,26 @@ export const projects: Project[] = [
     id: "tumor-identifier",
     index: "07",
     title: "Tumor Identifier",
-    eyebrow: "Medical imaging prototype",
+    eyebrow: "Medical imaging application",
     summary:
-      "A Baylor Medical Center prototype that correlated 2D biopsy scans with a 3D biopsy model, then outlined and reconstructed tumor tissue in context.",
+      "A production application for Baylor Medical Center that correlated 2D biopsy scans with a 3D biopsy model and reconstructed outlined tumor tissue in context.",
     role: "Creative Technologist",
-    year: "R&D archive",
+    year: "Production archive",
     stack: ["TensorFlow.js", "WebGL", "Node.js"],
     signal: "TMR",
     accent: "acid",
     category: "AI + Automation",
-    status: "Research prototype",
+    status: "Production application",
     highlights: [
       "Aligned marked regions from 2D scans with a three-dimensional biopsy model.",
       "Generated an outlined 3D representation of identified tumor tissue.",
       "Used WebGL and browser tooling to make the scan-to-model relationship explorable.",
     ],
     dossier: {
-      scope: "An R&D visualization prototype for aligning 2D biopsy scans with a three-dimensional biopsy model and reconstructing a marked region in context.",
-      ownership: ["Worked with 3D and 2D biopsy scan inputs as part of the prototype workflow.", "Mapped outlined regions across scan slices into a reconstructed 3D representation.", "Built an explorable browser visualization to communicate the scan-to-model process."],
+      scope: "A production medical imaging application for aligning 2D biopsy scans with a three-dimensional biopsy model and reconstructing marked regions in context.",
+      ownership: ["Worked with 3D and 2D biopsy scan inputs in the application workflow.", "Mapped outlined regions across scan slices into a reconstructed 3D representation.", "Built an explorable browser visualization to communicate the scan-to-model process."],
       systems: ["WebGL, Node.js, and custom browser JavaScript", "TensorFlow.js listed in the original project stack", "2D/3D scan alignment, contours, and reconstruction"],
-      note: "The interactive demo on this site uses synthetic geometry only. It is a historical visualization prototype, not a diagnostic tool or clinical advice.",
+      note: "The interactive demo on this site uses synthetic geometry only. It is separate from the production application and is not a diagnostic tool or clinical advice.",
     },
   },
   {
@@ -584,6 +587,7 @@ export const projects: Project[] = [
   {
     id: "clip-my-screen",
     index: "21",
+    sortOrder: 22,
     title: "Clip My Screen",
     eyebrow: "Open-source instant replay",
     summary:
@@ -595,6 +599,7 @@ export const projects: Project[] = [
     accent: "amber",
     category: "Creative Tools",
     status: "Open-source desktop app",
+    mode: "lab",
     highlights: [
       "Built an always-ready replay buffer with 1-, 5-, and 15-minute saves.",
       "Added display selection, screenshots, long recordings, and simple clip editing.",
@@ -605,6 +610,115 @@ export const projects: Project[] = [
       ownership: ["Designed and implemented the desktop capture and clip library experience.", "Built local replay capture, display selection, keyboard shortcuts, and private share links.", "Set up cross-platform desktop packaging and public releases."],
       systems: ["Electron and Node.js local service", "ScreenCaptureKit on macOS and FFmpeg capture on Windows", "GitHub Actions release builds"],
       source: { label: "View source and downloads", url: "https://github.com/nascarjake/clip-my-screen" },
+    },
+  },
+  {
+    id: "stream-dj",
+    index: "22",
+    sortOrder: 20,
+    title: "Stream DJ",
+    eyebrow: "AI broadcast studio",
+    summary: "A local-first desktop studio exploring audience requests, AI DJ voice, show programming, and audio playback for livestreams and radio-style shows.",
+    role: "Creator · Engineer",
+    year: "Current",
+    stack: ["Electron", "React", "TypeScript", "Vite"],
+    signal: "SDJ",
+    accent: "ice",
+    category: "AI + Automation",
+    mode: "lab",
+    status: "Active prototype",
+    highlights: [
+      "Explores a moderated queue for audience music requests.",
+      "Pairs DJ voice links with a local song library and on-air controls.",
+      "Keeps the studio local-first and provider-neutral.",
+    ],
+    dossier: {
+      scope: "What would a local-first, AI-assisted broadcast desk look like for an independent streamer?",
+      ownership: ["Built an Electron station workspace with on-air controls and a persistent player.", "Explored DJ voice announcements, requests, and reusable programming blocks.", "Separated music, text, and voice providers so the studio can evolve without one provider dependency."],
+      systems: ["Electron desktop shell", "React and TypeScript interface", "Local backend and station data"],
+      note: "The repository describes this as an early prototype; integrations and show automation are still evolving.",
+    },
+  },
+  {
+    id: "jcal",
+    index: "23",
+    sortOrder: 21,
+    title: "jcal",
+    eyebrow: "Home calendar assistant",
+    summary: "A touch-first home calendar workspace exploring shared family schedules, lists, weather, and natural-language commands.",
+    role: "Creator · Engineer",
+    year: "Current",
+    stack: ["Electron", "React", "TypeScript", "Gemini"],
+    signal: "JCL",
+    accent: "amber",
+    category: "AI + Automation",
+    mode: "lab",
+    status: "In development",
+    highlights: [
+      "Brings multiple calendars into a wall-display interface.",
+      "Explores shared lists and color-coded family profiles.",
+      "Uses natural-language commands for household planning.",
+    ],
+    dossier: {
+      scope: "How can a shared household display make schedules and everyday lists easier to use?",
+      ownership: ["Built an Electron and React application for touch screens and kiosk use.", "Explored calendar aggregation, family profiles, and shared lists.", "Connected natural-language commands through a Gemini integration."],
+      systems: ["Electron and React", "Calendar integrations", "Gemini-powered commands"],
+      note: "The project is a work in progress; this record describes the repository's current direction.",
+    },
+  },
+  {
+    id: "markdown-podcast-narrator",
+    index: "24",
+    sortOrder: 23,
+    title: "Markdown Podcast Narrator",
+    eyebrow: "Notes into spoken episodes",
+    summary: "A desktop experiment that turns Markdown and research notes into editable two-host conversations, then renders distinct local voices into an MP3.",
+    role: "Creator · Engineer",
+    year: "Current",
+    stack: ["Electron", "Node.js", "Kokoro", "FFmpeg"],
+    signal: "POD",
+    accent: "ice",
+    category: "Creative Tools",
+    mode: "lab",
+    status: "Open-source release",
+    highlights: [
+      "Drafts an editable two-host conversation from source notes.",
+      "Renders distinct Kokoro voices locally and saves an MP3.",
+      "Also supports a single-narrator reading mode without an AI writer.",
+    ],
+    dossier: {
+      scope: "Can written notes become a useful spoken explanation while keeping the script editable?",
+      ownership: ["Built the Electron episode studio and source intake workflow.", "Connected optional writing providers for conversation drafts.", "Added local Kokoro voice rendering, MP3 output, and playback."],
+      systems: ["Electron desktop app", "Optional local or CLI writing providers", "Kokoro voice synthesis and FFmpeg"],
+      note: "The writing provider is optional; voice generation runs locally after its model is available.",
+      source: { label: "View source and releases", url: "https://github.com/nascarjake/markdown-podcast-narrator" },
+    },
+  },
+  {
+    id: "music-writer",
+    index: "25",
+    sortOrder: 24,
+    title: "Music Writer",
+    eyebrow: "Audio-to-code music research",
+    summary: "A music analysis workspace exploring how separated audio stems and note events can become a reproducible Strudel arrangement.",
+    role: "Creator · Researcher",
+    year: "Current",
+    stack: ["Python", "HTDemucs", "Basic Pitch", "Strudel"],
+    signal: "MUW",
+    accent: "acid",
+    category: "Creative Tools",
+    mode: "lab",
+    status: "Research workspace",
+    highlights: [
+      "Separates a recording into instrumental stems for analysis.",
+      "Fits detected notes and drum transients to a rhythmic grid.",
+      "Generates Strudel reconstructions from the resulting events.",
+    ],
+    dossier: {
+      scope: "How much of a recorded arrangement can be reconstructed as editable music code?",
+      ownership: ["Created an analysis pipeline for stem separation and note extraction.", "Mapped detected events to a beat grid and section structure.", "Produced Strudel versions of the analyzed arrangement."],
+      systems: ["Python analysis scripts", "HTDemucs and Basic Pitch", "Strudel music code"],
+      note: "The current workspace documents one transcription study; this is research material rather than a released app.",
     },
   },
 ];

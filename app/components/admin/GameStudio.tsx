@@ -213,6 +213,7 @@ function gameToApi(game: Game) {
 function projectFromApi(value: unknown): PortfolioProject | null {
   if (!value || typeof value !== "object") return null;
   const item = value as Record<string, unknown>;
+  if (item.mode === "lab") return null;
   const id = stringValue(item.id);
   const title = stringValue(item.title);
   return id && title
@@ -367,13 +368,14 @@ export function GameStudio() {
 
   return <main className={styles.shell}>
     <header className={styles.topbar}>
-      <div className={styles.brand}><span className={styles.mark}>GG</span><div><strong>Goose Games catalogue</strong><span>One list for goosegames.dev</span></div></div>
+      <div className={styles.brand}><span className={styles.mark}>GG</span><div><strong>Arcade Studio</strong><span>Games for the arcade and Goose Games</span></div></div>
       <div className={styles.topActions}>
-        <a className={styles.ghost} href="/admin/">Project Studio</a>
+        <a className={styles.ghost} href="/arcade/" target="_blank">View arcade ↗</a>
         <a className={styles.ghost} href="https://goosegames.dev" target="_blank" rel="noreferrer">View Goose Games ↗</a>
         <div className={styles.saveCluster}><span className={styles.status}>{dirty ? "UNSAVED" : game?.version ? `SAVED · V${game.version}` : "NEW GAME"}</span><button className={styles.button} type="button" disabled={!game || saving} onClick={() => void save()}>{saving ? "Saving…" : game?.published ? "Save & publish" : "Save draft"}</button></div>
       </div>
     </header>
+    <nav className={styles.modeTabs} aria-label="Project Studio modes"><a href="/admin/">01 / Portfolio & résumé</a><a href="/admin/lab/">02 / AI Lab</a><a href="/admin/games/" aria-current="page">03 / Arcade</a></nav>
     <div className={styles.layout}>
       <aside className={styles.sidebar}>
         <button className={styles.button} type="button" onClick={newGame}>+ New game</button>
@@ -386,7 +388,7 @@ export function GameStudio() {
       </aside>
       {game ? <section className={styles.main}>
         {notice && <div className={notice.type === "error" ? styles.error : styles.success}>{notice.text}</div>}
-        <div className={styles.section}><header className={styles.sectionHeader}><h2>Catalog identity</h2><p>Published games become the public catalogue for goosegames.dev.</p></header><div className={styles.sectionBody}>
+        <div className={styles.section}><header className={styles.sectionHeader}><h2>Catalog identity</h2><p>Published games appear in the arcade and Goose Games catalogue.</p></header><div className={styles.sectionBody}>
           <label className={styles.label}>Title<input className={styles.input} value={game.title} onChange={(event) => { update("title", event.target.value); if (!game.version && (!game.id || game.id === slugify(game.title))) update("id", slugify(event.target.value)); }} /></label>
           <div className={styles.grid3}><label className={styles.label}>Slug<input className={`${styles.input} ${styles.slug}`} value={game.id} disabled={Boolean(game.version)} onChange={(event) => update("id", slugify(event.target.value))} /></label><label className={styles.label}>Sort order<input className={styles.input} type="number" value={game.sortOrder} onChange={(event) => update("sortOrder", Number(event.target.value))} /></label><label className={styles.label}>Genre<input className={styles.input} value={game.genre} onChange={(event) => update("genre", event.target.value)} /></label></div>
           <label className={styles.label}>Tagline<input className={styles.input} value={game.tagline} onChange={(event) => update("tagline", event.target.value)} placeholder="A concise hook for the game card" /></label>

@@ -10,7 +10,7 @@ export default function NotFound() {
           plenty to explore back at the workbench.
         </p>
         <Link href="/" className="button button-ink">
-          Back to the arcade →
+          Choose a path →
         </Link>
       </div>
     </JournalShell>

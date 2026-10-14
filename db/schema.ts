@@ -18,6 +18,7 @@ export const projects = sqliteTable(
       .notNull()
       .default("acid"),
     category: text("category").notNull().default("SaaS"),
+    mode: text("mode", { enum: ["portfolio", "lab"] }).notNull().default("portfolio"),
     status: text("status").notNull().default("Draft"),
     highlightsJson: text("highlights_json").notNull().default("[]"),
     scope: text("scope").notNull().default(""),
@@ -35,6 +36,12 @@ export const projects = sqliteTable(
   },
   (table) => [
     index("projects_published_sort_idx").on(
+      table.published,
+      table.archivedAt,
+      table.sortOrder,
+    ),
+    index("projects_mode_published_sort_idx").on(
+      table.mode,
       table.published,
       table.archivedAt,
       table.sortOrder,

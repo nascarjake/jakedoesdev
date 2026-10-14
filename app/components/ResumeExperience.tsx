@@ -75,7 +75,7 @@ export function ResumeExperience() {
             <span>YEARS OF BUILDING</span>
           </div>
           <div>
-            <strong>{projects.length}</strong>
+            <strong>{projects.filter((project) => project.mode !== "lab").length}</strong>
             <span>PROJECTS IN THE ARCHIVE</span>
           </div>
           <div>

@@ -6,7 +6,7 @@ import { useEffect, useRef, useState, type ReactNode } from "react";
 import { projects, type ProjectCategory } from "../data/portfolio";
 import { openWorkbenchPanel } from "../lib/workbench-navigation";
 import { Icon, type IconName } from "./WorkbenchIcons";
-import { ContactButton } from "./ContactButton";
+import { WorkbenchHeader } from "./WorkbenchHeader";
 
 const groups: {
   title: string;
@@ -29,6 +29,7 @@ type DirectoryProject = {
   category: ProjectCategory;
   stack: string[];
   accent: "acid" | "amber" | "ice";
+  mode?: "portfolio" | "lab";
 };
 
 const categories = new Set<ProjectCategory>([
@@ -53,7 +54,7 @@ function directoryProjectFromApi(value: unknown): DirectoryProject | null {
     : null;
   if (!id || !title || !category || !accent || !Array.isArray(project.stack)) return null;
   const stack = project.stack.filter((item): item is string => typeof item === "string");
-  return { id, title, category, stack, accent };
+  return { id, title, category, stack, accent, mode: project.mode === "lab" ? "lab" : "portfolio" };
 }
 
 export function WorkbenchShell({
@@ -67,7 +68,7 @@ export function WorkbenchShell({
 }) {
   const [query, setQuery] = useState("");
   const [directoryOpen, setDirectoryOpen] = useState(false);
-  const [catalog, setCatalog] = useState<DirectoryProject[]>(projects);
+  const [catalog, setCatalog] = useState<DirectoryProject[]>(projects.filter((project) => project.mode !== "lab"));
   const pathname = usePathname();
   const searchInput = useRef<HTMLInputElement>(null);
   useEffect(() => {
@@ -103,7 +104,7 @@ export function WorkbenchShell({
       .then((payload) => {
         if (!Array.isArray(payload.projects)) return;
         const next = payload.projects.map(directoryProjectFromApi);
-        if (next.every((project): project is DirectoryProject => project !== null)) setCatalog(next);
+        if (next.every((project): project is DirectoryProject => project !== null)) setCatalog(next.filter((project) => project.mode !== "lab"));
       })
       .catch(() => undefined);
     return () => controller.abort();
@@ -114,7 +115,7 @@ export function WorkbenchShell({
       .includes(query.toLowerCase()),
   );
   return (
-    <div className="workbench-app">
+    <div className="workbench-app" data-mode={section === "arcade" ? "arcade" : "portfolio"}>
       <a
         className="skip-link"
         href="#main-content"
@@ -125,51 +126,7 @@ export function WorkbenchShell({
       >
         Skip to content
       </a>
-      <header className="site-header">
-        <Link href="/" className="identity" aria-label="Jacob Clark, home">
-          <span className="identity-monogram">
-            jc<span>.</span>
-          </span>
-          <span>
-            <strong>JACOB CLARK</strong>
-            <small>ENGINEER. BUILDER. GAME MAKER.</small>
-          </span>
-        </Link>
-        <nav className="top-nav" aria-label="Main navigation">
-          <Link
-            href="/"
-            aria-current={
-              section === "arcade" || section === "projects"
-                ? "page"
-                : undefined
-            }
-          >
-            Workbench
-          </Link>
-          <Link
-            href="/resume"
-            aria-current={section === "resume" ? "page" : undefined}
-          >
-            About me
-          </Link>
-          <Link
-            href="/updates"
-            aria-current={section === "notes" ? "page" : undefined}
-          >
-            Field notes
-          </Link>
-        </nav>
-        <a
-          className="top-discord"
-          href="https://discord.gg/6BJTUpDSsE"
-          target="_blank"
-          rel="noreferrer"
-          aria-label="Join the Discord"
-        >
-          <Icon name="discord" size={19} />
-        </a>
-        <ContactButton />
-      </header>
+      <WorkbenchHeader section={section} />
 
       <div className="intro-strip">
         <span>
@@ -291,18 +248,18 @@ export function WorkbenchShell({
               )}
             </nav>
           </section>
-          <section className="lab-directory" aria-labelledby="lab-directory-title">
+          <Link className="lab-directory" href="/lab" aria-labelledby="lab-directory-title">
             <span className="lab-directory-icon">
               <Icon name="code" size={17} />
             </span>
             <div>
               <div className="lab-directory-heading">
                 <h2 id="lab-directory-title">Lab bench</h2>
-                <span>Next up</span>
+                <span>Explore ↗</span>
               </div>
-              <p>Experiments, prototypes, and utility tools will live here.</p>
+              <p>Experiments and prototypes from the AI Lab.</p>
             </div>
-          </section>
+          </Link>
           <div className="sidebar-bottom">
             <Link href="/resume">
               <Icon name="file" size={16} /> The 60-second résumé{" "}

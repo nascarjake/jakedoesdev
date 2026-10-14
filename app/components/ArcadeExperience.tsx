@@ -4,9 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import {
-  arcadeCartridges as cartridges,
   arcadeGames,
   studioCartridge,
+  type ArcadeGame,
 } from "../data/arcade";
 import { Icon } from "./WorkbenchIcons";
 import { WorkbenchShell, WorkspaceToolbar } from "./WorkbenchShell";
@@ -26,7 +26,10 @@ function Screws() {
 }
 
 export function ArcadeExperience() {
-  const [selected, setSelected] = useState(0);
+  const [games, setGames] = useState<ArcadeGame[]>(arcadeGames);
+  const [selectedSlot, setSelected] = useState(0);
+  const selected = Math.min(selectedSlot, games.length);
+  const [wideLayout, setWideLayout] = useState(false);
   const [sound, setSound] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [runId, setRunId] = useState(0);
@@ -36,11 +39,15 @@ export function ArcadeExperience() {
   const audio = useRef<AudioContext | null>(null);
   const media = useRef<ArcadeMediaHandle>(null);
   const cabinet = useRef<HTMLElement>(null);
+  const cartridges = [
+    { ...studioCartridge, description: `${games.length} games. Plenty of curiosity. Browse the cartridges, watch real gameplay, or load a browser game right here.` },
+    ...games,
+  ];
   const cartridge = cartridges[selected];
   const running = playing;
-  const shelfOffset = 0;
-  const shelfCartridges = cartridges;
-  const shelfSelected = selected;
+  const shelfOffset = wideLayout && games.length ? 1 : 0;
+  const shelfCartridges = wideLayout && games.length ? games : cartridges;
+  const shelfSelected = Math.max(0, selected - shelfOffset);
   const shelfStart = Math.min(
     Math.floor(shelfSelected / 3) * 3,
     Math.max(0, shelfCartridges.length - 3),
@@ -49,8 +56,38 @@ export function ArcadeExperience() {
     shelfStart,
     shelfStart + 3,
   );
-  const currentNumber = selected + 1;
-  const totalCartridges = cartridges.length;
+  const currentNumber = shelfOffset ? selected : selected + 1;
+  const totalCartridges = shelfOffset ? games.length : cartridges.length;
+
+  useEffect(() => {
+    const controller = new AbortController();
+    fetch("/api/games", { signal: controller.signal })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Game catalogue unavailable");
+        return await response.json() as { games?: ArcadeGame[] };
+      })
+      .then((payload) => {
+        if (Array.isArray(payload.games)) setGames(payload.games);
+      })
+      .catch(() => undefined);
+    return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
+    const query = window.matchMedia("(min-width: 1101px)");
+    const syncLayout = () => {
+      setWideLayout(query.matches);
+      if (query.matches && games.length) {
+        setSelected((current) => (current === 0 ? 1 : current));
+        setPlaying(false);
+        setInserted(false);
+      }
+    };
+
+    syncLayout();
+    query.addEventListener("change", syncLayout);
+    return () => query.removeEventListener("change", syncLayout);
+  }, [games.length]);
 
   useEffect(
     () => () => {
@@ -61,7 +98,7 @@ export function ArcadeExperience() {
   );
 
   function select(index: number) {
-    const first = 0;
+    const first = wideLayout && games.length ? 1 : 0;
     const length = cartridges.length - first;
     const normalized = ((index - first + length) % length) + first;
     setSelected(normalized);
@@ -135,6 +172,58 @@ export function ArcadeExperience() {
           <br />› PLAY
           <br />› REPEAT
         </span>
+        <aside className={styles.studioPanel} aria-label="About Goose Games">
+          <span className={styles.studioTab}>THE STUDIO</span>
+          <div className={styles.studioHeading}>
+            <div>
+              <p>INDEPENDENT GAME STUDIO</p>
+              <h2>{studioCartridge.title}</h2>
+            </div>
+            <span aria-label={`${games.length} games`}>
+              {String(games.length).padStart(2, "0")}
+            </span>
+          </div>
+          <div className={styles.studioBody}>
+            <div className={styles.studioCover}>
+              <Image
+                src={studioCartridge.cover}
+                alt="Goose Games illustrated cartridge cover"
+                fill
+                sizes="160px"
+                priority
+                unoptimized
+              />
+            </div>
+            <div className={styles.studioCopy}>
+              <p className={styles.studioTagline}>{studioCartridge.tagline}</p>
+              <p>{studioCartridge.description}</p>
+              <div className={styles.studioFacts}>
+                <span>PLAY IN BROWSER</span>
+                <span>REAL GAMEPLAY</span>
+                <span>BUILT WITH CURIOSITY</span>
+              </div>
+            </div>
+          </div>
+          <div className={styles.studioActions}>
+            <a
+              className={styles.studioLink}
+              href={studioCartridge.playUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              VISIT GOOSEGAMES.DEV <Icon name="external" size={18} />
+            </a>
+            <a
+              className={styles.studioDiscord}
+              href="https://discord.gg/6BJTUpDSsE"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="Join the Goose Games Discord"
+            >
+              <Icon name="discord" size={20} />
+            </a>
+          </div>
+        </aside>
         <section
           ref={cabinet}
           tabIndex={-1}
@@ -347,7 +436,7 @@ export function ArcadeExperience() {
       <div className={styles.belowCabinet}>
         <span>
           {String(currentNumber).padStart(2, "0")} / {totalCartridges}{" "}
-          CARTRIDGES · {arcadeGames.length} REAL
+          {shelfOffset ? "GAMES" : "CARTRIDGES"} · {games.length} REAL
           GAMES
         </span>
         <Link href="/universe">
@@ -360,10 +449,10 @@ export function ArcadeExperience() {
             <p className="eyebrow">THE CARTRIDGE COLLECTION</p>
             <h2>Find your next obsession.</h2>
           </div>
-          <span>{arcadeGames.length} games / made with curiosity</span>
+          <span>{games.length} games / made with curiosity</span>
         </div>
         <div className={styles.libraryGrid}>
-          {arcadeGames.map((game, index) => (
+          {games.map((game, index) => (
             <article key={game.id} data-selected={selected === index + 1}>
               <button
                 onClick={() => {

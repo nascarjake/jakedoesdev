@@ -13,6 +13,7 @@ type ProjectRow = {
   signal: string;
   accent: "acid" | "amber" | "ice";
   category: string;
+  mode: "portfolio" | "lab";
   status: string;
   highlights_json: string;
   scope: string;
@@ -70,6 +71,7 @@ type ProjectInput = {
   signal?: string;
   accent?: string;
   category?: string;
+  mode?: string;
   status?: string;
   highlights?: unknown;
   scope?: string;
@@ -97,6 +99,7 @@ type SafeProjectInput = {
   signal: string;
   accent: "acid" | "amber" | "ice";
   category: string;
+  mode: "portfolio" | "lab";
   status: string;
   highlights: string[];
   scope: string;
@@ -117,14 +120,14 @@ type SafeProjectInput = {
 
 const PROJECT_SELECT = `
   SELECT id, sort_order, title, eyebrow, summary, story_html, role, year,
-    stack_json, signal, accent, category, status, highlights_json, scope,
+    stack_json, signal, accent, category, mode, status, highlights_json, scope,
     ownership_json, systems_json, note, source_label, source_url, published,
     featured, version, archived_at, created_at, updated_at
   FROM projects`;
 
 const PROJECT_FIELDS = `
   id, sort_order, title, eyebrow, summary, story_html, role, year, stack_json,
-  signal, accent, category, status, highlights_json, scope, ownership_json,
+  signal, accent, category, mode, status, highlights_json, scope, ownership_json,
   systems_json, note, source_label, source_url, published, featured, version,
   archived_at, created_at, updated_at`;
 
@@ -256,6 +259,7 @@ function cleanProject(input: ProjectInput): SafeProjectInput | Response {
     signal: cleanText(input.signal, 5).toUpperCase() || "PRJ",
     accent,
     category: cleanText(input.category, 80) || "SaaS",
+    mode: input.mode === "lab" ? "lab" : "portfolio",
     status: cleanText(input.status, 120) || "Draft",
     highlights: cleanArray(input.highlights),
     scope: cleanText(input.scope, 4_000),
@@ -302,6 +306,7 @@ function projectDto(row: ProjectRow, media: MediaRow[]) {
     signal: row.signal,
     accent: row.accent,
     category: row.category,
+    mode: row.mode,
     status: row.status,
     highlights: parseStringArray(row.highlights_json),
     dossier: {
@@ -417,14 +422,15 @@ async function saveProject(
   statements.push(
     env.DB.prepare(
       `INSERT INTO projects (${PROJECT_FIELDS}) VALUES (
-        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL,
+        ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL,
         COALESCE((SELECT created_at FROM projects WHERE id = ?), CURRENT_TIMESTAMP), CURRENT_TIMESTAMP
       )
       ON CONFLICT(id) DO UPDATE SET
         sort_order = excluded.sort_order, title = excluded.title, eyebrow = excluded.eyebrow,
         summary = excluded.summary, story_html = excluded.story_html, role = excluded.role,
         year = excluded.year, stack_json = excluded.stack_json, signal = excluded.signal,
-        accent = excluded.accent, category = excluded.category, status = excluded.status,
+        accent = excluded.accent, category = excluded.category, mode = excluded.mode,
+        status = excluded.status,
         highlights_json = excluded.highlights_json, scope = excluded.scope,
         ownership_json = excluded.ownership_json, systems_json = excluded.systems_json,
         note = excluded.note, source_label = excluded.source_label, source_url = excluded.source_url,
@@ -443,6 +449,7 @@ async function saveProject(
       project.signal,
       project.accent,
       project.category,
+      project.mode,
       project.status,
       JSON.stringify(project.highlights),
       project.scope,
@@ -527,6 +534,7 @@ async function restoreRevision(
   const snapshot = JSON.parse(revision.snapshot_json) as ProjectInput;
   const current = await getProjectRow(env, cleanText(snapshot.id, 80));
   if (!current) return error("Project not found.", 404);
+  snapshot.mode ??= current.mode;
   snapshot.version = current.version;
   return saveProject(
     env,

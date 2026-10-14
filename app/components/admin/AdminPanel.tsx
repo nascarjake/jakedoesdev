@@ -30,6 +30,7 @@ type Project = {
   signal: string;
   accent: "acid" | "amber" | "ice";
   category: string;
+  mode: "portfolio" | "lab";
   status: string;
   highlights: string[];
   scope: string;
@@ -55,7 +56,7 @@ type ImportEvidence = {
   warnings: string[];
 };
 
-const emptyProject = (sortOrder = 0): Project => ({
+const emptyProject = (sortOrder = 0, mode: Project["mode"] = "portfolio"): Project => ({
   id: "",
   sortOrder,
   title: "Untitled project",
@@ -67,8 +68,9 @@ const emptyProject = (sortOrder = 0): Project => ({
   stack: [],
   signal: "PRJ",
   accent: "acid",
-  category: "SaaS",
-  status: "Draft",
+  category: mode === "lab" ? "AI + Automation" : "SaaS",
+  mode,
+  status: mode === "lab" ? "Experiment" : "Draft",
   highlights: [],
   scope: "",
   ownership: [],
@@ -101,6 +103,7 @@ function projectFromApi(value: Record<string, unknown>): Project {
   const source = (dossier.source ?? {}) as Record<string, unknown>;
   return {
     ...(value as unknown as Project),
+    mode: value.mode === "lab" ? "lab" : "portfolio",
     sortOrder: Number(value.sortOrder ?? 0),
     storyHtml: String(value.storyHtml ?? "<p></p>"),
     scope: String(dossier.scope ?? value.scope ?? ""),
@@ -155,7 +158,7 @@ function RichTextEditor({ value, onChange }: { value: string; onChange(value: st
   </div>;
 }
 
-export function AdminPanel() {
+export function AdminPanel({ initialMode = "portfolio" }: { initialMode?: Project["mode"] }) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [project, setProject] = useState<Project | null>(null);
   const [email, setEmail] = useState("");
@@ -182,9 +185,10 @@ export function AdminPanel() {
     const next = response.projects.map(projectFromApi);
     setEmail(session.user.email);
     setProjects(next);
-    if (selectId) setProject(next.find((item) => item.id === selectId) ?? next[0] ?? null);
-    else setProject((current) => next.find((item) => item.id === current?.id) ?? next[0] ?? null);
-  }, []);
+    const firstInMode = next.find((item) => item.mode === initialMode) ?? null;
+    if (selectId) setProject(next.find((item) => item.id === selectId) ?? firstInMode);
+    else setProject((current) => next.find((item) => item.id === current?.id && item.mode === initialMode) ?? firstInMode);
+  }, [initialMode]);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -263,7 +267,7 @@ export function AdminPanel() {
     setAiBusy(true); setNotice(null);
     try {
       const response = await api<{ project: Partial<Project> }>("/api/admin/ai", { method: "POST", body: JSON.stringify({ mode, prompt: aiPrompt, project }) });
-      setProject({ ...project, ...response.project, id: project.version ? project.id : (response.project.id ?? project.id), version: project.version, media: project.media, published: project.published, featured: project.featured });
+      setProject({ ...project, ...response.project, id: project.version ? project.id : (response.project.id ?? project.id), mode: project.mode, version: project.version, media: project.media, published: project.published, featured: project.featured });
       setDirty(true);
       setNotice({ type: "success", text: "AI draft applied. Review every field before saving." });
     } catch (caught) { setNotice({ type: "error", text: caught instanceof Error ? caught.message : "AI request failed." }); }
@@ -286,6 +290,7 @@ export function AdminPanel() {
         ...project,
         ...response.project,
         id: project.version ? project.id : (response.project.id ?? project.id),
+        mode: project.mode,
         version: project.version,
         media,
         published: project.published,
@@ -379,14 +384,15 @@ export function AdminPanel() {
     await api(`/api/admin/projects/${project.id}`, { method: "DELETE", body: "{}" }); setDirty(false); await loadProjects(); setNotice({ type: "success", text: "Project archived." });
   };
 
-  const filtered = useMemo(() => projects.filter((item) => `${item.title} ${item.category}`.toLowerCase().includes(query.toLowerCase())), [projects, query]);
+  const filtered = useMemo(() => projects.filter((item) => item.mode === initialMode && `${item.title} ${item.category}`.toLowerCase().includes(query.toLowerCase())), [projects, query, initialMode]);
   if (loading) return <main className={styles.shell}><div className={styles.loading}><div><div className={styles.mark}>JC</div><h1>Opening Project Studio…</h1></div></div></main>;
   if (!email) return <main className={styles.shell}><div className={styles.empty}><div><h1>Project Studio is locked</h1><p className={styles.muted}>{notice?.text ?? "Sign in through Cloudflare Access to continue."}</p></div></div></main>;
 
   return <main className={styles.shell}>
-    <header className={styles.topbar}><div className={styles.brand}><span className={styles.mark}>JC</span><div><strong>Project Studio</strong><span>{email}</span></div></div><div className={styles.topActions}><a className={styles.ghost} href="/admin/updates/">Update review</a><a className={styles.ghost} href="/admin/games/">Goose Games catalogue</a><a className={styles.ghost} href="/universe/" target="_blank">View portfolio ↗</a><div className={styles.saveCluster}><span className={styles.status}>{dirty ? "LOCAL DRAFT" : project?.version ? `SAVED · V${project.version}` : "NEW PROJECT"}</span><button className={styles.button} type="button" disabled={!project || saving} onClick={() => void save()}>{saving ? "Saving…" : project?.published ? "Save & publish" : "Save draft"}</button></div></div></header>
+    <header className={styles.topbar}><div className={styles.brand}><span className={styles.mark}>JC</span><div><strong>{initialMode === "lab" ? "AI Lab Studio" : "Portfolio Studio"}</strong><span>{email}</span></div></div><div className={styles.topActions}><a className={styles.ghost} href="/admin/updates/">Update review</a><a className={styles.ghost} href={initialMode === "lab" ? "/lab/" : "/universe/"} target="_blank">View {initialMode === "lab" ? "AI Lab" : "portfolio"} ↗</a><div className={styles.saveCluster}><span className={styles.status}>{dirty ? "LOCAL DRAFT" : project?.version ? `SAVED · V${project.version}` : "NEW PROJECT"}</span><button className={styles.button} type="button" disabled={!project || saving} onClick={() => void save()}>{saving ? "Saving…" : project?.published ? "Save & publish" : "Save draft"}</button></div></div></header>
+    <nav className={styles.modeTabs} aria-label="Project Studio modes"><a href="/admin/" aria-current={initialMode === "portfolio" ? "page" : undefined}>01 / Portfolio & résumé</a><a href="/admin/lab/" aria-current={initialMode === "lab" ? "page" : undefined}>02 / AI Lab</a><a href="/admin/games/">03 / Arcade</a></nav>
     <div className={styles.layout}>
-      <aside className={styles.sidebar}><button className={styles.button} type="button" onClick={() => { if (!dirty || window.confirm("Discard unsaved changes?")) { setProject(emptyProject(projects.length)); setImportUrl(""); setImportEvidence(null); setDirty(true); setRevisions([]); } }}>+ New project</button><input className={styles.search} type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search projects…" />
+      <aside className={styles.sidebar}><button className={styles.button} type="button" onClick={() => { if (!dirty || window.confirm("Discard unsaved changes?")) { setProject(emptyProject(projects.length, initialMode)); setImportUrl(""); setImportEvidence(null); setDirty(true); setRevisions([]); } }}>+ New {initialMode === "lab" ? "experiment" : "project"}</button><input className={styles.search} type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder={`Search ${initialMode === "lab" ? "experiments" : "projects"}…`} />
         <div className={styles.projectList}>{filtered.map((item) => <button type="button" className={styles.projectItem} data-active={project?.id === item.id} onClick={() => select(item)} key={item.id}><div><strong>{item.title}</strong><span>{item.category} · {item.status}</span></div><i className={`${styles.dot} ${item.published ? styles.published : ""}`} /></button>)}</div>
       </aside>
       {project ? <section className={styles.main}>
@@ -398,6 +404,7 @@ export function AdminPanel() {
           <label className={styles.label}>Summary<textarea className={styles.textarea} value={project.summary} onChange={(event) => update("summary", event.target.value)} /></label>
           <div className={styles.grid2}><label className={styles.label}>Role<input className={styles.input} value={project.role} onChange={(event) => update("role", event.target.value)} /></label><label className={styles.label}>Year / period<input className={styles.input} value={project.year} onChange={(event) => update("year", event.target.value)} /></label></div>
           <div className={styles.grid3}><label className={styles.label}>Category<input className={styles.input} value={project.category} onChange={(event) => update("category", event.target.value)} /></label><label className={styles.label}>Accent<select className={styles.select} value={project.accent} onChange={(event) => update("accent", event.target.value as Project["accent"])}><option value="acid">Acid</option><option value="amber">Amber</option><option value="ice">Ice</option></select></label><label className={styles.label}>Status<input className={styles.input} value={project.status} onChange={(event) => update("status", event.target.value)} /></label></div>
+          <label className={styles.label}>Site mode<select className={styles.select} value={project.mode} onChange={(event) => update("mode", event.target.value as Project["mode"])}><option value="portfolio">Portfolio / résumé</option><option value="lab">AI Lab</option></select></label>
           <ListEditor label="Technology stack" value={project.stack} onChange={(value) => update("stack", value)} />
         </div></div>
         <div className={styles.section}><header className={styles.sectionHeader}><h2>Rich story</h2><p>Format the longer narrative while seeing the result directly.</p></header><div className={styles.sectionBody}><RichTextEditor value={project.storyHtml} onChange={(value) => update("storyHtml", value)} /></div></div>

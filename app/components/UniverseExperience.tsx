@@ -105,7 +105,7 @@ function ProjectIllustration({ project }: { project: Project }) {
 }
 
 export function UniverseExperience() {
-  const [catalog, setCatalog] = useState(projects);
+  const [catalog, setCatalog] = useState(projects.filter((project) => project.mode !== "lab"));
   useEffect(() => {
     const controller = new AbortController();
     fetch("/api/projects", { signal: controller.signal })
@@ -115,10 +115,11 @@ export function UniverseExperience() {
       })
       .then((payload) => {
         if (payload.projects?.length) {
+          const portfolio = payload.projects.filter((project) => project.mode !== "lab");
           const clipMyScreen = projects.find((project) => project.id === "clip-my-screen");
-          setCatalog(clipMyScreen && !payload.projects.some((project) => project.id === clipMyScreen.id)
-            ? [...payload.projects, clipMyScreen]
-            : payload.projects);
+          setCatalog(clipMyScreen && !portfolio.some((project) => project.id === clipMyScreen.id)
+            ? [...portfolio, clipMyScreen]
+            : portfolio);
         }
       })
       .catch(() => undefined);
@@ -266,7 +267,7 @@ export function UniverseExperience() {
               Things I’ve <em>built.</em>
             </h1>
             <p>
-              Products, platforms, experiments. A few decades of following the
+              Products, platforms, and shipped work. A few decades of following the
               interesting problems.
             </p>
           </header>
