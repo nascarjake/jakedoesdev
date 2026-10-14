@@ -19,7 +19,7 @@ export function LabExperience() {
 
   useEffect(() => {
     const controller = new AbortController();
-    fetch("/api/projects", { signal: controller.signal })
+    fetch("/api/projects", { signal: controller.signal, cache: "no-store" })
       .then(async (response) => {
         if (!response.ok) throw new Error("Lab catalogue unavailable");
         return await response.json() as { projects?: Project[] };
