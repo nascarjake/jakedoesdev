@@ -7,6 +7,10 @@ export type ProjectMediaEntry = {
 const shot = (path: string, caption: string) => ({ src: `/projects/${path}.webp`, caption });
 
 export const projectMedia: Record<string, ProjectMediaEntry> = {
+  'clip-my-screen': {
+    shots: [shot('clip-my-screen/library', 'Clip My Screen — searchable local library with illustrative demo captures'), shot('clip-my-screen/dashboard', 'Capture dashboard with recording explicitly paused'), shot('clip-my-screen/settings', 'Replay, display, audio, and sharing settings')],
+    note: 'Actual app interface rendered with demo fixtures. No personal recordings or desktop capture were used for these screenshots.',
+  },
   traxo: {
     shots: [shot('traxo/overview', 'Traxo mobile — archived product overview'), shot('traxo/itinerary', 'The itinerary view'), shot('traxo/flight', 'Flight details and travel alerts')],
     note: 'Original mobile product imagery. The company website reflects Traxo today.',
