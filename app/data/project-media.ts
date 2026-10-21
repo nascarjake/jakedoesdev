@@ -11,6 +11,14 @@ export const projectMedia: Record<string, ProjectMediaEntry> = {
     shots: [shot('clip-my-screen/library', 'Clip My Screen — searchable local library with illustrative demo captures'), shot('clip-my-screen/dashboard', 'Capture dashboard with recording explicitly paused'), shot('clip-my-screen/settings', 'Replay, display, audio, and sharing settings')],
     note: 'Actual app interface rendered with demo fixtures. No personal recordings or desktop capture were used for these screenshots.',
   },
+  'markdown-podcast-narrator': {
+    shots: [shot('markdown-podcast-studio/studio', 'Markdown Podcast Studio — editable two-host episode with synthetic notes and local voice choices')],
+    note: 'Real desktop interface with a synthetic script. No personal content, recording, or paid AI generation.',
+  },
+  'stream-dj': {
+    shots: [shot('stream-dj/studio', 'Stream DJ — synthetic Harbor FM station, stopped and ready to plan'), shot('stream-dj/programming', 'Reusable programming blocks with synthetic show participants')],
+    note: 'Real desktop interface with isolated synthetic station data. No personal media, live broadcast, recording, or paid AI generation.',
+  },
   traxo: {
     shots: [shot('traxo/overview', 'Traxo mobile — archived product overview'), shot('traxo/itinerary', 'The itinerary view'), shot('traxo/flight', 'Flight details and travel alerts')],
     note: 'Original mobile product imagery. The company website reflects Traxo today.',

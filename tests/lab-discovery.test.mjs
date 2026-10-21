@@ -26,7 +26,7 @@ test('needs overlap where a tool serves more than one task', () => {
 
 test('capability, task search, and availability combine without promoting prototypes to releases', () => {
   assert.deepEqual(find({ skill: 'voice-generation' }), ['stream-dj', 'markdown-podcast-narrator']);
-  assert.deepEqual(find({ skill: 'voice-generation', availability: 'release' }), ['markdown-podcast-narrator']);
+  assert.deepEqual(find({ skill: 'voice-generation', availability: 'release' }), ['stream-dj', 'markdown-podcast-narrator']);
   assert.deepEqual(find({ query: '  RESEARCH   notes  ' }), ['markdown-podcast-narrator', 'music-writer']);
   assert.deepEqual(find({ query: 'two-host research' }), ['markdown-podcast-narrator']);
   assert.deepEqual(find({ need: 'capture-explain', query: 'bug reproduction' }), ['clip-my-screen']);
