@@ -54,7 +54,10 @@ test('shareable filters round-trip and tolerate unknown values without losing un
 
 test('static export offers all tools, practical uses, and durable project links before hydration', () => {
   const html = readFileSync(new URL('../out/lab/index.html', import.meta.url), 'utf8');
-  assert.match(html, /Start with a need/);
+  assert.match(html, /Small tools and open-ended experiments/);
+  assert.match(html, /APP SCREENSHOT/);
+  assert.match(html, /CONCEPT STUDY/);
+  assert.doesNotMatch(html, /Start with a need|Find your next tool/);
   assert.match(html, /Search a task or tool/);
   for (const project of lab) {
     assert.ok(html.includes(`href="#${project.id}"`), project.id);

@@ -5,22 +5,23 @@ import { useEffect, useRef, useState } from "react";
 import { projects, type Project } from "../data/portfolio";
 import { projectMedia } from "../data/project-media";
 import { defaultLabFilters, filterLabProjects, getLabDiscovery, isLabRelease, labNeeds, labSkills, readLabFilters, writeLabFilters, type LabFilters } from "../data/lab-discovery";
-import { ExperimentVisual } from "./LabVisuals";
+import { LabPreview } from "./LabPreview";
 import { ProjectMedia } from "./ProjectMedia";
 import { WorkbenchHeader } from "./WorkbenchHeader";
+import { Icon, type IconName } from "./WorkbenchIcons";
 import styles from "./LabExperience.module.css";
 
 const byLabOrder = (a: Project, b: Project) => Number(isLabRelease(b)) - Number(isLabRelease(a)) || (a.sortOrder ?? Number.MAX_SAFE_INTEGER) - (b.sortOrder ?? Number.MAX_SAFE_INTEGER);
 const initialExperiments = projects.filter((project) => project.mode === "lab").sort(byLabOrder);
+const needIcons: IconName[] = ["folder", "sound", "game", "grid"];
 
 export function LabExperience() {
   const [experiments, setExperiments] = useState<Project[]>(initialExperiments);
   const [activeId, setActiveId] = useState("");
   const [filters, setFilters] = useState<LabFilters>(defaultLabFilters);
-  const detailRef = useRef<HTMLElement>(null);
+  const detailRef = useRef<HTMLDialogElement>(null);
   const browseRef = useRef<HTMLHeadingElement>(null);
   const opener = useRef<HTMLAnchorElement | null>(null);
-  const focusDetail = useRef(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -51,22 +52,27 @@ export function LabExperience() {
   }, []);
 
   const active = experiments.find((project) => project.id === activeId);
+  const activeKey = active?.id;
   useEffect(() => {
-    if (!active) return;
-    // Defer until React has mounted the shared-link target, including API-only tools.
-    const frame = requestAnimationFrame(() => {
-      detailRef.current?.scrollIntoView({ behavior: "instant", block: "start" });
-      if (focusDetail.current) detailRef.current?.focus({ preventScroll: true });
-      focusDetail.current = false;
-    });
-    return () => cancelAnimationFrame(frame);
-  }, [active]);
+    const dialog = detailRef.current;
+    if (!dialog || !activeKey) return;
+    const previousOverflow = document.body.style.overflow;
+    if (!dialog.open) dialog.showModal();
+    document.body.style.overflow = "hidden";
+    const focusFrame = requestAnimationFrame(() => dialog.querySelector<HTMLButtonElement>("button")?.focus({ preventScroll: true }));
+    return () => {
+      cancelAnimationFrame(focusFrame);
+      dialog.close();
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [activeKey]);
 
   const results = filterLabProjects(experiments, filters);
   const needCounts = new Map(labNeeds.map((need) => [need.id, experiments.filter((project) => getLabDiscovery(project).needs.includes(need.id)).length]));
   const media = active ? projectMedia[active.id] : undefined;
   const hasMedia = Boolean(active && (active.media?.length || media));
   const filtering = filters.query !== "" || filters.need !== "all" || filters.skill !== "all" || filters.availability !== "all";
+  const collection = labNeeds.find((need) => need.id === filters.need);
 
   function updateFilters(next: LabFilters) {
     setFilters(next);
@@ -74,64 +80,78 @@ export function LabExperience() {
   }
 
   function closeDetails() {
+    detailRef.current?.close();
     setActiveId("");
     window.history.replaceState(null, "", window.location.pathname + window.location.search);
-    if (opener.current?.isConnected) opener.current.focus();
-    else browseRef.current?.focus();
+    requestAnimationFrame(() => {
+      if (opener.current?.isConnected) opener.current.focus({ preventScroll: true });
+      else browseRef.current?.focus({ preventScroll: true });
+    });
+  }
+
+  function rememberOpener(anchor: HTMLAnchorElement) {
+    opener.current = anchor;
+    // A repeated click on the same hash still opens its panel.
+    if (window.location.hash === anchor.hash) setActiveId(anchor.hash.slice(1));
   }
 
   return <main className={styles.page}>
-    <div className={styles.frame}>
-      <div className={styles.headerTheme}><WorkbenchHeader section="lab" /></div>
-      <section className={styles.intro} aria-labelledby="lab-title">
-        <span className={styles.overline}>JAKE DOES DEV / AI LAB</span>
-        <div className={styles.introMain}>
-          <h1 id="lab-title">Start with a need.<br /><em>Find your next tool.</em></h1>
-          <div><p>Something to capture, create, or make easier? Explore tools by what they help you do.</p><span className={styles.introNote}>{experiments.length} TOOLS & EXPERIMENTS · BUILT BY JACOB CLARK</span></div>
+    <div className={styles.masthead}><WorkbenchHeader section="lab" /></div>
+    <div className={styles.workspace}>
+      <aside className={styles.sidebar} aria-label="Lab collections">
+        <Link className={styles.labMark} href="/lab"><span aria-hidden="true">✳</span><strong>the lab<span>by Jake</span></strong></Link>
+        <div className={styles.collectionLabel}>COLLECTIONS</div>
+        <div className={styles.collections} role="group" aria-label="Browse by need">
+          <button type="button" aria-pressed={filters.need === "all"} onClick={() => updateFilters({ ...filters, need: "all" })}><Icon name="grid" size={16} /><span>All experiments</span><small>{experiments.length}</small></button>
+          {labNeeds.map((need, i) => <button type="button" key={need.id} aria-pressed={filters.need === need.id} onClick={() => updateFilters({ ...filters, need: filters.need === need.id ? "all" : need.id })}><Icon name={needIcons[i]} size={16} /><span>{need.label}</span><small>{needCounts.get(need.id)}</small></button>)}
         </div>
-        <div className={styles.introFoot}><span>Public releases sit alongside prototypes and research. Each tool tells you where it stands.</span><a href="#find-a-tool">FIND A TOOL <span aria-hidden="true">↘</span></a></div>
-      </section>
+        <div className={styles.sidebarNote}><span className={styles.noteSymbol} aria-hidden="true">↳</span><p>Things I wanted<br />to exist.</p><span>AN ONGOING COLLECTION</span></div>
+        <a className={styles.githubLink} href="https://github.com/nascarjake" target="_blank" rel="noreferrer"><Icon name="code" size={15} /> Find me on GitHub <Icon name="external" size={12} /></a>
+      </aside>
 
-      <section className={styles.browser} id="find-a-tool" aria-labelledby="browse-title">
-        <div className={styles.sectionHeading}><div><span className={styles.overline}>01 / WHAT DO YOU WANT TO DO?</span><h2 ref={browseRef} tabIndex={-1} id="browse-title">Browse by need.</h2></div><button type="button" className={styles.textButton} onClick={() => updateFilters(defaultLabFilters)}>Show everything ↗</button></div>
-        <div className={styles.needs} role="group" aria-label="Browse by need">
-          {labNeeds.map((need) => <button type="button" key={need.id} aria-pressed={filters.need === need.id} className={styles.need} onClick={() => updateFilters({ ...filters, need: filters.need === need.id ? "all" : need.id })}>
-            <span className={styles.needTop}><span aria-hidden="true">{need.symbol}</span><small>{needCounts.get(need.id)} {needCounts.get(need.id) === 1 ? "TOOL" : "TOOLS"}</small></span>
-            <strong>{need.label}</strong><span>{need.description}</span>
-          </button>)}
+      <section className={styles.browser} id="find-a-tool" aria-labelledby="lab-title">
+        <header className={styles.browserHeading}>
+          <div><h1 ref={browseRef} tabIndex={-1} id="lab-title">{collection?.label ?? "AI Lab"}<span className={styles.titleDot}>.</span></h1><p>{collection?.description ?? "Small tools and open-ended experiments from my workbench."}</p></div>
+        </header>
+
+        <div className={styles.toolbar}>
+          <label className={styles.search}><Icon name="search" size={17} /><span className={styles.srOnly}>Search a task or tool</span><input type="search" value={filters.query} onChange={(event) => updateFilters({ ...filters, query: event.target.value })} placeholder="Search experiments…" /></label>
+          <label className={styles.select}><span className={styles.srOnly}>Skill / capability</span><select value={filters.skill} onChange={(event) => updateFilters({ ...filters, skill: event.target.value as LabFilters["skill"] })}><option value="all">Any capability</option>{labSkills.map((skill) => <option key={skill.id} value={skill.id}>{skill.label}</option>)}</select></label>
+          <label className={styles.select}><span className={styles.srOnly}>Availability</span><select value={filters.availability} onChange={(event) => updateFilters({ ...filters, availability: event.target.value as LabFilters["availability"] })}><option value="all">All stages</option><option value="release">Public releases</option><option value="in-progress">Prototypes + research</option></select></label>
         </div>
-        <div className={styles.filters}>
-          <label className={styles.search}><span>Search a task or tool</span><input type="search" value={filters.query} onChange={(event) => updateFilters({ ...filters, query: event.target.value })} placeholder="Try “research notes” or “screen replay”" /></label>
-          <label><span>Skill / capability</span><select value={filters.skill} onChange={(event) => updateFilters({ ...filters, skill: event.target.value as LabFilters["skill"] })}><option value="all">All capabilities</option>{labSkills.map((skill) => <option key={skill.id} value={skill.id}>{skill.label}</option>)}</select></label>
-          <label><span>Availability</span><select value={filters.availability} onChange={(event) => updateFilters({ ...filters, availability: event.target.value as LabFilters["availability"] })}><option value="all">Releases + experiments</option><option value="release">Public releases</option><option value="in-progress">Prototypes + research</option></select></label>
-        </div>
-        <div className={styles.resultsHeading}><h2>Tools for the job</h2><p role="status" aria-live="polite" aria-atomic="true">{results.length} of {experiments.length} tools{filters.need !== "all" ? " · " + labNeeds.find((need) => need.id === filters.need)?.label : ""}</p>{filtering && <button type="button" className={styles.textButton} onClick={() => updateFilters(defaultLabFilters)}>Clear filters ×</button>}</div>
-        <div className={styles.cards}>
+        <div className={styles.resultsHeading}><p role="status" aria-live="polite" aria-atomic="true">{results.length} {results.length === 1 ? "experiment" : "experiments"}{filtering ? " found" : " on the bench"}</p>{filtering ? <button type="button" onClick={() => updateFilters(defaultLabFilters)}>Reset filters <span aria-hidden="true">×</span></button> : null}</div>
+
+        <div className={styles.cards} data-filtered={filtering}>
           {results.map((project) => {
             const info = getLabDiscovery(project);
-            return <article className={styles.card} key={project.id} data-release={isLabRelease(project)}>
-              <div className={styles.cardTop}><span>{project.title}</span><span className={styles.status}>{project.status}</span></div>
-              <div className={styles.flow} aria-label={info.flow.join(" to ")}><span>{info.flow[0]}</span><i aria-hidden="true">→</i><strong>{info.flow[1]}</strong></div>
-              <h3>{info.outcome}</h3>
-              <ul className={styles.uses}>{info.uses.map((use) => <li key={use}>{use}</li>)}</ul>
-              <div className={styles.skills} aria-label="Capabilities">{labSkills.filter((skill) => info.skills.includes(skill.id)).map((skill) => <button type="button" key={skill.id} aria-pressed={filters.skill === skill.id} onClick={() => updateFilters({ ...filters, skill: filters.skill === skill.id ? "all" : skill.id })}>{skill.label}</button>)}</div>
-              <div className={styles.cardActions}>{project.dossier.source && <a className={styles.primaryAction} href={project.dossier.source.url}>{project.dossier.source.label} <span aria-hidden="true">↗</span></a>}<a href={"#" + project.id} aria-label={"Explore " + project.title} onClick={(event) => { opener.current = event.currentTarget; focusDetail.current = true; if (activeId === project.id) detailRef.current?.scrollIntoView({ behavior: "instant" }); }}>Explore {project.dossier.source ? "details" : "the experiment"} <span aria-hidden="true">→</span></a></div>
+            return <article className={styles.card} key={project.id} data-featured={!filtering && project.id === "clip-my-screen"}>
+              <a className={styles.cardPreview} href={"#" + project.id} aria-label={"Preview " + project.title} onClick={(event) => rememberOpener(event.currentTarget)}><LabPreview project={project} /><span className={styles.previewArrow}><Icon name="arrow" size={19} /></span></a>
+              <div className={styles.cardBody}>
+                <div className={styles.cardTitle}><h2><a href={"#" + project.id} aria-label={"Explore " + project.title} onClick={(event) => rememberOpener(event.currentTarget)}>{project.title}</a></h2><span className={styles.status} data-release={isLabRelease(project)}><i />{project.status}</span></div>
+                <p>{info.outcome}</p>
+                <div className={styles.cardFoot}><div className={styles.skills} aria-label="Capabilities">{labSkills.filter((skill) => info.skills.includes(skill.id)).map((skill) => <button type="button" key={skill.id} aria-pressed={filters.skill === skill.id} onClick={() => updateFilters({ ...filters, skill: filters.skill === skill.id ? "all" : skill.id })}>{skill.label}</button>)}</div>{project.dossier.source && <a className={styles.sourceLink} href={project.dossier.source.url} aria-label={project.dossier.source.label}>{project.id === "clip-my-screen" ? "Download" : "Source"}<Icon name="external" size={12} /></a>}</div>
+              </div>
             </article>;
           })}
         </div>
-        {!results.length && <div className={styles.empty}><h3>{experiments.length ? "No tools match this combination yet." : "New tools are on the way."}</h3><p>Try another need or capability, or browse the whole Lab.</p><button type="button" onClick={() => updateFilters(defaultLabFilters)}>Show all tools →</button></div>}
+        {!results.length && <div className={styles.empty}><span aria-hidden="true">∅</span><h2>{experiments.length ? "Nothing on this shelf. Yet." : "More experiments are on their way."}</h2><p>Try another search or clear a filter to see the rest of the collection.</p><button type="button" onClick={() => updateFilters(defaultLabFilters)}>See all experiments <Icon name="arrow" size={15} /></button></div>}
+        <footer className={styles.footer}><span>Built, broken, rebuilt. By <Link href="/resume">Jacob Clark</Link>.</span><Link href="/updates">Notes from the workbench <Icon name="arrow" size={13} /></Link></footer>
       </section>
-
-      {active && <section className={styles.detail} ref={detailRef} tabIndex={-1} id={active.id} aria-labelledby="lab-tool-title">
-        <div className={styles.detailHeading}><span className={styles.overline}>02 / A CLOSER LOOK</span><button type="button" onClick={closeDetails}>Back to browsing ↑</button></div>
-        <div className={styles.detailColumns}>
-          <div className={styles.detailCopy}><span className={styles.status}>{active.status}</span><h2 id="lab-tool-title">{active.title}</h2><p>{active.summary}</p><h3>What you can do</h3><ul>{active.highlights.map((item) => <li key={item}>{item}</li>)}</ul>{active.dossier.source && <a className={styles.primaryAction} href={active.dossier.source.url}>{active.dossier.source.label} ↗</a>}{active.dossier.note && <p className={styles.note}>{active.dossier.note}</p>}
-            <details className={styles.buildNotes}><summary>How it’s built</summary><p>{active.dossier.scope || active.eyebrow}</p><ul>{active.dossier.ownership.map((item) => <li key={item}>{item}</li>)}</ul><div className={styles.stack}>{active.stack.map((item) => <span key={item}>{item}</span>)}</div></details>
-          </div>
-          <div className={styles.preview}><div className={styles.previewLabel}>{hasMedia ? "PROJECT MEDIA" : "CONCEPT VISUAL · NOT A PRODUCT SCREENSHOT"}</div><div className={styles.previewStage} key={active.id}>{hasMedia ? <ProjectMedia media={media} assets={active.media} title={active.title} /> : <ExperimentVisual id={active.id} title={active.title} signal={active.signal} />}</div></div>
-        </div>
-      </section>}
-      <footer className={styles.footer}><span>SMALL TOOLS. NEW POSSIBILITIES.</span><Link href="/universe">Explore the engineering work ↗</Link></footer>
     </div>
+
+    <dialog className={styles.detail} ref={detailRef} aria-labelledby="lab-tool-title" onCancel={(event) => { if (event.target !== event.currentTarget) return; event.preventDefault(); closeDetails(); }} onClick={(event) => { if (event.target === event.currentTarget) closeDetails(); }}>
+      {active && <div className={styles.detailInner} id={active.id}>
+        <div className={styles.detailToolbar}><span>THE LAB / {active.signal}</span><button type="button" onClick={closeDetails} aria-label="Close experiment details"><Icon name="close" size={18} /></button></div>
+        <div className={styles.detailPreview} key={active.id}>{hasMedia ? <ProjectMedia media={media} assets={active.media} title={active.title} /> : <LabPreview project={active} />}</div>
+        <div className={styles.detailCopy}><span className={styles.status} data-release={isLabRelease(active)}><i />{active.status}</span><h2 id="lab-tool-title">{active.title}</h2><p>{active.summary}</p>
+          {active.dossier.source && <a className={styles.primaryAction} href={active.dossier.source.url}>{active.dossier.source.label}<Icon name="external" size={15} /></a>}
+          <section><h3>Put it to use</h3><ul>{getLabDiscovery(active).uses.map((item) => <li key={item}>{item}</li>)}</ul></section>
+          <section><h3>Inside the experiment</h3><ul>{active.highlights.map((item) => <li key={item}>{item}</li>)}</ul></section>
+          {active.dossier.note && <p className={styles.note}>{active.dossier.note}</p>}
+          <details className={styles.buildNotes}><summary>Under the hood</summary><p>{active.dossier.scope || active.eyebrow}</p><ul>{active.dossier.ownership.map((item) => <li key={item}>{item}</li>)}</ul><div className={styles.stack}>{active.stack.map((item) => <span key={item}>{item}</span>)}</div></details>
+          {!hasMedia && <p className={styles.illustrationNote}>The illustration is a concept study, not a product screenshot.</p>}
+        </div>
+      </div>}
+    </dialog>
   </main>;
 }
