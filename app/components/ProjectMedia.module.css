@@ -9,3 +9,5 @@
 .dialog{position:fixed;top:50%;left:50%;margin:0;transform:translate(-50%,-50%);box-sizing:border-box;max-height:calc(100dvh - 24px)}
 @media(max-width:700px){.stage{height:280px}.stage:not(.video)::before{inset:12px}.toolbar{align-items:flex-start;flex-direction:column}.caption{align-items:flex-start}.logoGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.logoGrid figure:last-child{grid-column:1/-1}.dynamicImage{padding:20px 28px}.videoCover h3{font-size:27px}.fullImage{height:65dvh}}
 .logoGrid figure>div{height:86px}.logoGrid .clientLogo{object-fit:contain!important;padding:8px 14px!important;box-sizing:border-box}
+
+.expand svg{display:inline-block;vertical-align:-2px;margin-left:4px}
