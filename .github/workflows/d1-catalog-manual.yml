@@ -1,0 +1,48 @@
+name: Personal D1 catalog (manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      operation:
+        description: Read the catalog, or update one reviewed game's approved text fields
+        type: choice
+        options:
+          - read
+          - update
+        default: read
+        required: true
+      game_id:
+        description: Exact game id; leave blank to list the catalog on a read
+        type: string
+        required: false
+      expected_version:
+        description: Current version shown by a read; required for update
+        type: string
+        required: false
+      changes_json:
+        description: JSON object using tagline, description, or controls_hint; put feature bullets under a Features: heading in description
+        type: string
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  catalog:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: goosegames-personal-d1
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Read or update the allowlisted personal catalog
+        env:
+          D1_CATALOG_AUTH_MODE: api-token
+          CLOUDFLARE_D1_API_TOKEN: ${{ secrets.CLOUDFLARE_PERSONAL_D1_TOKEN }}
+          D1_CATALOG_OPERATION: ${{ inputs.operation }}
+          D1_CATALOG_GAME_ID: ${{ inputs.game_id }}
+          D1_CATALOG_EXPECTED_VERSION: ${{ inputs.expected_version }}
+          D1_CATALOG_CHANGES_JSON: ${{ inputs.changes_json }}
+        run: node scripts/d1-catalog.mjs
