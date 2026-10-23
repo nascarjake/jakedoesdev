@@ -3,6 +3,11 @@ name: Deploy portfolio to GitHub Pages
 on:
   push:
     branches: ["main"]
+    paths-ignore:
+      - ".github/workflows/d1-catalog-manual.yml"
+      - ".github/workflows/deploy-pages.yml"
+      - "scripts/d1-catalog.mjs"
+      - "tests/d1-catalog.test.mjs"
   workflow_dispatch:
   workflow_call:
     inputs:
