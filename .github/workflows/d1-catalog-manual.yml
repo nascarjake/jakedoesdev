@@ -1,6 +1,6 @@
 name: Personal D1 catalog (manual)
 
-on:
+"on":
   workflow_dispatch:
     inputs:
       operation:
@@ -20,7 +20,7 @@ on:
         type: string
         required: false
       changes_json:
-        description: JSON object using tagline, description, or controls_hint; put feature bullets under a Features: heading in description
+        description: "JSON object using tagline, description, or controls_hint; put feature bullets under a Features: heading in description"
         type: string
         required: false
 
