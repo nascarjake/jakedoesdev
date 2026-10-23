@@ -4,11 +4,12 @@ name: Personal D1 catalog (manual)
   workflow_dispatch:
     inputs:
       operation:
-        description: Read the catalog, or update one reviewed game's approved text fields
+        description: Read the catalog, update one game, or apply one reviewed 11-game text batch
         type: choice
         options:
           - read
           - update
+          - batch
         default: read
         required: true
       game_id:
@@ -21,6 +22,10 @@ name: Personal D1 catalog (manual)
         required: false
       changes_json:
         description: "JSON object using tagline, description, or controls_hint; put feature bullets under a Features: heading in description"
+        type: string
+        required: false
+      batch_json:
+        description: "Exactly 11 reviewed entries: [{id, expectedVersion, changes}]. Descriptions use paragraphs and a Features: bullet list."
         type: string
         required: false
 
@@ -45,4 +50,5 @@ jobs:
           D1_CATALOG_GAME_ID: ${{ inputs.game_id }}
           D1_CATALOG_EXPECTED_VERSION: ${{ inputs.expected_version }}
           D1_CATALOG_CHANGES_JSON: ${{ inputs.changes_json }}
+          D1_CATALOG_BATCH_JSON: ${{ inputs.batch_json }}
         run: node scripts/d1-catalog.mjs

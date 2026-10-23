@@ -9,6 +9,7 @@ export const DATABASE_ID = "26609868-e1a1-42b7-a650-5f077b911d4a";
 const API_ROOT = "https://api.cloudflare.com/client/v4";
 const FIELD_LIMITS = Object.freeze({ tagline: 300, description: 10_000, controls_hint: 500 });
 const GAME_ID = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const REVIEWED_GAME_IDS = new Set(["orbital-smash", "revo", "downbeat", "dye-day", "daho", "rack-ruin", "pinfall", "netrunner", "rift-riot", "millionaire", "fortune-quest"]);
 
 function assertSafeGameId(id) {
   if (typeof id !== "string" || !GAME_ID.test(id) || id.length > 80) {
@@ -168,6 +169,57 @@ export async function updateGame({ id, expectedVersion, changes, token, fetchImp
   return { id, version: after.version, changedFields: Object.keys(changes), revisionId, revisionSaved: true, verified: true };
 }
 
+export function validateBatchUpdates(updates) {
+  if (!Array.isArray(updates) || updates.length !== 11) throw new Error("A catalog batch must contain exactly the 11 reviewed games.");
+  const seen = new Set();
+  for (const item of updates) {
+    if (!item || typeof item !== "object" || Array.isArray(item) || Object.keys(item).some((key) => !["id", "expectedVersion", "changes"].includes(key))) {
+      throw new Error("Each batch entry must contain only id, expectedVersion, and changes.");
+    }
+    assertSafeGameId(item.id);
+    if (!REVIEWED_GAME_IDS.has(item.id)) throw new Error("A catalog batch may update only the 11 reviewed Goose Games ids.");
+    if (seen.has(item.id)) throw new Error("A catalog batch cannot contain duplicate game ids.");
+    seen.add(item.id);
+    assertVersion(item.expectedVersion);
+    validateChanges(item.changes);
+  }
+  if (seen.size !== REVIEWED_GAME_IDS.size || [...REVIEWED_GAME_IDS].some((id) => !seen.has(id))) {
+    throw new Error("A catalog batch must contain the exact 11 reviewed Goose Games ids.");
+  }
+  return updates;
+}
+
+export async function updateGamesBatch({ updates, token, fetchImpl = fetch }) {
+  const items = validateBatchUpdates(updates);
+  const prepared = [];
+  // Read and version-check every game before creating any backup or changing text.
+  for (const item of items) {
+    const before = await readGame(item.id, { authMode: "api-token", token, fetchImpl });
+    if (before.version !== item.expectedVersion) throw new Error(`Batch preflight failed: catalog game '${item.id}' changed since review; no descriptions were updated.`);
+    const media = await queryD1("SELECT id, kind, url, storage_key, caption, alt_text, mime_type, sort_order FROM game_media WHERE game_id = ? ORDER BY sort_order", [item.id], {
+      authMode: "api-token", token, fetchImpl,
+    });
+    prepared.push({ item, before, media, revisionId: randomUUID() });
+  }
+  // Save all private D1 before-images before the first game row is updated.
+  for (const { item, before, media, revisionId } of prepared) {
+    await queryD1("INSERT INTO game_revisions (id, game_id, version, snapshot_json, edited_by) VALUES (?, ?, ?, ?, ?)",
+      [revisionId, item.id, item.expectedVersion, JSON.stringify(revisionSnapshot(before, media)), "manual-d1-catalog-batch"], { authMode: "api-token", token, fetchImpl });
+  }
+  const results = [];
+  for (const { item, revisionId } of prepared) {
+    const assignments = Object.keys(item.changes).map((field) => `${field} = ?`).join(", ");
+    await queryD1(`UPDATE games SET ${assignments}, version = version + 1, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND version = ?`,
+      [...Object.values(item.changes), item.id, item.expectedVersion], { authMode: "api-token", token, fetchImpl });
+    const after = await readGame(item.id, { authMode: "api-token", token, fetchImpl });
+    if (after.version !== item.expectedVersion + 1 || Object.entries(item.changes).some(([key, value]) => after[key] !== value)) {
+      throw new Error(`Post-write verification failed for catalog game '${item.id}'. The before-image is saved in D1 revision ${revisionId}; inspect it before recovery.`);
+    }
+    results.push({ id: item.id, version: after.version, changedFields: Object.keys(item.changes), revisionId, revisionSaved: true, verified: true });
+  }
+  return results;
+}
+
 function parseJsonInput(value, label) {
   try { return JSON.parse(value); } catch { throw new Error(`${label} must be valid JSON.`); }
 }
@@ -189,7 +241,13 @@ async function main() {
     console.log(JSON.stringify(result, null, 2));
     return;
   }
-  throw new Error("Allowed operations are read and update. Read is the default.");
+  if (operation === "batch") {
+    const updates = parseJsonInput(process.env.D1_CATALOG_BATCH_JSON || "", "D1_CATALOG_BATCH_JSON");
+    const result = await updateGamesBatch({ updates, token });
+    console.log(JSON.stringify(result, null, 2));
+    return;
+  }
+  throw new Error("Allowed operations are read, update, and one reviewed 11-game batch. Read is the default.");
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
