@@ -1,9 +1,10 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { ACCOUNT_ID, DATABASE_ID, assertD1AuthMode, listGames, queryD1, readGame, safeReceipts, updateGame, validateChanges } from "../scripts/d1-catalog.mjs";
+import { ACCOUNT_ID, DATABASE_ID, assertD1AuthMode, listGames, queryD1, readGame, safeReceipts, updateGame, updateGamesBatch, validateBatchUpdates, validateChanges } from "../scripts/d1-catalog.mjs";
 
 const TOKEN = "mock-secret-value-never-output";
 const row = { id: "reflex", title: "REFLEX", tagline: "old", description: "old description", controls_hint: null, version: 3 };
+const GAME_IDS = ["orbital-smash", "revo", "downbeat", "dye-day", "daho", "rack-ruin", "pinfall", "netrunner", "rift-riot", "millionaire", "fortune-quest"];
 
 function mockFetch(rows) {
   const calls = [];
@@ -95,4 +96,68 @@ test("version mismatch makes no writes", async () => {
   const { fetchImpl, calls } = mockFetch({ current: structuredClone(row) });
   await assert.rejects(updateGame({ id: "reflex", expectedVersion: 2, changes: { tagline: "new" }, token: TOKEN, fetchImpl }), /changed since it was reviewed/);
   assert.equal(calls.some(({ body }) => body.sql.startsWith("UPDATE")), false);
+});
+
+test("batch requires the exact 11 unique reviewed ids and allowlisted text fields", () => {
+  const updates = GAME_IDS.map((id, index) => ({
+    id,
+    expectedVersion: 1,
+    changes: { description: `Paragraph one.\n\nParagraph two.\n\nFeatures:\n- Feature ${index}` },
+  }));
+  assert.equal(validateBatchUpdates(updates).length, 11);
+  assert.throws(() => validateBatchUpdates(updates.slice(1)), /exactly the 11/);
+  assert.throws(() => validateBatchUpdates([...updates.slice(0, 10), { ...updates[10], id: updates[0].id }]), /duplicate/);
+  assert.throws(() => validateBatchUpdates([...updates.slice(0, 10), { ...updates[10], changes: { published: true } }]), /Only tagline/);
+});
+
+test("batch snapshots all 11 before-images before targeted versioned writes and returns safe receipts", async () => {
+  const rows = Object.fromEntries(GAME_IDS.map((id, index) => {
+    return [id, { id, title: `Game ${index}`, tagline: "old", description: "old", version: 1 }];
+  }));
+  const calls = [];
+  const fetchImpl = async (url, init) => {
+    const body = JSON.parse(init.body);
+    calls.push(body);
+    const sql = body.sql;
+    let results = [];
+    if (sql.startsWith("SELECT * FROM games")) results = [structuredClone(rows[body.params[0]])];
+    else if (sql.startsWith("SELECT id, kind")) results = [];
+    else if (sql.startsWith("INSERT INTO game_revisions")) results = [];
+    else if (sql.startsWith("UPDATE games")) {
+      const id = body.params.at(-2);
+      const version = body.params.at(-1);
+      const fields = sql.slice("UPDATE games SET ".length, sql.indexOf(", version =")).split(", ");
+      if (rows[id].version === version) {
+        fields.forEach((field, index) => { rows[id][field.split(" = ")[0]] = body.params[index]; });
+        rows[id].version += 1;
+      }
+      results = [{ meta: { changes: 1 } }];
+    }
+    return { ok: true, status: 200, json: async () => ({ success: true, result: [{ success: true, results }] }) };
+  };
+  const updates = Object.keys(rows).map((id, index) => ({
+    id, expectedVersion: 1,
+    changes: { description: `Para one ${index}.\n\nPara two.\n\nFeatures:\n- Feature ${index}` },
+  }));
+  const results = await updateGamesBatch({ updates, token: TOKEN, fetchImpl });
+  assert.equal(results.length, 11);
+  assert.ok(results.every((item) => item.verified && item.revisionSaved && item.version === 2));
+  assert.ok(results.every((item) => !Object.hasOwn(item, "description")));
+  const firstUpdate = calls.findIndex((call) => call.sql.startsWith("UPDATE games"));
+  const lastSnapshot = calls.map((call, index) => call.sql.startsWith("INSERT INTO game_revisions") ? index : -1).at(-1);
+  assert.equal(calls.filter((call) => call.sql.startsWith("INSERT INTO game_revisions")).length, 11);
+  assert.ok(lastSnapshot < firstUpdate, "all before-images must be saved before the first row update");
+});
+
+test("batch version conflict fails during preflight before any revision or content writes", async () => {
+  const updates = GAME_IDS.map((id) => ({ id, expectedVersion: 1, changes: { description: "New text" } }));
+  const calls = [];
+  const fetchImpl = async (url, init) => {
+    const body = JSON.parse(init.body); calls.push(body.sql);
+    const id = body.params[0];
+    const row = { id, title: id, description: "old", version: id === "netrunner" ? 2 : 1 };
+    return { ok: true, status: 200, json: async () => ({ success: true, result: [{ success: true, results: [row] }] }) };
+  };
+  await assert.rejects(updateGamesBatch({ updates, token: TOKEN, fetchImpl }), /no descriptions were updated/);
+  assert.equal(calls.some((sql) => sql.startsWith("INSERT INTO") || sql.startsWith("UPDATE games")), false);
 });
