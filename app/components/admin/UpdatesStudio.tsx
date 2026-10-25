@@ -6,7 +6,7 @@ import styles from "./AdminPanel.module.css";
 
 type Entry = { projectId: string; text: string };
 type Draft = { id:string; title:string; date:string; summary:string; entries:Entry[]; published:boolean; updatedAt:string };
-type Project = { id:string; name:string; excluded:boolean };
+type Project = { id:string; name:string; excluded:boolean; canonicalId:string|null; identityStatus:"verified"|"unresolved"; locked:boolean; version:number };
 type Sync = { intervalMinutes:number; lastSyncedAt:number; manualRequestedAt:number; lastRunUrl:string; nextCheckAt:number; nextPublishAt:number; due:boolean };
 type Notice = { type:"error"|"success"; text:string };
 type Tab = "review"|"projects"|"sync";
@@ -31,7 +31,17 @@ export function UpdatesStudio() {
   const [loading,setLoading]=useState(true);
   const [saving,setSaving]=useState(false);
   const [notice,setNotice]=useState<Notice|null>(null);
-  const [newProject,setNewProject]=useState("");
+  const [pendingExclusions,setPendingExclusions]=useState<Record<string,boolean>>({});
+  const [projectsSaving,setProjectsSaving]=useState(false);
+  const [projectsNotice,setProjectsNotice]=useState<Notice|null>(null);
+  const folderProjects=useMemo(()=>projects.filter((project)=>!project.canonicalId||project.id===project.canonicalId),[projects]);
+  const pendingCount=Object.keys(pendingExclusions).length;
+  useEffect(()=>{
+    if(!pendingCount)return;
+    const warn=(event:BeforeUnloadEvent)=>{event.preventDefault();event.returnValue="";};
+    window.addEventListener("beforeunload",warn);
+    return ()=>window.removeEventListener("beforeunload",warn);
+  },[pendingCount]);
   useEffect(()=>{
     let active=true;
     void Promise.all([
@@ -60,7 +70,7 @@ export function UpdatesStudio() {
   const save=async(publish:boolean)=>{
     if(!selected)return;
     const draft={...selected,entries:selected.entries.map((entry)=>({...entry,text:entry.text.trim()})).filter((entry)=>entry.text),published:publish||selected.published};
-    const visible=draft.entries.filter((entry)=>!projects.find((project)=>project.id===entry.projectId)?.excluded);
+    const visible=draft.entries.filter((entry)=>{const project=projects.find((item)=>item.id===entry.projectId);return project?.identityStatus==="verified"&&!project.excluded&&!project.locked;});
     if(!draft.title.trim()||!draft.summary.trim()||!draft.entries.length){setNotice({type:"error",text:"Add a title, summary, and at least one project entry."});return;}
     if(publish&&!visible.length){setNotice({type:"error",text:"Include a project with an entry before approving."});return;}
     setSaving(true);setNotice(null);
@@ -96,20 +106,36 @@ export function UpdatesStudio() {
     }catch(caught){setNotice({type:"error",text:caught instanceof Error?caught.message:"Could not delete."});}
     finally{setSaving(false);}
   };
-  const createProject=async()=>{
-    const name=newProject.trim();if(!name)return;
-    setSaving(true);
-    try{const result=await api<{projects:Project[]}>("/api/admin/updates/projects",{method:"POST",body:JSON.stringify({id:`${slug(name)}-${crypto.randomUUID().slice(0,8)}`,name})});
-      setProjects(result.projects);setNewProject("");setNotice({type:"success",text:"Project added as excluded. Include it when its work is ready for public updates."});
-    }catch(caught){setNotice({type:"error",text:caught instanceof Error?caught.message:"Could not add project."});}
-    finally{setSaving(false);}
+  const toggleExclusion=(project:Project,excluded:boolean)=>{
+    setPendingExclusions((current)=>{
+      const next={...current};
+      if(excluded===project.excluded)delete next[project.id];else next[project.id]=excluded;
+      return next;
+    });
+    setProjectsNotice(null);
   };
-  const saveProject=async(project:Project)=>{
-    setSaving(true);
-    try{const result=await api<{projects:Project[]}>(`/api/admin/updates/projects/${encodeURIComponent(project.id)}`,{method:"PUT",body:JSON.stringify({name:project.name,excluded:project.excluded})});
-      setProjects(result.projects);setNotice({type:"success",text:"Project settings saved. Published changes take effect after the next sync."});
-    }catch(caught){setNotice({type:"error",text:caught instanceof Error?caught.message:"Could not save project."});}
-    finally{setSaving(false);}
+  const saveProjects=async()=>{
+    const changes=Object.entries(pendingExclusions).map(([id,excluded])=>({id,excluded,version:projects.find((project)=>project.id===id)?.version}));
+    if(!changes.length||projectsSaving)return;
+    setProjectsSaving(true);setProjectsNotice(null);
+    try {
+      const result=await api<{projects:Project[]}>("/api/admin/updates/projects",{method:"PUT",body:JSON.stringify({changes})});
+      setProjects(result.projects);setPendingExclusions({});
+      setProjectsNotice({type:"success",text:"All exclusion changes saved. Reviewed publishing approval is still required; published changes take effect after the next sync."});
+    } catch(caught) {
+      setProjectsNotice({type:"error",text:caught instanceof Error?caught.message:"Could not save exclusions. Your pending edits are retained."});
+    } finally {setProjectsSaving(false);}
+  };
+  const reloadProjects=async()=>{
+    setProjectsSaving(true);
+    try {
+      const result=await api<{projects:Project[]}>("/api/admin/updates");
+      setProjects(result.projects);
+      // Retain pending values, including IDs removed or protected elsewhere.
+      // The next save will reject those IDs rather than silently losing edits.
+      setProjectsNotice({type:"success",text:"Current settings loaded. Your pending choices are retained. Review them before saving again."});
+    } catch(caught) {setProjectsNotice({type:"error",text:caught instanceof Error?caught.message:"Could not reload settings. Pending edits retained."});}
+    finally {setProjectsSaving(false);}
   };
   const changeSchedule=async(minutes:number)=>{
     setSaving(true);
@@ -127,9 +153,10 @@ export function UpdatesStudio() {
     const groups=new Map<string,{id:string;name:string;bullets:string[]}>();
     for(const entry of selected?.entries??[]) {
       const project=projects.find((item)=>item.id===entry.projectId);
-      if(!project||project.excluded||!entry.text.trim())continue;
-      if(!groups.has(project.id))groups.set(project.id,{id:project.id,name:project.name,bullets:[]});
-      groups.get(project.id)?.bullets.push(entry.text);
+      if(!project||project.identityStatus!=="verified"||project.excluded||project.locked||!entry.text.trim())continue;
+      const id=project.canonicalId!;
+      if(!groups.has(id))groups.set(id,{id,name:"Project updates",bullets:[]});
+      groups.get(id)?.bullets.push(entry.text);
     }
     return [...groups.values()];
   },[selected,projects]);
@@ -167,9 +194,18 @@ export function UpdatesStudio() {
       </div></div></div>
     </>:<div className={styles.empty}><div><h1>No draft selected</h1><button className={styles.button} type="button" onClick={create}>Create an update</button></div></div>}</section>
     </div>}
-    {tab==="projects"&&<section className={styles.updateSettings}><h1>Projects &amp; exclusions</h1><p>Every change is assigned to a project. New projects start excluded. Turn off exclusion only for work you want eligible for public posts; approval is still required.</p>
-      <div className={styles.section}><div className={styles.sectionBody}>{projects.map((project)=><div className={styles.projectSetting} key={project.id}><input className={styles.input} aria-label={`Name for ${project.id}`} value={project.name} onChange={(event)=>setProjects((current)=>current.map((item)=>item.id===project.id?{...item,name:event.target.value}:item))}/><label className={styles.check}><input type="checkbox" checked={project.excluded} onChange={(event)=>setProjects((current)=>current.map((item)=>item.id===project.id?{...item,excluded:event.target.checked}:item))}/>Exclude from updates</label><button className={styles.ghost} type="button" disabled={saving} onClick={()=>void saveProject(project)}>Save</button></div>)}</div></div>
-      <div className={styles.section}><header className={styles.sectionHeader}><h2>Add a project</h2></header><div className={styles.sectionBody}><div className={styles.row}><input className={styles.input} aria-label="New project name" placeholder="Project name" value={newProject} onChange={(event)=>setNewProject(event.target.value)}/><button className={styles.button} type="button" disabled={saving||!newProject.trim()} onClick={()=>void createProject()}>Add excluded project</button></div></div></div>
+    {tab==="projects"&&<section className={styles.updateSettings}><h1>Projects &amp; exclusions</h1><p>Projects come from verified folders on your computer. Folder names and short identifiers appear only here. Unresolved records and protected folders stay excluded. Publishing still requires review.</p>
+      <div className={styles.row}>
+        <button className={styles.button} type="button" disabled={projectsSaving||!pendingCount} onClick={()=>void saveProjects()}>{projectsSaving?"Saving…":"Save Changes"}</button>
+        <span role="status" aria-live="polite">{pendingCount?`${pendingCount} unsaved exclusion ${pendingCount===1?"change":"changes"}`:"No unsaved exclusion changes"}</span>
+        <button className={styles.ghost} type="button" disabled={projectsSaving} onClick={()=>void reloadProjects()}>Reload current settings</button>
+      </div>
+      {projectsNotice&&<div className={projectsNotice.type==="error"?styles.error:styles.success} role={projectsNotice.type==="error"?"alert":"status"}>{projectsNotice.text}</div>}
+      <div className={styles.section}><div className={styles.sectionBody}>{folderProjects.map((project)=><div className={styles.projectSetting} key={project.id}>
+        <div><strong>{project.identityStatus==="verified"?project.name:"Unresolved folder"}</strong><small> · {project.id.slice(-8)}</small><p className={styles.hint}>{project.identityStatus!=="verified"?"Folder provenance required; historical record retained privately.":project.locked?"Protected by local publishing policy.":"Verified project folder"}</p></div>
+        <label className={styles.check}><input type="checkbox" disabled={projectsSaving||project.locked||project.identityStatus!=="verified"} checked={pendingExclusions[project.id]??project.excluded} onChange={(event)=>toggleExclusion(project,event.target.checked)}/>Exclude from updates</label>
+      </div>)}</div></div>
+      <p className={styles.hint}>Record work from its actual project workspace with the worklog helper. Legacy labels cannot create or rename folder identities. {folderProjects.filter((project)=>project.identityStatus==="unresolved").length} unresolved project records are withheld.</p>
     </section>}
     {tab==="sync"&&<section className={styles.updateSettings}><h1>Publishing control</h1><p>Approved updates are copied to GitHub Pages on this schedule. GitHub checks for work every 15 minutes, so starts can be delayed.</p>
       <div className={styles.section}><div className={styles.sectionBody}><label className={styles.label}>Publish cadence<select className={styles.select} value={sync?.intervalMinutes??60} disabled={saving} onChange={(event)=>void changeSchedule(Number(event.target.value))}><option value={15}>Every 15 minutes</option><option value={60}>Hourly</option><option value={360}>Every 6 hours</option><option value={1440}>Daily</option></select></label>

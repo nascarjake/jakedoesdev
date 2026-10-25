@@ -1,7 +1,7 @@
 import type { AdminIdentity } from "./access";
+import { updateProjects, projectDto, validateExclusionChanges, saveExclusions, containsLocalPath, visibleProject } from "./update-folders";
 
 type Row = { id:string; title:string; date:string; summary:string; entries_json:string; published:number; created_at:string; updated_at:string };
-type Project = { id:string; name:string; excluded:number };
 type Entry = { projectId:string; text:string };
 type Sync = { interval_minutes:number; last_synced_at:number; manual_requested_at:number; last_run_url:string };
 const intervals = new Set([15,60,360,1440]);
@@ -10,13 +10,12 @@ function error(message:string,status=400) { return json({error:message},status);
 function text(value:unknown,max:number) { return typeof value==="string" ? value.trim().slice(0,max) : ""; }
 function entries(raw:string):Entry[] { try { const value:unknown=JSON.parse(raw); return Array.isArray(value) ? value.filter((item):item is Entry=>!!item && typeof item.projectId==="string" && typeof item.text==="string") : []; } catch { return []; } }
 function dto(row:Row) { return {id:row.id,title:row.title,date:row.date,summary:row.summary,entries:entries(row.entries_json),published:row.published===1,createdAt:row.created_at,updatedAt:row.updated_at}; }
-function projectDto(row:Project) { return {...row,excluded:row.excluded===1}; }
 async function body(request:Request):Promise<Record<string,unknown>|Response> {
   if(Number(request.headers.get("content-length")??0)>100000) return error("Request is too large.",413);
   try { const data:unknown=await request.json(); return data && typeof data==="object" && !Array.isArray(data) ? data as Record<string,unknown> : error("Send an object."); }
   catch { return error("Request body must be valid JSON."); }
 }
-async function allProjects(env:Env) { return (await env.DB.prepare("SELECT id,name,excluded FROM update_projects ORDER BY name COLLATE NOCASE").all<Project>()).results; }
+const allProjects = updateProjects;
 async function allUpdates(env:Env,published=false) { return (await env.DB.prepare(`SELECT id,title,date,summary,entries_json,published,created_at,updated_at FROM updates ${published?"WHERE published=1":""} ORDER BY date DESC,updated_at DESC LIMIT 100`).all<Row>()).results; }
 function cleanEntries(value:unknown):Entry[]|null {
   if(!Array.isArray(value)||value.length>100) return null;
@@ -37,7 +36,7 @@ async function saveUpdate(request:Request,env:Env,id:string|null) {
   if(!id&&published) return error("Save the draft first, then approve it.");
   const projects=new Map((await allProjects(env)).map((project)=>[project.id,project]));
   if(items.some((item)=>!projects.has(item.projectId))) return error("Every entry needs a project from the project list.");
-  if(published&&!items.some((item)=>projects.get(item.projectId)?.excluded===0)) return error("Include at least one project with an entry before publishing.");
+  if(published&&!items.some((item)=>visibleProject(projects.get(item.projectId)))) return error("Include at least one project with an entry before publishing.");
   try {
     if(id) {
       const result=await env.DB.prepare("UPDATE updates SET title=?,date=?,summary=?,entries_json=?,published=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").bind(title,date,summary,JSON.stringify(items),published?1:0,id).run();
@@ -60,13 +59,14 @@ export async function handlePublicUpdates(request:Request,env:Env):Promise<Respo
     const updates=(await allUpdates(env,true)).map((row)=>{
       const grouped=new Map<string,{id:string;name:string;bullets:string[]}>();
       for(const entry of entries(row.entries_json)) {
-        const project=projects.get(entry.projectId); if(!project||project.excluded) continue;
-        if(!grouped.has(project.id)) grouped.set(project.id,{id:project.id,name:project.name,bullets:[]});
-        grouped.get(project.id)?.bullets.push(entry.text);
+        const project=projects.get(entry.projectId); if(!visibleProject(project)||!project||containsLocalPath(entry.text)) continue;
+        const canonicalId=project.canonicalId!;
+        if(!grouped.has(canonicalId)) grouped.set(canonicalId,{id:canonicalId,name:"Project updates",bullets:[]});
+        grouped.get(canonicalId)?.bullets.push(entry.text);
       }
       const groups=[...grouped.values()];
       return {id:row.id,title:row.title,date:row.date,summary:row.summary,projects:groups,bullets:groups.flatMap((group)=>group.bullets)};
-    }).filter((update)=>update.projects.length>0);
+    }).filter((update)=>update.projects.length>0 && ![update.title,update.summary].some(containsLocalPath));
     return json({updates});
   } catch(caught) { console.error(JSON.stringify({event:"public_updates_failed",error:caught instanceof Error?caught.message:"unknown"})); return error("Published updates could not be loaded.",500); }
 }
@@ -93,19 +93,15 @@ export async function handleAdminUpdates(request:Request,env:Env,_identity:Admin
   try {
     if(path==="/api/admin/updates"&&request.method==="GET") return json({updates:(await allUpdates(env)).map(dto),projects:(await allProjects(env)).map(projectDto)});
     if(path==="/api/admin/updates"&&request.method==="POST") return saveUpdate(request,env,null);
-    if(path==="/api/admin/updates/projects"&&request.method==="POST") {
+    if(path==="/api/admin/updates/projects"&&request.method==="PUT") {
       const data=await body(request); if(data instanceof Response) return data;
-      const id=text(data.id,80).toLowerCase(),name=text(data.name,120);
-      if(!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(id)||!name) return error("Add a project name and slug.");
-      await env.DB.prepare("INSERT INTO update_projects (id,name,excluded) VALUES (?,?,1)").bind(id,name).run();
-      return json({projects:(await allProjects(env)).map(projectDto)},201);
+      const changes=validateExclusionChanges(data.changes);
+      if(!changes) return error("Send unique folder IDs, boolean exclusions and expected versions (up to 500).");
+      if(!await saveExclusions(env,changes)) return error("No changes saved. A folder changed elsewhere or is protected. Your pending edits are retained; reload current settings before retrying.",409);
+      return json({projects:(await allProjects(env)).map(projectDto)});
     }
-    const project=path.match(/^\/api\/admin\/updates\/projects\/([^/]+)$/);
-    if(project&&request.method==="PUT") {
-      const data=await body(request); if(data instanceof Response) return data;
-      const name=text(data.name,120); if(!name||typeof data.excluded!=="boolean") return error("Add a name and exclusion setting.");
-      const result=await env.DB.prepare("UPDATE update_projects SET name=?,excluded=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").bind(name,data.excluded?1:0,decodeURIComponent(project[1])).run();
-      return result.meta.changes?json({projects:(await allProjects(env)).map(projectDto)}):error("Project not found.",404);
+    if(path==="/api/admin/updates/projects"||path.startsWith("/api/admin/updates/projects/")) {
+      return error("Projects are created from verified local folder provenance. Use Save Changes for exclusions.",405);
     }
     if(path==="/api/admin/updates/sync"&&request.method==="GET") return json(syncDto((await syncRow(env))!));
     if(path==="/api/admin/updates/sync"&&request.method==="PUT") {

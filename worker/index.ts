@@ -8,6 +8,8 @@ import { handleAdminUpdates, handlePublicUpdates, handleSyncControl } from "./up
 import { handleUpdatePage } from "./updates-page";
 import { handleRedirectedDesktopScreenshot } from "./desktop-assets";
 
+declare const __BUILD_COMMIT__: string;
+
 // Image security config. SVG sources with .svg extension auto-skip the
 // optimization endpoint on the client side (served directly, no proxy).
 // To route SVGs through the optimizer (with security headers), set
@@ -102,4 +104,13 @@ const worker = {
   },
 };
 
-export default worker;
+const versionedWorker = {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    const response = await worker.fetch(request, env, ctx);
+    const versioned = new Response(response.body, response);
+    versioned.headers.set("x-jakedoesdev-revision", __BUILD_COMMIT__);
+    return versioned;
+  },
+};
+
+export default versionedWorker;
