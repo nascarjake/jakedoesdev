@@ -22,10 +22,24 @@ asset, commit, and deployed page as public.
 - This project deploys only to the personal Cloudflare account pinned in
   `wrangler.jsonc` (`01f53095bb8f6eec6d75040c4232602a`). The account owns
   `jakedoesdev.com`. Do not use an employer or client Cloudflare login here.
-- Use the named Wrangler OAuth profile `jakedoesdev-personal` and the project
+- The project pins Node.js `22.22.3` in `.nvmrc` and Wrangler `4.141.0` in
+  `package.json`. Use `npm run cloudflare:version` to check the resolved local
+  tools. Cloudflare deploy, remote D1 migration, and worklog sync scripts select
+  that installed runtime; do not use `npx` or a global Wrangler for this project.
+- Use the named Wrangler OAuth profile `personal` and the project
   scripts `npm run deploy:cloudflare` and `npm run db:migrate:remote`. They verify
-  the login and target before a remote change. The daily worklog sync uses the
-  same profile. Do not rely on Wrangler's default login for this project.
+  the login and target before a remote change. Bind that profile to this project
+  directory so `whoami` cannot use a different default profile. The read-only
+  `profile` mode verifies identity with `whoami --json`, D1 access with
+  `d1 list --profile personal`, and active zone ownership through a read-only
+  Cloudflare API request using the bound profile's supported `auth token --json`
+  output. OAuth credentials stay in memory; token-command logs are discarded.
+  Ambient API tokens and API keys are rejected. The project launcher selects this mode
+  explicitly. A separate `api-token` mode is planned but not implemented. The
+  deploy verifier fails closed on an unverified account, database, or zone.
+  The worklog REST writer is disabled
+  until a separately reviewed mode exists. Do not rely on Wrangler's default
+  login for this project.
 - If the profile is missing or the identity check fails, stop and have the
   owner sign into the personal account. Never substitute credentials from
   another Cloudflare account.

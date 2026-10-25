@@ -10,17 +10,18 @@
     "build": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext build",
     "build:pages": "next build --webpack",
     "start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
-    "deploy:cloudflare": "node scripts/deploy-cloudflare.mjs",
+    "deploy:cloudflare": "node scripts/with-cloudflare-node.mjs deploy",
+    "cloudflare:version": "node scripts/with-cloudflare-node.mjs version",
     "worklog": "node scripts/worklog.mjs",
-    "worklog:sync": "node scripts/sync-worklog-review.mjs",
+    "worklog:sync": "node scripts/with-cloudflare-node.mjs worklog",
     "updates:sync": "node scripts/sync-approved-updates.mjs",
     "test": "npm run build:pages && node --test tests/*.test.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next --ignore-pattern worker-configuration.d.ts",
     "typecheck:worker": "tsc -p tsconfig.worker.json",
     "db:generate": "drizzle-kit generate",
     "db:seed-sql": "node scripts/generate-portfolio-seed.mjs",
-    "db:migrate:local": "wrangler d1 migrations apply jakedoesdev-portfolio --local",
-    "db:migrate:remote": "node scripts/verify-cloudflare-account.mjs && wrangler d1 migrations apply jakedoesdev-portfolio --remote --profile jakedoesdev-personal"
+    "db:migrate:local": "node scripts/with-cloudflare-node.mjs migrate-local",
+    "db:migrate:remote": "node scripts/with-cloudflare-node.mjs migrate"
   },
   "dependencies": {
     "drizzle-orm": "0.45.2",

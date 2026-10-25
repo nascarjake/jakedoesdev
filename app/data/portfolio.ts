@@ -599,7 +599,7 @@ export const projects: Project[] = [
     category: "Creative Tools",
     status: "Open-source · Early release",
     mode: "lab",
-    highlights: ["Save the last 1, 5, or 15 minutes with a global shortcut.", "Keep a searchable local library with tags, favorites, trimming, and revocable sharing.", "Download a Mac DMG or Windows installer, with capture paused on first launch."],
+    highlights: ["Save the last 1, 5, or 15 minutes with a global shortcut.", "Trim on a visual thumbnail timeline, split and arrange sequences, and keep a searchable local library.", "Download for Mac or Windows, choose your capture setup, and start clipping automatically."],
     dossier: {
       scope: "What if saving a screen moment did not require predicting it first, a subscription, or a cloud account?",
       ownership: ["Designed the desktop capture experience, local clip library, and explicit pause/resume controls.", "Built native Mac capture and cross-platform replay, export, and sharing workflows.", "Published open-source Mac and Windows builds with setup guides, screenshots, and automated checks."],
