@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import path from "node:path";
 import {
   EXPECTED_ACCOUNT_ID,
+  ROOT,
   readProfileZones,
   activeProfileForProject,
   cloudflareAuthMode,
@@ -38,12 +40,12 @@ test("profile selection uses the nearest directory binding and does not fall bac
     "┌──────────────────────┬──────────────────────────────────────────────────────────┐",
     "│ Profile              │ Bound Directories                                        │",
     "├──────────────────────┼──────────────────────────────────────────────────────────┤",
-    "│ personal │ /Users/jacobclark/Source                                │",
-    "│ work                 │ /Users/jacobclark/Source/jakedoesdev                     │",
+    `│ personal │ ${path.dirname(ROOT)} │`,
+    `│ work │ ${ROOT} │`,
     "└──────────────────────┴──────────────────────────────────────────────────────────┘",
   ].join("\n");
   assert.equal(activeProfileForProject(table), "work");
-  assert.equal(activeProfileForProject(table.replace("│ work                 │ /Users/jacobclark/Source/jakedoesdev                     │", "│ work                 │ -                                                        │")), "personal");
+  assert.equal(activeProfileForProject(table.replace(`│ work │ ${ROOT} │`, "│ work                 │ -                                                        │")), "personal");
 });
 
 test("profile mode rejects token credentials and API-token mode remains unimplemented", () => {

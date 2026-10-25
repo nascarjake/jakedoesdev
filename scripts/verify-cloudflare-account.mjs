@@ -241,7 +241,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     console.error(`Node.js ${process.versions.node} is below this project's required Node 22.13.0. Run 'npm run deploy:cloudflare' or 'npm run db:migrate:remote' to select the pinned runtime.`);
     process.exitCode = 1;
   } else verifyCloudflareAccount().then(() => {
-    console.log("Verified the personal Wrangler profile, account, and D1 database.");
+    console.log("Verified the personal Wrangler profile, account, D1 database, and active domain.");
   }).catch((error) => {
     console.error(error instanceof Error ? error.message : "Cloudflare account verification failed.");
     process.exitCode = 1;
