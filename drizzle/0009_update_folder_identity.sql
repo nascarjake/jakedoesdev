@@ -16,3 +16,17 @@ CREATE TABLE update_project_folder_aliases (
 );
 --> statement-breakpoint
 CREATE INDEX update_project_folder_idx ON update_project_folder_aliases(folder_id);
+--> statement-breakpoint
+-- Preserve the exact review boundary for already published legacy notes.
+-- This copies only within the existing private D1 database. It never changes
+-- publication flags, entries, labels or exclusion settings.
+CREATE TABLE update_legacy_public_snapshots (
+  update_id text PRIMARY KEY NOT NULL REFERENCES updates(id),
+  title text NOT NULL,
+  date text NOT NULL,
+  summary text NOT NULL,
+  entries_json text NOT NULL
+);
+--> statement-breakpoint
+INSERT INTO update_legacy_public_snapshots (update_id,title,date,summary,entries_json)
+SELECT id,title,date,summary,entries_json FROM updates WHERE published=1;

@@ -104,3 +104,35 @@ test("legacy rename/write endpoints are disabled and unresolved projects cannot 
   const publish = new Request("https://example.invalid/api/admin/updates/old-note", { method: "PUT", body: JSON.stringify({ title: "Reviewed", summary: "Reviewed", date: "2026-10-25", entries: [{ projectId: "unresolved", text: "Unknown change" }], published: true }) });
   assert.equal((await handleAdminUpdates(publish, env, {})).status, 400);
 });
+
+test("unchanged historical approvals preserve existing labels, entry visibility and exclusions", async (t) => {
+  const { db, env, original } = fixture(t);
+  db.exec("INSERT INTO update_legacy_public_snapshots SELECT id,title,date,summary,entries_json FROM updates WHERE published=1");
+  const load = async () => (await (await handlePublicUpdates(new Request("https://example.invalid/api/updates"), env)).json()).updates;
+  const updates = await load();
+  assert.deepEqual(updates[0].projects, [
+    { id: "old-label", name: "AI label", bullets: ["Reviewed improvement."] },
+    { id: "unresolved", name: "Personal sounding label", bullets: ["Must not escape."] },
+  ]);
+  assert.equal(db.prepare("SELECT entries_json FROM updates").get().entries_json, original);
+  // Future edits cannot inherit that earlier approval boundary.
+  db.exec("UPDATE updates SET summary='Changed after the historical approval'");
+  const changed = await load();
+  assert.ok(!JSON.stringify(changed).includes("Must not escape"));
+  // Existing explicit exclusions are always honored even for the snapshot.
+  db.exec("UPDATE updates SET summary='Reviewed summary'; UPDATE update_projects SET excluded=1 WHERE id='unresolved'");
+  assert.ok(!JSON.stringify(await load()).includes("Must not escape"));
+});
+
+test("the additive migration captures existing approvals without changing raw history or exclusions", (t) => {
+  const db = new DatabaseSync(":memory:"); t.after(() => db.close());
+  for (const filename of ["0003_update_review_queue.sql", "0004_update_projects_and_sync.sql"]) db.exec(readFileSync(new URL(`../drizzle/${filename}`, import.meta.url), "utf8"));
+  db.exec("INSERT INTO update_projects (id,name,excluded) VALUES ('old-included','Reviewed label',0),('old-excluded','Excluded label',1)");
+  db.exec("INSERT INTO updates (id,title,date,summary,entries_json,published,created_by) VALUES ('historical','Reviewed','2026-10-01','Reviewed','[{\"projectId\":\"old-included\",\"text\":\"Reviewed change\"}]',1,'fixture'),('draft','Draft','2026-10-01','Unreviewed','[]',0,'fixture')");
+  const before = JSON.stringify(db.prepare("SELECT * FROM updates ORDER BY id").all());
+  const exclusions = JSON.stringify(db.prepare("SELECT * FROM update_projects ORDER BY id").all());
+  db.exec(readFileSync(new URL("../drizzle/0009_update_folder_identity.sql", import.meta.url), "utf8"));
+  assert.equal(JSON.stringify(db.prepare("SELECT * FROM updates ORDER BY id").all()), before);
+  assert.equal(JSON.stringify(db.prepare("SELECT * FROM update_projects ORDER BY id").all()), exclusions);
+  assert.deepEqual(db.prepare("SELECT update_id FROM update_legacy_public_snapshots").all().map((row) => row.update_id), ["historical"]);
+});

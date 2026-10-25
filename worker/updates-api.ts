@@ -1,7 +1,7 @@
 import type { AdminIdentity } from "./access";
 import { updateProjects, projectDto, validateExclusionChanges, saveExclusions, containsLocalPath, visibleProject } from "./update-folders";
 
-type Row = { id:string; title:string; date:string; summary:string; entries_json:string; published:number; created_at:string; updated_at:string };
+type Row = { id:string; title:string; date:string; summary:string; entries_json:string; published:number; created_at:string; updated_at:string; legacy_snapshot?:number };
 type Entry = { projectId:string; text:string };
 type Sync = { interval_minutes:number; last_synced_at:number; manual_requested_at:number; last_run_url:string };
 const intervals = new Set([15,60,360,1440]);
@@ -9,14 +9,16 @@ function json(value:unknown, status=200) { return Response.json(value,{status,he
 function error(message:string,status=400) { return json({error:message},status); }
 function text(value:unknown,max:number) { return typeof value==="string" ? value.trim().slice(0,max) : ""; }
 function entries(raw:string):Entry[] { try { const value:unknown=JSON.parse(raw); return Array.isArray(value) ? value.filter((item):item is Entry=>!!item && typeof item.projectId==="string" && typeof item.text==="string") : []; } catch { return []; } }
-function dto(row:Row) { return {id:row.id,title:row.title,date:row.date,summary:row.summary,entries:entries(row.entries_json),published:row.published===1,createdAt:row.created_at,updatedAt:row.updated_at}; }
+function dto(row:Row) { return {id:row.id,title:row.title,date:row.date,summary:row.summary,entries:entries(row.entries_json),published:row.published===1,legacySnapshot:row.published===1&&row.legacy_snapshot===1,createdAt:row.created_at,updatedAt:row.updated_at}; }
 async function body(request:Request):Promise<Record<string,unknown>|Response> {
   if(Number(request.headers.get("content-length")??0)>100000) return error("Request is too large.",413);
   try { const data:unknown=await request.json(); return data && typeof data==="object" && !Array.isArray(data) ? data as Record<string,unknown> : error("Send an object."); }
   catch { return error("Request body must be valid JSON."); }
 }
 const allProjects = updateProjects;
-async function allUpdates(env:Env,published=false) { return (await env.DB.prepare(`SELECT id,title,date,summary,entries_json,published,created_at,updated_at FROM updates ${published?"WHERE published=1":""} ORDER BY date DESC,updated_at DESC LIMIT 100`).all<Row>()).results; }
+async function allUpdates(env:Env,published=false) { return (await env.DB.prepare(`SELECT id,title,date,summary,entries_json,published,created_at,updated_at,
+  EXISTS(SELECT 1 FROM update_legacy_public_snapshots s WHERE s.update_id=updates.id AND s.title=updates.title AND s.date=updates.date AND s.summary=updates.summary AND s.entries_json=updates.entries_json) AS legacy_snapshot
+  FROM updates ${published?"WHERE published=1":""} ORDER BY date DESC,updated_at DESC LIMIT 100`).all<Row>()).results; }
 function cleanEntries(value:unknown):Entry[]|null {
   if(!Array.isArray(value)||value.length>100) return null;
   const result=value.map((item:unknown)=>{
@@ -59,14 +61,18 @@ export async function handlePublicUpdates(request:Request,env:Env):Promise<Respo
     const updates=(await allUpdates(env,true)).map((row)=>{
       const grouped=new Map<string,{id:string;name:string;bullets:string[]}>();
       for(const entry of entries(row.entries_json)) {
-        const project=projects.get(entry.projectId); if(!visibleProject(project)||!project||containsLocalPath(entry.text)) continue;
-        const canonicalId=project.canonicalId!;
-        if(!grouped.has(canonicalId)) grouped.set(canonicalId,{id:canonicalId,name:"Project updates",bullets:[]});
+        const project=projects.get(entry.projectId); if(!project) continue;
+        const historical=row.legacy_snapshot===1 && project.legacyName!==undefined;
+        if(historical&&project.legacyExcluded!==0) continue;
+        if(historical ? (project.canonicalId!==null&&!visibleProject(project)) : (!visibleProject(project)||containsLocalPath(entry.text))) continue;
+        const canonicalId=historical?project.id:project.canonicalId!;
+        if(!grouped.has(canonicalId)) grouped.set(canonicalId,{id:canonicalId,name:historical?project.legacyName!:"Project updates",bullets:[]});
         grouped.get(canonicalId)?.bullets.push(entry.text);
       }
       const groups=[...grouped.values()];
-      return {id:row.id,title:row.title,date:row.date,summary:row.summary,projects:groups,bullets:groups.flatMap((group)=>group.bullets)};
-    }).filter((update)=>update.projects.length>0 && ![update.title,update.summary].some(containsLocalPath));
+      if(!row.legacy_snapshot&&[row.title,row.summary].some(containsLocalPath)) return null;
+      return groups.length?{id:row.id,title:row.title,date:row.date,summary:row.summary,projects:groups,bullets:groups.flatMap((group)=>group.bullets)}:null;
+    }).filter((update)=>update!==null);
     return json({updates});
   } catch(caught) { console.error(JSON.stringify({event:"public_updates_failed",error:caught instanceof Error?caught.message:"unknown"})); return error("Published updates could not be loaded.",500); }
 }

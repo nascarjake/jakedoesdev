@@ -38,15 +38,14 @@ export function UpdatesFeed({ initialUpdates }: { initialUpdates: PublishedUpdat
 
   useEffect(() => {
     let active = true;
-    void fetch("https://jakedoesdev.com/api/updates", {
+    void fetch("https://raw.githubusercontent.com/nascarjake/jakedoesdev/main/content/updates/index.json", {
       headers: { accept: "application/json" },
       cache: "no-store",
     })
       .then(async (response) => {
         if (!response.ok) throw new Error("The published updates index is unavailable.");
         const payload: unknown = await response.json();
-        const updates = payload && typeof payload === "object" && "updates" in payload ? (payload as { updates: unknown }).updates : null;
-        if (!Array.isArray(updates) || !updates.every((item): item is PublishedUpdate =>
+        if (!Array.isArray(payload) || !payload.every((item): item is PublishedUpdate =>
           item && typeof item === "object" &&
           typeof item.id === "string" &&
           typeof item.title === "string" &&
@@ -57,10 +56,10 @@ export function UpdatesFeed({ initialUpdates }: { initialUpdates: PublishedUpdat
             Array.isArray((project as { bullets?: unknown }).bullets)))) &&
           Array.isArray(item.bullets) && item.bullets.every((bullet: unknown) => typeof bullet === "string"),
         )) throw new Error("The published updates index returned an invalid post.");
-        return updates as PublishedUpdate[];
+        return payload as PublishedUpdate[];
       })
       .then((published) => { if (active) setUpdates(published); })
-      .catch(() => { /* Never fall back to a stale managed post that bypasses exclusions. */ });
+      .catch(() => { /* The GitHub Pages export keeps its static content. */ });
     return () => { active = false; };
   }, [initialUpdates]);
 

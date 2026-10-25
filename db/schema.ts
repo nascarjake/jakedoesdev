@@ -212,3 +212,11 @@ export const updateProjectFolderAliases = sqliteTable("update_project_folder_ali
   aliasId: text("alias_id").primaryKey().references(() => updateProjects.id),
   folderId: text("folder_id").notNull().references(() => updateFolders.id),
 }, (table) => [index("update_project_folder_idx").on(table.folderId)]);
+
+export const updateLegacyPublicSnapshots = sqliteTable("update_legacy_public_snapshots", {
+  updateId: text("update_id").primaryKey().references(() => updates.id),
+  title: text("title").notNull(),
+  date: text("date").notNull(),
+  summary: text("summary").notNull(),
+  entriesJson: text("entries_json").notNull(),
+});
