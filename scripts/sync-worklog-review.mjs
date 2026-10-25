@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 
-import { createHash } from "node:crypto";
-import { existsSync, readdirSync, readFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { existsSync, readdirSync, readFileSync, mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { verifyCloudflareAccount } from "./verify-cloudflare-account.mjs";
+import { parseLedger } from "./project-identity.mjs";
+import { PROFILE, verifyCloudflareAccount } from "./verify-cloudflare-account.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const LEDGER_DIR = path.join(ROOT, ".worklog", "weeks");
-const API_ROOT = "https://api.cloudflare.com/client/v4";
 const PUBLIC_UPDATES_API = "https://jakedoesdev.com/api/updates";
 
 function isoWeek(date = new Date()) {
@@ -37,129 +37,85 @@ function weekEndDate(week) {
   return januaryFourth.toISOString().slice(0, 10);
 }
 
-function parseLedger(source) {
-  return source.split(/^###\s+/m).slice(1).flatMap((block) => {
-    const lines = block.trim().split(/\r?\n/);
-    const heading = lines.shift() ?? "";
-    const fields = Object.fromEntries(lines.map((line) => line.match(/^[-*]\s+([a-z]+):\s*(.+)$/i)).filter(Boolean).map((match) => [match[1].toLowerCase(), match[2].trim()]));
-    if (!fields.summary || fields.visibility === "private") return [];
-    const summary = fields.summary.replace(/^(["'])(.*)\1$/, "$2").trim();
-    if (!summary) return [];
-    const sourceKey = createHash("sha256").update(`${heading}\n${summary}`).digest("hex");
-    const project = heading.split(" · ").slice(1).join(" · ").trim() || "Unassigned";
-    const slug = project.toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 55) || "project";
-    const projectId = `${slug}-${createHash("sha256").update(project).digest("hex").slice(0, 10)}`;
-    return [{ summary, sourceKey, project, projectId }];
-  });
-}
 
-async function cloudflare(pathname, token, init = {}) {
-  const response = await fetch(`${API_ROOT}${pathname}`, {
-    ...init,
-    headers: { authorization: `Bearer ${token}`, "content-type": "application/json", ...init.headers },
-  });
-  const body = await response.json().catch(() => ({}));
-  if (!response.ok || body.success === false) {
-    const code = body.errors?.[0]?.code;
-    throw new Error(code === 10000 || response.status === 403
-      ? "The personal Wrangler profile needs D1 Read and D1 Write access for this account."
-      : `Cloudflare D1 request failed (${response.status}).`);
+const quote = (value) => `'${String(value).replaceAll("'", "''")}'`;
+async function queryD1(sql, params = []) {
+  // Parameters originate in private ledger files. Quote as SQL literals in a
+  // private file, never as shell arguments or logged command text.
+  let index = 0;
+  const statement = sql.replace(/\?/g, () => quote(params[index++]));
+  if (index !== params.length) throw new Error("Invalid query parameter count.");
+  const directory = path.join(ROOT, ".worklog", "sync");
+  mkdirSync(directory, { recursive: true, mode: 0o700 });
+  const filename = path.join(directory, "pending.sql");
+  writeFileSync(filename, statement, { mode: 0o600 });
+  try {
+    const raw = execFileSync(path.join(ROOT, "node_modules", ".bin", "wrangler"),
+      ["d1", "execute", "jakedoesdev-portfolio", "--remote", "--profile", PROFILE, "--file", filename, "--json"],
+      { cwd: ROOT, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+    const response = JSON.parse(raw);
+    if (!Array.isArray(response) || response.some((item) => item.success === false)) throw new Error();
+    const result = response[0];
+    if (/^UPDATE /i.test(statement) && result.meta?.changes !== 1) throw new Error("The review draft changed concurrently; nothing was overwritten. Retry sync.");
+    return result.results ?? [];
+  } catch (error) {
+    throw new Error(error.message?.startsWith("The review draft") ? error.message : "The verified personal D1 sync failed. No credentials or private query details were logged; retry is safe.");
   }
-  return body;
 }
 
-async function queryD1(token, accountId, databaseId, sql, params = []) {
-  const response = await cloudflare(`/accounts/${accountId}/d1/database/${databaseId}/query`, token, {
-    method: "POST",
-    body: JSON.stringify({ sql, params }),
-  });
-  if (response.result?.some((item) => item.success === false)) throw new Error("D1 rejected the update review write.");
-  return response.result?.[0]?.results ?? [];
-}
-
-async function syncWeek(week, entries, { token, accountId, databaseId }) {
+export async function syncWeek(week, entries, { query = queryD1 } = {}) {
   const id = `week-${week.toLowerCase()}`;
-  const existing = await queryD1(token, accountId, databaseId,
+  const existing = await query(
     "SELECT bullets_json, entries_json, source_keys_json, published FROM updates WHERE id = ? LIMIT 1", [id]);
 
-  for (const entry of entries) {
-    await queryD1(token, accountId, databaseId,
-      "INSERT INTO update_projects (id,name,excluded) VALUES (?,?,1) ON CONFLICT(id) DO NOTHING",
-      [entry.projectId, entry.project]);
+  for (const entry of entries.filter((item) => item.folder)) {
+    await query(
+      "INSERT INTO update_folders (id,name,excluded,policy_locked) VALUES (?,?,1,1) ON CONFLICT(id) DO NOTHING",
+      [entry.folder.id, entry.folder.name]);
   }
   if (existing[0]?.published === 1) {
-    let previousItems = [];
-    try { previousItems = JSON.parse(existing[0].entries_json); } catch { previousItems = []; }
-    if (!Array.isArray(previousItems) || previousItems.length === 0) {
-      let previousBullets = [];
-      try { previousBullets = JSON.parse(existing[0].bullets_json); } catch { previousBullets = []; }
-      await queryD1(token, accountId, databaseId,
-        "INSERT INTO update_projects (id,name,excluded) VALUES ('previously-approved','Previously approved',0) ON CONFLICT(id) DO NOTHING");
-      const retained = previousBullets.filter((bullet) => typeof bullet === "string")
-        .map((bullet) => ({ projectId: "previously-approved", text: bullet }));
-      await queryD1(token, accountId, databaseId,
-        "UPDATE updates SET entries_json = ? WHERE id = ? AND published = 1 AND entries_json = '[]'",
-        [JSON.stringify(retained), id]);
-      console.log(`Preserved the already approved ${week} post in a legacy review group.`);
-    } else {
-      console.log(`The ${week} update is already published; the automation left it unchanged.`);
-    }
+    console.log(`The ${week} update is already approved; raw history was left unchanged.`);
     return;
   }
   let bullets = [];
   let items = [];
   let sourceKeys = [];
   if (existing[0]) {
-    try { bullets = JSON.parse(existing[0].bullets_json); } catch { bullets = []; }
-    try { items = JSON.parse(existing[0].entries_json); } catch { items = []; }
-    try { sourceKeys = JSON.parse(existing[0].source_keys_json); } catch { sourceKeys = []; }
+    try {
+      bullets = JSON.parse(existing[0].bullets_json);
+      items = JSON.parse(existing[0].entries_json);
+      sourceKeys = JSON.parse(existing[0].source_keys_json);
+    } catch { throw new Error("Stored review history is invalid; nothing was overwritten."); }
   }
-  if (!Array.isArray(bullets)) bullets = [];
-  if (!Array.isArray(items)) items = [];
-  if (!Array.isArray(sourceKeys)) sourceKeys = [];
-  const migrating = Boolean(existing[0] && items.length === 0 && bullets.length > 0);
-  if (migrating) {
-    const bySummary = new Map();
-    for (const entry of entries) {
-      const ids = bySummary.get(entry.summary) ?? new Set();
-      ids.add(entry.projectId);
-      bySummary.set(entry.summary, ids);
-    }
-    const unassigned = entries.find((entry) => entry.project === "Unassigned");
-    const fallbackId = unassigned?.projectId ?? `unassigned-${createHash("sha256").update("Unassigned").digest("hex").slice(0, 10)}`;
-    if (!unassigned) await queryD1(token, accountId, databaseId,
-      "INSERT INTO update_projects (id,name,excluded) VALUES (?,'Unassigned',1) ON CONFLICT(id) DO NOTHING", [fallbackId]);
-    items = bullets.filter((bullet) => typeof bullet === "string").map((bullet) => ({
-      projectId: bySummary.get(bullet)?.size === 1 ? [...bySummary.get(bullet)][0] : fallbackId, text: bullet,
-    }));
-  }
+  if (![bullets, items, sourceKeys].every(Array.isArray)) throw new Error("Stored review history is invalid; nothing was overwritten.");
+  // Legacy bullets without provenance stay untouched. Never reconstruct
+  // identity by matching text or assigning a "previously approved" group.
   const knownKeys = new Set(sourceKeys.filter((key) => typeof key === "string"));
-  const knownBullets = new Set(bullets.filter((bullet) => typeof bullet === "string"));
-  const additions = entries.filter((entry) => !knownKeys.has(entry.sourceKey));
+  const additions = entries.filter((entry) => entry.folder && !knownKeys.has(entry.sourceKey));
   for (const entry of additions) {
-    if (!knownBullets.has(entry.summary)) {
+    if (!items.some((item) => item.projectId === entry.folder.id && item.text === entry.summary)) {
       bullets.push(entry.summary);
-      items.push({ projectId: entry.projectId, text: entry.summary });
+      items.push({ projectId: entry.folder.id, text: entry.summary });
     }
     sourceKeys.push(entry.sourceKey);
     knownKeys.add(entry.sourceKey);
-    knownBullets.add(entry.summary);
   }
-  if (!additions.length && existing[0] && !migrating) {
+  if (!additions.length && existing[0]) {
     console.log(`No new summaries for ${week}; the review draft is unchanged.`);
     return;
   }
 
+  if (!additions.length) return;
   const { year, month, day } = localDate();
   const date = week === isoWeek() ? `${year}-${month}-${day}` : weekEndDate(week);
   const title = `Field notes · ${week}`;
   const summary = "A running notebook of ideas, builds, and lessons from the week.";
   if (existing[0]) {
-    await queryD1(token, accountId, databaseId,
-      "UPDATE updates SET bullets_json = ?, entries_json = ?, source_keys_json = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND published = 0",
-      [JSON.stringify(bullets), JSON.stringify(items), JSON.stringify(sourceKeys), id]);
+    await query(
+      "UPDATE updates SET bullets_json = ?, entries_json = ?, source_keys_json = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND published = 0 AND entries_json = ? AND source_keys_json = ?",
+      [JSON.stringify(bullets), JSON.stringify(items), JSON.stringify(sourceKeys), id, existing[0].entries_json, existing[0].source_keys_json]);
   } else {
-    await queryD1(token, accountId, databaseId,
+    await query(
       "INSERT INTO updates (id, title, date, summary, bullets_json, entries_json, source_keys_json, published, created_by) VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?)",
       [id, title, date, summary, JSON.stringify(bullets), JSON.stringify(items), JSON.stringify(sourceKeys), "daily work log"]);
   }
@@ -167,22 +123,31 @@ async function syncWeek(week, entries, { token, accountId, databaseId }) {
 }
 
 async function main() {
-  const args = process.argv.slice(2);
-  if (args.length > 1 || (args.length === 1 && args[0] !== "--all")) {
-    throw new Error("Usage: sync-worklog-review.mjs [--all]");
-  }
-  const weeks = args[0] === "--all"
+  const args = new Set(process.argv.slice(2));
+  if ([...args].some((arg) => !["--all", "--plan"].includes(arg))) throw new Error("Usage: sync-worklog-review.mjs [--all] [--plan]");
+  const weeks = args.has("--all")
     ? (existsSync(LEDGER_DIR) ? readdirSync(LEDGER_DIR).filter((name) => /^\d{4}-W\d{2}\.md$/.test(name)).map((name) => name.slice(0, -3)).sort() : [])
     : [isoWeek()];
   const batches = weeks.flatMap((week) => {
     const ledgerPath = path.join(LEDGER_DIR, `${week}.md`);
-    return existsSync(ledgerPath) ? [{ week, entries: parseLedger(readFileSync(ledgerPath, "utf8")) }] : [];
+    return existsSync(ledgerPath) ? [{ week, entries: parseLedger(readFileSync(ledgerPath, "utf8"), { workspaceRoot: path.dirname(ROOT) }) }] : [];
   }).filter(({ entries }) => entries.length > 0);
   if (!batches.length) {
     console.log("No non-private ledger summaries are ready for review.");
     return;
   }
 
+  const allEntries = batches.flatMap((batch) => batch.entries);
+  const unresolved = allEntries.filter((entry) => !entry.folder).length;
+  console.log(`${allEntries.length - unresolved} verified folder records; ${unresolved} unresolved records withheld.`);
+  if (args.has("--plan")) {
+    const directory = path.join(ROOT, ".worklog", "sync");
+    mkdirSync(directory, { recursive: true, mode: 0o700 });
+    writeFileSync(path.join(directory, "provenance-plan.json"), JSON.stringify({ batches }, null, 2), { mode: 0o600 });
+    console.log("Private provenance plan prepared. No remote writes or publishing approvals.");
+    return;
+  }
+  if (!allEntries.some((entry) => entry.folder)) return;
   let publicApi;
   try {
     publicApi = await fetch(PUBLIC_UPDATES_API, { signal: AbortSignal.timeout(10_000) });
@@ -195,11 +160,11 @@ async function main() {
     return;
   }
 
-  const account = await verifyCloudflareAccount();
-  for (const { week, entries } of batches) await syncWeek(week, entries, account);
+  await verifyCloudflareAccount();
+  for (const { week, entries } of batches) await syncWeek(week, entries);
 }
 
-main().catch((caught) => {
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main().catch((caught) => {
   console.error(caught instanceof Error ? caught.message : "Could not sync the private work log to the update review portal.");
   process.exitCode = 1;
 });

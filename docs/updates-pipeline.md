@@ -32,3 +32,71 @@ The private work log is intentionally ignored by Git and cannot be read by GitHu
 ```
 
 Run `npm run worklog:sync -- --all` once to add older weeks to the private review queue. The normal daily command checks only the current week and exits cleanly when its ledger does not exist yet. Both commands need the verified `jakedoesdev-personal` Wrangler OAuth profile described in [`project-studio-setup.md`](project-studio-setup.md). They are idempotent: they add only new source summaries to unpublished weekly drafts and leave approved updates untouched.
+
+## Verified folder identity and batch exclusions
+
+Update Studio identities now come from actual workspace provenance. The worklog
+helper resolves the real directory and Git common directory: subdirectories,
+symlinks and linked worktrees share their underlying repository identity;
+independent nested repositories stay separate. Non-Git folders require an
+explicit containing workspace root. Labels and repository remotes never decide
+identity. From the source workspace, append with `--workspace /actual/project`
+when the command's current directory is not the project. Absolute paths remain
+in the ignored local ledger only. The remote database receives an opaque ID and
+an admin-only basename; public notes use a generic heading.
+
+The canonical worklog directory is beside the helper, regardless of the command's
+current directory. New entries preserve the original label and summary and add
+folder provenance. Old entries without provenance are not assigned a folder.
+`node scripts/sync-worklog-review.mjs --all --plan` creates a private local plan;
+it does not write D1 or approve a post. Normal sync uses the named personal
+Wrangler profile and the account verifier before CLI writes, inserts folders as
+excluded and policy locked, and updates only an unpublished draft whose original
+entries and source keys still match. Approved posts and corrupt history are
+never rewritten by this sync.
+
+`0009_update_folder_identity.sql` is additive and leaves raw project rows,
+exclusion flags, entries, bullets and source keys intact. **Before remote
+application**, export a full D1 backup into ignored local storage, retain the
+original software revision and current identity tables, and review a readable
+mapping. Never put the backup, mapping, paths or client metadata in Git.
+`node scripts/reconcile-update-folders.mjs <private-snapshot.json>
+<verified-local-evidence.json>` backs up its input and writes a private plan only.
+The snapshot contains `projects`, `updates`, and optional `folders` and `aliases`;
+evidence comes from `parseLedger` and is reverified against the actual filesystem.
+Every historical occurrence of an alias must have an exact source-key link and
+matching text to the same verified folder. Otherwise the entire alias remains
+unresolved. Names and text equality by themselves never authorize a mapping.
+Excluded aliases propagate exclusion on first reconciliation. The plan includes
+reverse SQL, but applying or reversing identity changes requires a fresh backup
+and version checks within a D1 transaction; the planner does not execute SQL.
+A metadata-only audit is sufficient to count unresolved records, never to approve
+alias mappings or substitute for the full pre-application backup.
+
+All new folders are policy locked and excluded until an explicit local publishing
+policy review. Existing client/shared-work exclusions must never be converted to
+personal eligibility. No eligibility allowlist has been inferred. Folder
+provenance for legacy records and authorization for any new eligible folders are
+separate outstanding decisions. Drop the alias table before the folder table
+only when reversing the schema together with the old software revision; retained
+raw records support recovery. Recheck exclusion effects before exposing the old
+public API again.
+
+The Projects & exclusions tab has one Save Changes action, pending-change count,
+saving state, and success/error messages. A failed save retains all pending
+values. Reload fetches current versions while retaining pending choices for
+review. The API validates the complete batch and updates it with a single SQL
+statement; stale versions, protected inclusion or unknown folders change no
+rows. Old per-row creation/rename/save endpoints cannot bypass folder identity.
+
+Managed Field Notes use the current folder-filtered public API. Static managed
+copies and the old raw GitHub index cannot bypass exclusions; original tracked
+Markdown remains intact. A software rollout never approves ledger content.
+
+Release from a clean commit only after the personal account/zone guard passes,
+the backup and migration review are complete, and the schema is available.
+Worker responses include `x-jakedoesdev-revision` from the build commit (with a
+`-dirty` suffix for local builds). Compare that header on
+`https://jakedoesdev.com/admin/updates/` and `/api/updates` with `git rev-parse HEAD`,
+then verify authenticated batch saves and anonymous filtering. A successful
+Pages workflow alone does not deploy this Worker or verify Update Studio.

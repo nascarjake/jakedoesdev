@@ -42,7 +42,9 @@ function readUpdate(filename: string): Update | null {
   const source = readFileSync(path.join(UPDATES_DIRECTORY, filename), "utf8");
   const { frontmatter, body } = splitFrontmatter(source);
 
-  if (frontmatter.published !== "true") {
+  // Managed posts are served through the folder-filtered API. A stale static
+  // copy must never bypass current exclusions during a software deployment.
+  if (frontmatter.published !== "true" || frontmatter.source === "admin-review") {
     return null;
   }
 
