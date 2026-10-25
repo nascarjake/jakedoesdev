@@ -58,7 +58,7 @@ never rewritten by this sync.
 `0009_update_folder_identity.sql` is additive and leaves raw project rows,
 exclusion flags, entries, bullets and source keys intact. **Before remote
 application**, export a full D1 backup into ignored local storage, retain the
-original software revision and current identity tables, and review a readable
+original software revision and current identity/snapshot tables, and review a readable
 mapping. Never put the backup, mapping, paths or client metadata in Git.
 `node scripts/reconcile-update-folders.mjs <private-snapshot.json>
 <verified-local-evidence.json>` backs up its input and writes a private plan only.
@@ -77,7 +77,7 @@ All new folders are policy locked and excluded until an explicit local publishin
 policy review. Existing client/shared-work exclusions must never be converted to
 personal eligibility. No eligibility allowlist has been inferred. Folder
 provenance for legacy records and authorization for any new eligible folders are
-separate outstanding decisions. Drop the alias table before the folder table
+separate outstanding decisions. Drop the snapshot and alias tables before the folder table
 only when reversing the schema together with the old software revision; retained
 raw records support recovery. Recheck exclusion effects before exposing the old
 public API again.
@@ -89,9 +89,16 @@ review. The API validates the complete batch and updates it with a single SQL
 statement; stale versions, protected inclusion or unknown folders change no
 rows. Old per-row creation/rename/save endpoints cannot bypass folder identity.
 
-Managed Field Notes use the current folder-filtered public API. Static managed
-copies and the old raw GitHub index cannot bypass exclusions; original tracked
-Markdown remains intact. A software rollout never approves ledger content.
+Historical published notes are preserved. The additive migration records the
+exact reviewed payload of rows already marked published, inside the same private
+D1 database. An unchanged row keeps its existing public labels and original
+project exclusions even when its folder is unresolved. This exception cannot
+approve a new draft, new entry, or edited payload. Future publication requires
+verified provenance and eligible folders. Existing tracked Markdown, public
+index, and the reviewed publishing sync remain intact. A software rollout never
+approves new ledger content or changes historical visibility. An alias mapping
+that would hide a historical note or broaden eligibility must remain unapplied
+until its exact effect has been reviewed and approved.
 
 Release from a clean commit only after the personal account/zone guard passes,
 the backup and migration review are complete, and the schema is available.

@@ -1,13 +1,14 @@
 export type UpdateProject = {
   id: string; name: string; excluded: number; canonicalId: string | null;
   identityStatus: "verified" | "unresolved"; locked: number; version: number;
+  legacyName?: string; legacyExcluded?: number;
 };
 
 export async function updateProjects(env: Env): Promise<UpdateProject[]> {
   const folders = (await env.DB.prepare(`SELECT id,name,excluded,id AS canonicalId,
     'verified' AS identityStatus,policy_locked AS locked,version FROM update_folders
     ORDER BY name COLLATE NOCASE,id`).all<UpdateProject>()).results;
-  const legacy = (await env.DB.prepare(`SELECT p.id,COALESCE(f.name,p.name) AS name,
+  const legacy = (await env.DB.prepare(`SELECT p.id,COALESCE(f.name,p.name) AS name,p.name AS legacyName,p.excluded AS legacyExcluded,
     CASE WHEN f.id IS NULL THEN 1 ELSE f.excluded END AS excluded,
     f.id AS canonicalId,CASE WHEN f.id IS NULL THEN 'unresolved' ELSE 'verified' END AS identityStatus,
     COALESCE(f.policy_locked,1) AS locked,COALESCE(f.version,0) AS version
