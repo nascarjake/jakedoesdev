@@ -65,7 +65,7 @@ export function getLabDiscovery(project: Project): Discovery {
 }
 
 export function isLabRelease(project: Project): boolean {
-  return Boolean(project.dossier.source && /^(?:open-source[\s·]+|public\s+)?(?:early\s+)?release$/i.test(project.status.trim()));
+  return Boolean(project.dossier.source && /^(?:open-source[\s·]+|public\s+|desktop\s+)?(?:early\s+)?release(?: · Mac \+ Windows)?$/i.test(project.status.trim()));
 }
 
 export function filterLabProjects(projects: Project[], filters: LabFilters): Project[] {
