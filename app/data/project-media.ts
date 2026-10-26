@@ -20,6 +20,14 @@ export const projectMedia: Record<string, ProjectMediaEntry> = {
     shots: [], video: 'LyOMJq47ASQ', website: 'https://github.com/nascarjake/luminary',
     note: 'Original Luminary walkthrough by JakeDoesDev, documenting the project at the time of recording.',
   },
+  'markdown-podcast-narrator': {
+    shots: [shot('markdown-podcast-studio/studio', 'Markdown Podcast Studio — editable two-host episode with synthetic notes and local voice choices')],
+    note: 'Real desktop interface with a synthetic script. No personal content, recording, or paid AI generation.',
+  },
+  'stream-dj': {
+    shots: [shot('stream-dj/studio', 'Stream DJ — synthetic Harbor FM station, stopped and ready to plan'), shot('stream-dj/programming', 'Reusable programming blocks with synthetic show participants')],
+    note: 'Real desktop interface with isolated synthetic station data. No personal media, live broadcast, recording, or paid AI generation.',
+  },
   traxo: {
     shots: [shot('traxo/overview', 'Traxo mobile — archived product overview'), shot('traxo/itinerary', 'The itinerary view'), shot('traxo/flight', 'Flight details and travel alerts')],
     note: 'Original mobile product imagery. The company website reflects Traxo today.',
