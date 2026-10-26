@@ -6,6 +6,7 @@ import { handleAdminGamesApi, handleGameMedia, handlePublicGames } from "./games
 import { handleAdminApi, handleProjectMedia, handlePublicProjects } from "./projects-api";
 import { handleAdminUpdates, handlePublicUpdates, handleSyncControl } from "./updates-api";
 import { handleUpdatePage } from "./updates-page";
+import { handleRedirectedDesktopScreenshot } from "./desktop-assets";
 
 // Image security config. SVG sources with .svg extension auto-skip the
 // optimization endpoint on the client side (served directly, no proxy).
@@ -16,6 +17,8 @@ import { handleUpdatePage } from "./updates-page";
 const worker = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+    const restoredScreenshot = handleRedirectedDesktopScreenshot(request, env);
+    if (restoredScreenshot) return restoredScreenshot;
 
     if (url.pathname === "/api/games") {
       return handlePublicGames(request, env);
