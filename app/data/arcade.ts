@@ -29,6 +29,18 @@ const shots = (id: string, captions: string[]) =>
 // screenshots are authentic captures. DAHO's artwork is conceptual.
 export const arcadeGames: ArcadeGame[] = [
   {
+    id: "demolition-derby",
+    title: "Demolition Derby",
+    genre: "Arcade racing",
+    cover: cover("demolition-derby"),
+    tagline: "Full contact. No mercy.",
+    description: "Race hard, trade paint, and keep your car running in a full-contact arcade racer. Take on a pack of rivals across circuits and a demolition bowl, then head back to the garage to choose your next ride.\n\nFeatures:\n- Race against AI rivals or battle to be the last car running.\n- Choose from six cars with distinct handling and durability.\n- Explore circuits, a demolition arena, and experimental tracks.\n- Damage and detach body panels as you collide; collect repairs to stay in the fight.\n- Customize your car and switch between chase, cockpit, hood, and roof cameras.",
+    playUrl: "https://nascarjake.github.io/demolition-derby-play/",
+    embedUrl: "https://nascarjake.github.io/demolition-derby-play/",
+    controlsHint: "WASD or arrow keys to drive; Space to slide; V to change camera.",
+    screenshots: [],
+  },
+  {
     id: "municipal",
     title: "MUNICIPAL",
     genre: "Traffic strategy",
