@@ -29,6 +29,18 @@ const shots = (id: string, captions: string[]) =>
 // screenshots are authentic captures. DAHO's artwork is conceptual.
 export const arcadeGames: ArcadeGame[] = [
   {
+    id: "municipal",
+    title: "MUNICIPAL",
+    genre: "Traffic strategy",
+    cover: cover("municipal"),
+    tagline: "Your streets. Your signal plan.",
+    description: "Take charge of a real-world neighborhood and turn its daily gridlock into a better commute. Tune signals, reshape intersections, and compare your plan against the original.\n\nFeatures:\n- Explore real OpenStreetMap districts in 3D.\n- Reprogram fixed-time and detector-actuated signals.\n- Add lanes and turn bays or switch between signals and stop signs.\n- Test changes against matched traffic simulations, informed by available counts.",
+    playUrl: "https://nascarjake.github.io/traffic-manager/",
+    embedUrl: "https://nascarjake.github.io/traffic-manager/",
+    controlsHint: "Mouse to inspect and edit; drag to orbit, scroll to zoom.",
+    screenshots: [],
+  },
+  {
     id: "orbital-smash",
     title: "Orbital Smash",
     genre: "Physics survival",
