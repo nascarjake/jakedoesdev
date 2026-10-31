@@ -42,30 +42,30 @@ export const podcastRelease: DesktopRelease = {
  screenshots: [{ name: "studio", caption: "Episode workspace with a synthetic two-host script, source intake, and local voice choices." }]
 };
 export const streamDjRelease: DesktopRelease = {
- id: "stream-dj", slug: "stream-dj", name: "Stream DJ", version: "0.1.0",
+ id: "stream-dj", slug: "stream-dj", name: "Stream DJ", version: "0.1.5", prerelease: true,
  heading: "Give your next live show a desk of its own.",
  intro: "A local-first desktop radio studio for your music library, show programming, audience requests, and optional AI DJ voice links. Plan the show, then take it on air when you are ready.",
  tag: "Build the lineup. Run the show.", files: [
   {
     "label": "Mac · Apple Silicon",
     "detail": "M1 or newer · macOS 12+",
-    "filename": "Stream-DJ-0.1.0-mac-arm64.zip",
-    "sha256": "e421e471671913bec55a490b7366a31c3aa8c7b528c3129008fa385f5381a9db",
-    "bytes": 116919993
+    "filename": "Stream-DJ-0.1.5-mac-arm64.zip",
+    "sha256": "2e5e79ba3441c9da847af5a95ceb6dc8062c018862d43f96847cad7a64aad65f",
+    "bytes": 116388419
   },
   {
     "label": "Mac · Intel",
     "detail": "Intel processor · macOS 12+",
-    "filename": "Stream-DJ-0.1.0-mac-x64.zip",
-    "sha256": "049d55cee3ee4be784fdf264916cce9d0979a9f720dbfdfa5b2b0b58be21f047",
-    "bytes": 122408106
+    "filename": "Stream-DJ-0.1.5-mac-x64.zip",
+    "sha256": "1e10c4774e1c1e0b92c64c6ea6a26d918320a45cf61f57361d36a4f8394b95b0",
+    "bytes": 121781954
   },
   {
     "label": "Windows · 64-bit",
     "detail": "Windows 10/11 · Intel or AMD x64",
-    "filename": "Stream-DJ-0.1.0-win-x64.zip",
-    "sha256": "bc34f4c69b53a8c339fb9ca2f8018dad612b44131b3530d5b794547e0da5a365",
-    "bytes": 140792392
+    "filename": "Stream-DJ-0.1.5-win-x64.zip",
+    "sha256": "8dfb136593dc49d2e9e9c6323dbcf2cdfb51ed4bd8d551511a83521dd2603b1d",
+    "bytes": 142064590
   }
 ],
  features: [
