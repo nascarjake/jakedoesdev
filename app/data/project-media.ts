@@ -7,6 +7,16 @@ export type ProjectMediaEntry = {
 const shot = (path: string, caption: string) => ({ src: `/projects/${path}.webp`, caption });
 
 export const projectMedia: Record<string, ProjectMediaEntry> = {
+  'rack-ruin': {
+    shots: [
+      { src: '/arcade/screenshots/rack-ruin-1.webp', caption: 'Rack & Ruin title menu: Ruin Run and Classic Pool' },
+      { src: '/arcade/screenshots/rack-ruin-2.webp', caption: 'Green-felt table with an active pocket multiplier' },
+      { src: '/arcade/screenshots/rack-ruin-3.webp', caption: 'Blue-felt table with glowing modified balls' },
+    ],
+    video: 'https://youtu.be/Qb1iRTERCVA?t=1971',
+    website: 'https://nascarjake.github.io/rack-web/',
+    note: 'Existing arcade screenshots and the Rack & Ruin segment of the recorded showcase. The browser demo and desktop build have different feature sets.',
+  },
   'clip-my-screen': {
     shots: [shot('clip-my-screen/library', 'Clip My Screen — searchable local library with illustrative demo captures'), shot('clip-my-screen/dashboard', 'Capture dashboard with recording explicitly paused'), shot('clip-my-screen/settings', 'Replay, display, audio, and sharing settings')],
     note: 'Actual app interface rendered with demo fixtures. No personal recordings or desktop capture were used for these screenshots.',

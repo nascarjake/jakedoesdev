@@ -1,3 +1,18 @@
+// Source-verified product narratives. See docs/portfolio-content-sources.md.
+export const projectStories: Record<string, string> = {
+  "rack-ruin": "<h2>Pool with more than one way to play</h2><p>Rack &amp; Ruin takes the precision of a billiards shot into four different formats: a roguelike run, Classic pool, authored challenges, and simultaneous Party play. Its web demo, desktop build, and mobile build share the game foundation, but do not expose identical features.</p><h3>Tables become the puzzle</h3><p>The challenge system supports walls, gates, rotating bars, linked portals, ball-specific pockets, and zones that change how a ball moves. A versioned table format separates the course definition from the physics runtime, allowing a new course to change the problem rather than just the background.</p><h3>Play together, or build a challenge</h3><p>Party Mode includes local players and AI opponents, with color-clearing and shared-rack rules. Unlike turn-based pool, each cue can shoot when its own ball slows down. The desktop Challenge Creator validates a course and requires its creator to complete it before publishing. Workshop integration is desktop-specific; the mobile build excludes the creator and Party interface.</p><p>This is an actively developed game. The screenshots and recorded walkthrough show existing builds; they are not a promise that every desktop or online feature is available in the browser demo.</p>",
+  "luminary": "<h2>Make an AI workflow visible</h2><p>Luminary is a desktop workspace for assembling assistants, structured objects, functions, and their connections into a visual pipeline. It makes the pieces of an agent workflow inspectable instead of hiding them inside a long prompt.</p><h3>Reusable building blocks</h3><p>The object designer imports and exports JSON schemas, including nested structures. Assistant and function libraries let a workflow reuse its components. Profiles bundle the pipeline, graph layout, assistants, schemas, and functions into an exportable package.</p><h3>Beyond the canvas</h3><p>Custom functions can run through a command-line interface, receiving JSON input and reporting progress and output. A separate Node execution engine runs workflows outside the desktop editor. That separation keeps the visual authoring experience distinct from the runtime that performs the work.</p><p>The walkthrough documents the project at the time of recording. Model providers and API availability can change; the repository is the place to check current setup requirements.</p>",
+  "straight-desk": "<h2>A phone agent that can finish the task</h2><p>Straight Desk uses live-audio AI models for customer conversations that lead to concrete actions. A roof-inspection flow, for example, collects the request, verifies the caller\u2019s details, schedules an appointment, and updates the CRM record.</p><h3>Conversation and workflow, deliberately separated</h3><p>Customizable agents follow a company playbook. Guardrails guide each step, while deterministic workflow orchestration keeps required actions predictable. The agent can reason and converse naturally without relying on free-form conversation alone to remember the process.</p><p>The product screenshots show the agent office, onboarding, call preview, and the relationship between a conversation and its actions. They illustrate the roof-inspection use case rather than presenting a generic chatbot demo.</p>",
+  "clip-my-screen": "<h2>Save the moment after it happens</h2><p>Clip My Screen keeps a rolling local replay buffer so a shortcut can save the previous one, five, or fifteen minutes. A tray or menu-bar controller provides access without keeping a large recording window in the way.</p><h3>From replay to usable clip</h3><p>The local library supports search, names, tags, and favorites. Its visual editor trims, splits, and reorders clips, with frame stepping, keyboard shortcuts, and undo/redo. Edits are nondestructive, so selecting a better cut does not destroy the original capture.</p><h3>Control what leaves the machine</h3><p>Recording and the library are local. Sharing is a deliberate action using revocable links, with an optional tunnel when remote access is needed. Capture still requires operating-system permissions. The macOS implementation supports system and authorized microphone audio; the current Windows capture path is video-only.</p>",
+  "stream-dj": "<h2>Run a station, not just a playlist</h2><p>Stream DJ brings the on-air desk, music library, clock, requests, and generation tools into one local-first workspace. A persistent player keeps the station accessible while the operator moves between views.</p><h3>Make room for the host</h3><p>The audio system analyzes a track\u2019s introduction to find a voice-safe window. DJ copy is fitted to that window, music ducks under the spoken segment, and its level returns before likely vocals. The aim is a transition that sounds intentional rather than a voice pasted over a song.</p><h3>Keep requests connected to the library</h3><p>Tracks retain metadata such as requester, prompt, title, category, tags, and play counts. Requests pass through a moderation queue. Music, text, and voice generation use configurable providers rather than one mandatory service. This remains an evolving station prototype, not a claim of unattended broadcast reliability.</p>",
+  "markdown-podcast-narrator": "<h2>Turn written material into an editable episode</h2><p>Markdown Podcast Studio accepts Markdown, plain text, or pasted notes and turns them into a script with editable host turns. Each host can have a different voice; a single-narrator path is available when a conversational rewrite is not needed.</p><h3>Keep the script in the loop</h3><p>Writer integrations include local LM Studio and supported coding-agent command-line tools. Optional research can draw from selected codebase files, Wikipedia, and a bounded set of URLs, with source references and retrieval warnings. The user can review the script before rendering the episode.</p><h3>A local audio pipeline</h3><p>Kokoro provides local speech after its models are downloaded, and FFmpeg produces the MP3. CPU rendering completes before playback. Local voice rendering does not mean every optional writer is local: selecting a cloud-backed provider can send the selected source material to that provider.</p>",
+  "jcal": "<h2>A household view of the day</h2><p>jcal brings calendar aggregation and household lists into a touch-friendly kiosk interface. Family colors make schedules easier to scan, while groceries, to-dos, and chores sit beside the calendar rather than in disconnected apps.</p><h3>From information to routine</h3><p>The project includes Google and Cozi calendar integration, natural-language assistance, weather, and an idle photo view. Its list system includes smart-list and meal-plan ingredient workflows. The goal is a useful shared surface in the home, not another personal productivity dashboard.</p><p>This is an in-development personal tool. Connected calendars and AI features require their own configuration and permissions.</p>",
+  "music-writer": "<h2>A reproducible transcription experiment</h2><p>Music Writer explores how a recorded track can become editable musical structure. The documented study separates stems with HTDemucs, extracts note candidates with Basic Pitch, and compares timing, energy, and chroma to understand the arrangement.</p><h3>From analysis to a playable sketch</h3><p>For the study track, the analysis fits a 118 BPM sixteenth-note grid and produces MIDI, note tables, section analysis, and Strudel arrangements. Keeping those intermediate artifacts makes it possible to inspect where a transcription succeeds or loses musical detail.</p><p>This is a research workflow built around one study, not a released universal audio-to-score converter. The portfolio describes the process without distributing the source recording or extracted samples.</p>",
+  "broadsheet": "<h2>Explore the news as a place</h2><p>Broadsheet experiments with an editorial canvas rather than a linear feed. Headlines, images, and article excerpts create a spatial overview. Open a story to unfold its full text, leave it open, and move to a neighboring story without losing the wider page.</p><h3>Enough material to test the idea</h3><p>The prototype contains a captured edition of 53 NASA stories with roughly 33,000 words and 95 image placements. Some articles include several images. This is a finite, attributed archive, not a live news service; the exploratory canvas reuses that archive as it extends.</p><h3>Fluid without a permanent render loop</h3><p>Selectable text remains in the document while composited transforms move the view. Viewport-based rendering and lazy images limit the work to nearby content. Search, an overview, enlarged photos, and persistent unfolded stories support both browsing and focused reading.</p>",
+  "ignite-dialogue": "<h2>Build the platform that builds the guides</h2><p>I built a platform to shorten the process of creating guided customer experiences for banks and credit unions. The work connected product decisions with architecture, security, infrastructure, and cost tracking, rather than treating the editor as an isolated interface.</p><h3>Shorten the production cycle</h3><p>The platform reduced a six-month production cycle to two weeks. I then improved that foundation with AI-assisted website research and guide creation, reaching an example of two guides built in ten minutes from a bank\u2019s website. That is a concrete creation workflow, not a claim that every customer implementation takes ten minutes.</p><p>Configurable integrations and generated configuration interfaces help teams adapt guides without rebuilding the application for each institution. Publishing automation connects that authoring work to delivery.</p>"
+};
+
+
 export type ProjectCategory =
   | "Enterprise"
   | "AI + Automation"
@@ -68,6 +83,7 @@ export type Experience = {
 export const projects: Project[] = [
   {
     id: "ignite-dialogue",
+    storyHtml: projectStories["ignite-dialogue"],
     index: "01",
     title: "Ignite Dialogue",
     eyebrow: "Enterprise conversation engine",
@@ -81,13 +97,13 @@ export const projects: Project[] = [
     category: "Enterprise",
     status: "Production system",
     highlights: [
-      "Modernized the primary decision-tree system and its supporting infrastructure for AWS scale.",
+      "Built the guide-production platform and its supporting infrastructure for AWS scale.",
       "Built self-service integrations with self-defining models and generated configuration UI.",
       "Automated guide publishing and continuous delivery with AWS Service Catalog and CodePipeline.",
     ],
     dossier: {
-      scope: "A modernization effort for a configurable guided-conversation platform used by financial institutions to guide product and service discussions.",
-      ownership: ["Reworked the aging decision-tree foundation for cloud-scale operation.", "Built an integration layer where models describe themselves and drive generated configuration UI.", "Supported enterprise theming, customer customization, one-click guide publishing, and a staged MongoDB migration from one database into multiple clusters."],
+      scope: "A platform I built to make configurable guided customer experiences faster to create and publish for financial institutions.",
+      ownership: ["Built and improved the guided-conversation foundation for cloud-scale operation.", "Built an integration layer where models describe themselves and drive generated configuration UI.", "Supported enterprise theming, customer customization, one-click guide publishing, and a staged MongoDB migration from one database into multiple clusters."],
       systems: ["Node.js services with a React application and legacy Scala", "AWS CloudFormation, Service Catalog, Beanstalk, Lambda, Cognito, S3, SSM, SNS, and SQS", "Cloudflare domains, Datadog observability, and separated MongoDB clusters"],
       note: "The current product page describes the broader platform; this record focuses on the architecture and delivery work listed in my résumé.",
       source: { label: "View current Ignite Dialogue context", url: "https://ignitesales.com/solutions/" },
@@ -511,6 +527,7 @@ export const projects: Project[] = [
   },
   {
     id: "rack-ruin",
+    storyHtml: projectStories["rack-ruin"],
     index: "18",
     title: "Rack & Ruin",
     eyebrow: "Cross-platform billiards game",
@@ -537,6 +554,7 @@ export const projects: Project[] = [
   },
   {
     id: "luminary",
+    storyHtml: projectStories["luminary"],
     index: "19",
     title: "Luminary",
     eyebrow: "Open-source AI workflow builder",
@@ -564,6 +582,7 @@ export const projects: Project[] = [
   },
   {
     id: "straight-desk",
+    storyHtml: projectStories["straight-desk"],
     index: "20",
     title: "Straight Desk",
     eyebrow: "24/7 voice operations assistant",
@@ -590,6 +609,7 @@ export const projects: Project[] = [
   },
   {
     id: "clip-my-screen",
+    storyHtml: projectStories["clip-my-screen"],
     index: "21",
     sortOrder: 22,
     title: "Clip My Screen",
@@ -614,6 +634,7 @@ export const projects: Project[] = [
   },
   {
     id: "stream-dj",
+    storyHtml: projectStories["stream-dj"],
     index: "22",
     sortOrder: 20,
     title: "Stream DJ",
@@ -642,6 +663,7 @@ export const projects: Project[] = [
   },
   {
     id: "jcal",
+    storyHtml: projectStories["jcal"],
     index: "23",
     sortOrder: 21,
     title: "jcal",
@@ -669,6 +691,7 @@ export const projects: Project[] = [
   },
   {
     id: "markdown-podcast-narrator",
+    storyHtml: projectStories["markdown-podcast-narrator"],
     index: "24",
     sortOrder: 23,
     title: "Markdown Podcast Studio",
@@ -697,6 +720,7 @@ export const projects: Project[] = [
   },
   {
     id: "music-writer",
+    storyHtml: projectStories["music-writer"],
     index: "25",
     sortOrder: 24,
     title: "Music Writer",

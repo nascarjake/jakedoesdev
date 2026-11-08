@@ -150,6 +150,7 @@ export function LabExperience() {
           {active.id !== "luminary" && active.dossier.source && <a className={styles.primaryAction} href={active.dossier.source.url}>{active.dossier.source.label}<Icon name="external" size={15} /></a>}
           </div>
           <section><h3>Put it to use</h3><ul>{getLabDiscovery(active).uses.map((item) => <li key={item}>{item}</li>)}</ul></section>
+          {active.storyHtml && <div className="project-rich-story" dangerouslySetInnerHTML={{ __html: active.storyHtml }} />}
           <section><h3>Inside the experiment</h3><ul>{active.highlights.map((item) => <li key={item}>{item}</li>)}</ul></section>
           {active.dossier.note && <p className={styles.note}>{active.dossier.note}</p>}
           <details className={styles.buildNotes}><summary>Under the hood</summary><p>{active.dossier.scope || active.eyebrow}</p><ul>{active.dossier.ownership.map((item) => <li key={item}>{item}</li>)}</ul><div className={styles.stack}>{active.stack.map((item) => <span key={item}>{item}</span>)}</div></details>
