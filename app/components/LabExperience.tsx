@@ -144,9 +144,11 @@ export function LabExperience() {
         <div className={styles.detailToolbar}><span>THE LAB / {active.signal}</span><button type="button" onClick={closeDetails} aria-label="Close experiment details"><Icon name="close" size={18} /></button></div>
         <div className={styles.detailPreview} key={active.id}>{hasMedia ? <ProjectMedia media={media} assets={active.media} title={active.title} /> : <LabPreview project={active} />}</div>
         <div className={styles.detailCopy}><span className={styles.status} data-release={isLabRelease(active)}><i />{active.status}</span><h2 id="lab-tool-title">{active.title}</h2><p>{active.summary}</p>
+          <div className={styles.detailActions}>
           {active.id === "luminary" && <Link className={styles.primaryAction} href="/luminary/">Watch the Luminary walkthrough<Icon name="arrow" size={15} /></Link>}
           {active.id === "luminary" && <a className={styles.primaryAction} href="https://github.com/nascarjake/luminary">Get started on GitHub<Icon name="external" size={15} /></a>}
           {active.id !== "luminary" && active.dossier.source && <a className={styles.primaryAction} href={active.dossier.source.url}>{active.dossier.source.label}<Icon name="external" size={15} /></a>}
+          </div>
           <section><h3>Put it to use</h3><ul>{getLabDiscovery(active).uses.map((item) => <li key={item}>{item}</li>)}</ul></section>
           <section><h3>Inside the experiment</h3><ul>{active.highlights.map((item) => <li key={item}>{item}</li>)}</ul></section>
           {active.dossier.note && <p className={styles.note}>{active.dossier.note}</p>}

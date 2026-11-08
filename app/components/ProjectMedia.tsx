@@ -45,7 +45,8 @@ function MediaStage({ asset, title, nearby }: { asset: ProjectMediaAsset; title:
 
 export function ProjectMedia({ media, assets, title }: { media?: ProjectMediaEntry; assets?: ProjectMediaAsset[]; title: string }) {
   const items = useMemo(() => {
-    const source = assets?.length ? assets : legacyAssets(media);
+    const supplied = legacyAssets(media);
+    const source = assets?.length ? [...assets, ...supplied.filter((item) => !assets.some((asset) => asset.url === item.url || (asset.kind === "video" && item.kind === "video" && youtubeId(asset.url) === youtubeId(item.url))))] : supplied;
     return [...source].sort((left, right) => Number(right.kind === "video") - Number(left.kind === "video") || (left.sortOrder ?? 0) - (right.sortOrder ?? 0));
   }, [assets, media]);
   const [index, setIndex] = useState(0);

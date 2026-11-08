@@ -21,7 +21,10 @@
     "db:generate": "drizzle-kit generate",
     "db:seed-sql": "node scripts/generate-portfolio-seed.mjs",
     "db:migrate:local": "node scripts/with-cloudflare-node.mjs migrate-local",
-    "db:migrate:remote": "node scripts/with-cloudflare-node.mjs migrate"
+    "db:migrate:remote": "node scripts/with-cloudflare-node.mjs migrate",
+    "prebuild": "node scripts/verify-public-surface.mjs",
+    "prebuild:pages": "node scripts/verify-public-surface.mjs",
+    "postbuild:pages": "node scripts/verify-public-surface.mjs --export"
   },
   "dependencies": {
     "drizzle-orm": "0.45.2",

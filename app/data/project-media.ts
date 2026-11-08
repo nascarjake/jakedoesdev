@@ -17,7 +17,7 @@ export const projectMedia: Record<string, ProjectMediaEntry> = {
     website: 'https://straightdesk.com',
   },
   luminary: {
-    shots: [], video: 'LyOMJq47ASQ', website: 'https://github.com/nascarjake/luminary',
+    shots: [shot('luminary/luminary-overview', 'Luminary — overview artwork supplied by JakeDoesDev')], video: 'LyOMJq47ASQ', website: 'https://github.com/nascarjake/luminary',
     note: 'Original Luminary walkthrough by JakeDoesDev, documenting the project at the time of recording.',
   },
   'markdown-podcast-narrator': {
@@ -27,6 +27,11 @@ export const projectMedia: Record<string, ProjectMediaEntry> = {
   'stream-dj': {
     shots: [shot('stream-dj/studio', 'Stream DJ — synthetic Harbor FM station, stopped and ready to plan'), shot('stream-dj/programming', 'Reusable programming blocks with synthetic show participants')],
     note: 'Real desktop interface with isolated synthetic station data. No personal media, live broadcast, recording, or paid AI generation.',
+  },
+  broadsheet: {
+    shots: [shot('broadsheet/broadsheet-preview', 'Broadsheet — spatial reading canvas with NASA stories')],
+    note: 'Actual Broadsheet interface supplied by Jake Clark.',
+    website: 'https://nascarjake.github.io/broadsheet/',
   },
   traxo: {
     shots: [shot('traxo/overview', 'Traxo mobile — archived product overview'), shot('traxo/itinerary', 'The itinerary view'), shot('traxo/flight', 'Flight details and travel alerts')],
