@@ -173,6 +173,7 @@ export function UniverseExperience() {
         </section>
       ) : view === "preview" ? (
         <article className="project-detail" key={selected.id}>
+          <div className="project-primary-column">
           <header className="detail-heading">
             <p className="eyebrow">
               {selected.year} <span className="eyebrow-divider">/</span>{" "}
@@ -188,6 +189,27 @@ export function UniverseExperience() {
             {selected.id === "tumor-identifier" ? <BiopsyDemo /> : selected.media?.length || projectMedia[selected.id] ? <ProjectMedia media={projectMedia[selected.id]} assets={selected.id === "straight-desk" ? undefined : selected.media} title={selected.title} /> : <ProjectIllustration project={selected} />}
             {selected.id === "ezforms" && <EzformsClients />}
           </div>
+          <section className="project-story-copy">
+            <div>
+              <p className="eyebrow">THE SHORT VERSION</p>
+              <h2>
+                From idea to
+                <br />
+                something useful.
+              </h2>
+            </div>
+            <div>
+              <p className="project-summary">{selected.summary}</p>
+              {selected.storyHtml && <div className="project-rich-story" dangerouslySetInnerHTML={{ __html: selected.storyHtml }} />}
+              <ul>
+                {selected.highlights.map((highlight) => (
+                  <li key={highlight}>{highlight}</li>
+                ))}
+              </ul>
+            </div>
+          </section>
+          </div>
+          <div className="project-secondary-column">
           <div className="project-facts">
             <div>
               <span>MY ROLE</span>
@@ -229,25 +251,7 @@ export function UniverseExperience() {
             </div>
             {selected.dossier.note && <p className="project-dossier-note">{selected.dossier.note}</p>}
           </section>
-          <section className="project-story-copy">
-            <div>
-              <p className="eyebrow">THE SHORT VERSION</p>
-              <h2>
-                From idea to
-                <br />
-                something useful.
-              </h2>
-            </div>
-            <div>
-              <p className="project-summary">{selected.summary}</p>
-              {selected.storyHtml && <div className="project-rich-story" dangerouslySetInnerHTML={{ __html: selected.storyHtml }} />}
-              <ul>
-                {selected.highlights.map((highlight) => (
-                  <li key={highlight}>{highlight}</li>
-                ))}
-              </ul>
-            </div>
-          </section>
+          </div>
           <footer className="project-detail-footer">
             <button className="text-link" onClick={() => setView("directory")}>
               <Icon name="grid" size={17} /> See all {catalog.length} projects

@@ -3788,12 +3788,13 @@ svg {
     grid-template-columns: minmax(0, 1.55fr) minmax(320px, 0.95fr);
     column-gap: 46px;
   }
-  .detail-heading { grid-column: 1; grid-row: 1; }
+  .project-primary-column,
+  .project-secondary-column { min-width: 0; }
+  .project-primary-column { grid-column: 1; }
+  .project-secondary-column { grid-column: 2; }
+  .project-primary-column .detail-heading { margin-bottom: 28px; }
   .project-facts {
-    grid-column: 2;
-    grid-row: 1;
     grid-template-columns: 1fr;
-    align-self: end;
     gap: 16px;
     margin-bottom: 28px;
     padding: 0 0 20px;
@@ -3804,13 +3805,9 @@ svg {
     padding: 16px 0 0;
   }
   .project-feature {
-    grid-column: 1;
-    grid-row: 2;
     min-width: 0;
   }
   .project-dossier {
-    grid-column: 2;
-    grid-row: 2;
     grid-template-columns: 1fr;
     align-self: start;
     gap: 22px;
@@ -3825,7 +3822,7 @@ svg {
     border-top: 1px solid var(--line);
     border-left: 0;
   }
-  .project-story-copy,
+  .project-story-copy { grid-template-columns: 1fr; gap: 12px; }
   .project-detail-footer { grid-column: 1 / -1; }
 }
 
