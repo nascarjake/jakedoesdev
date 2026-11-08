@@ -49,16 +49,14 @@ function render(path = "index.html") {
   return readFileSync(new URL(`../out/${path}`, import.meta.url), "utf8");
 }
 
-test("the exported homepage opens the Goose Games arcade", () => {
-  const html = render();
-  assert.match(html, /ARCADE MODE/);
-  assert.match(html, /Goose Games Arcade/);
-  assert.match(html, /aria-pressed="true" aria-label="Select Goose Games"/);
-  assert.match(html, /https:\/\/goosegames.dev/);
-  assert.match(html, /discord.gg\/6BJTUpDSsE/);
-  assert.doesNotMatch(html, /DRAG TO ORBIT|SEE COOL STUFF/);
-  assert.match(html.replace(/<!--.*?-->/g, ""), /11 REAL GAMES/);
-  assert.doesNotMatch(html, /Orbital Drift|Signal Runner|Concept cartridges/);
+test("homepage leads with portfolio and retains all three destinations", () => {
+  const html = render().replace(/<!--.*?-->/g, "");
+  assert.match(html, /Jake Clark/);
+  assert.match(html, /20\+ years building software/);
+  for (const route of ["universe", "lab", "arcade"]) assert.ok(html.includes(`href="/${route}/"`));
+  assert.match(html, /Explore 20 products &amp; tools/);
+  assert.match(html, /7 open-source projects/);
+  assert.doesNotMatch(html, /THREE DOORS|ONE WORKBENCH|Choose the door|BUILT WITH CURIOSITY/);
 });
 
 test("the arcade exports every real game and its generated cover", () => {

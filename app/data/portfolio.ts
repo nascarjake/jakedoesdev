@@ -552,6 +552,7 @@ export const projects: Project[] = [
       "Created an AI Flow engine library for running Luminary projects in other apps.",
     ],
     dossier: {
+      source: { label: "Explore Luminary", url: "/luminary/" },
       scope: "An open-source AI workflow builder for composing multiple LLM agents and carrying those workflows into other applications through a reusable engine library.",
       ownership: ["Created a workflow builder for chaining multiple LLM agents.", "Built the desktop interface with Electron and Angular.", "Developed an AI Flow engine library so Luminary projects can run in other apps."],
       systems: ["Electron desktop application", "Angular interface", "LLM Studio and reusable AI Flow engine library"],
