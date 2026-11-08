@@ -122,10 +122,10 @@ test("contact is available inside the site without an email application", () => 
   assert.match(html, /Close contact panel/);
 });
 
-test("the full project archive is available without client JavaScript", () => {
+test("featured landing and complete directory are available without client JavaScript", () => {
   const html = render("universe/index.html");
-  assert.match(html, /THE COMPLETE COLLECTION/);
-  assert.match(html, /Search the complete project archive/);
+  assert.match(html, /Featured products/);
+  assert.match(html, /Search shipped production products/);
   for (const project of [
     "Ignite Dialogue",
     "Eternus Engine Tools",

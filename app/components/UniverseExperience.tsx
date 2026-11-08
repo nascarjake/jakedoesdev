@@ -9,6 +9,9 @@ import { WorkbenchShell, WorkspaceToolbar } from "./WorkbenchShell";
 import dynamic from "next/dynamic";
 import { projectMedia } from "../data/project-media";
 import { ProjectMedia, EzformsClients } from "./ProjectMedia";
+import { PortfolioTimeline } from "./PortfolioTimeline";
+import { featuredProjectIds } from "../data/portfolio-views";
+import styles from "./PortfolioViews.module.css";
 
 const BiopsyDemo = dynamic(() => import("./BiopsyDemo"), { ssr: false, loading: () => <p>Preparing the synthetic biopsy walkthrough…</p> });
 
@@ -130,7 +133,7 @@ export function UniverseExperience() {
     getProjectHash,
     () => "",
   );
-  const view = catalog.some((project) => project.id === hash) ? "preview" : "directory";
+  const view = catalog.some((project) => project.id === hash) ? "preview" : hash === "directory" ? "directory" : hash === "timeline" ? "timeline" : "featured";
   function setView(next: "preview" | "directory") {
     openWorkbenchPanel(next === "directory" ? "directory" : selected.id);
   }
@@ -150,23 +153,25 @@ export function UniverseExperience() {
   }
   return (
     <WorkbenchShell section="projects" selectedProject={view === "preview" ? selected.id : undefined}>
-      <WorkspaceToolbar label="Project archive">
+      <WorkspaceToolbar label="Portfolio">
         <div className="view-switch" role="group" aria-label="Project view">
-          <button
-            aria-pressed={view === "preview"}
-            onClick={() => setView("preview")}
-          >
-            <Icon name="file" size={14} /> Preview
-          </button>
-          <button
-            aria-pressed={view === "directory"}
-            onClick={() => setView("directory")}
-          >
-            <Icon name="grid" size={14} /> All projects
-          </button>
+          {([['featured', 'Featured'], ['directory', 'All projects'], ['timeline', 'Timeline']] as const).map(([id, label]) => <button key={id} aria-pressed={view === id} onClick={() => openWorkbenchPanel(id)}>{label}</button>)}
         </div>
       </WorkspaceToolbar>
-      {view === "preview" ? (
+      {view === "timeline" ? <PortfolioTimeline catalog={catalog} onSelect={select} /> : view === "featured" ? (
+        <section className={styles.featured}>
+          <header><p className="eyebrow">SELECTED WORK</p><h1>Featured products</h1></header>
+          <div className={styles.featuredGrid}>{featuredProjectIds.map((id) => catalog.find((p) => p.id === id)).filter((p): p is Project => !!p).map((project, i) => {
+            const image = project.media?.find((asset) => asset.kind === "image")?.url ?? projectMedia[project.id]?.shots[0]?.src;
+            const video = projectMedia[project.id]?.video;
+            return <button key={project.id} onClick={() => select(project)} className={styles.featuredCard}>
+              <div className={styles.cover}>{image ? <img src={image} alt="" loading="lazy" /> : video ? <img src={`https://i.ytimg.com/vi/${video}/hqdefault.jpg`} alt="" loading="lazy" /> : <span className={styles.signal}>{project.signal}</span>}<span className={styles.number}>0{i + 1}</span></div>
+              <div className={styles.cardCopy}><p className="eyebrow">{project.category} · {project.year}</p><h2>{project.title} <span>↗</span></h2><p>{project.summary}</p><span className={styles.readMore}>View product</span></div>
+            </button>;
+          })}</div>
+          <div className={styles.browseLinks}><button onClick={() => openWorkbenchPanel('directory')}>All {catalog.length} products & tools →</button><button onClick={() => openWorkbenchPanel('timeline')}>Explore the timeline →</button><Link href="/resume">Career & résumé →</Link></div>
+        </section>
+      ) : view === "preview" ? (
         <article className="project-detail" key={selected.id}>
           <header className="detail-heading">
             <p className="eyebrow">
@@ -266,10 +271,7 @@ export function UniverseExperience() {
             <h1>
               Things I’ve <em>built.</em>
             </h1>
-            <p>
-              Products, platforms, and shipped work. A few decades of following the
-              interesting problems.
-            </p>
+
           </header>
           <div className="index-tools">
             <label className="index-search">

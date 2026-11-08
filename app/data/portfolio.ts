@@ -94,7 +94,7 @@ export const projects: Project[] = [
   {
     id: "ignite-ai",
     index: "02",
-    title: "Ignite AI",
+    title: "Ignite Spark AI",
     eyebrow: "Human-in-the-middle automation",
     summary:
       "Web and desktop tools for creating conversational guides and data-collection forms with reviewable AI assistance during client onboarding.",

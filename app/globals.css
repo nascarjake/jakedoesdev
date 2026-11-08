@@ -3840,3 +3840,5 @@ svg {
 .workbench-app[data-mode="arcade"] .workspace-main{background:#fff1cd;border-color:#174582}
 .workbench-app[data-mode="arcade"] .status-bar{background:#102c58;color:#e9f1fa;padding-inline:18px}
 @media(max-width:620px){.top-nav{gap:8px;padding:0 4px}.top-nav a{font-size:10px}}
+
+.portfolio-directory-views{display:grid;gap:4px;padding:12px 16px;border-bottom:1px solid #d9ddd1}.portfolio-directory-views a{font-size:12px;font-weight:600;padding:10px 8px;color:#43523a;border-radius:4px}.portfolio-directory-views a:hover{background:#e8eddc}

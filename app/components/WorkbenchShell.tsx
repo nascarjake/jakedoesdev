@@ -177,21 +177,11 @@ export function WorkbenchShell({
             />
             <kbd>/</kbd>
           </label>
-          <Link
-            href="/arcade"
-            className={`arcade-directory-link ${section === "arcade" ? "selected" : ""}`}
-            aria-current={section === "arcade" ? "page" : undefined}
-            onClick={() => setDirectoryOpen(false)}
-          >
-            <span className="arcade-link-icon">
-              <Icon name="game" />
-            </span>
-            <span>
-              <strong>Goose Games Arcade</strong>
-              <small>A little more play.</small>
-            </span>
-            <Icon name="arrow" size={16} />
-          </Link>
+          <nav className="portfolio-directory-views" aria-label="Portfolio views">
+            <Link href="/universe#featured" onClick={() => setDirectoryOpen(false)}>Featured products →</Link>
+            <Link href="/universe#directory" onClick={() => setDirectoryOpen(false)}>All products & tools →</Link>
+            <Link href="/universe#timeline" onClick={() => setDirectoryOpen(false)}>Product & career timeline →</Link>
+          </nav>
           <section className="production-directory" aria-labelledby="production-directory-title">
             <div className="production-directory-heading">
               <h2 id="production-directory-title">Shipped production products</h2>
@@ -259,6 +249,21 @@ export function WorkbenchShell({
               </div>
               <p>Experiments and prototypes from the AI Lab.</p>
             </div>
+          </Link>
+          <Link
+            href="/arcade"
+            className={`arcade-directory-link ${section === "arcade" ? "selected" : ""}`}
+            aria-current={section === "arcade" ? "page" : undefined}
+            onClick={() => setDirectoryOpen(false)}
+          >
+            <span className="arcade-link-icon">
+              <Icon name="game" />
+            </span>
+            <span>
+              <strong>Goose Games Arcade</strong>
+              <small>A little more play.</small>
+            </span>
+            <Icon name="arrow" size={16} />
           </Link>
           <div className="sidebar-bottom">
             <Link href="/resume">
