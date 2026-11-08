@@ -23,3 +23,11 @@ test('Straight Desk uses six verified screenshots, excluding private calendar an
  for(const shot of projectMedia['straight-desk'].shots){assert.ok(shot.src.startsWith('/projects/straight-desk/'));assert.ok(shot.caption.length>8);assert.ok(readFileSync('out'+shot.src).length>0);}
  const source=readFileSync('app/components/UniverseExperience.tsx','utf8');assert.match(source,/selected.id === "straight-desk" \? undefined : selected.media/);
 });
+
+// Next Link updates history without emitting native hashchange for same-page links.
+test('all sidebar panel links use the shared native hash navigation handler',()=>{
+ const source=readFileSync('app/components/WorkbenchShell.tsx','utf8');
+ for(const panel of ['featured','directory','timeline']) assert.ok(source.includes(`navigatePanel(event, "${panel}")`));
+ assert.ok(source.includes('navigatePanel(event, project.id)'));
+ assert.ok(source.includes('event.preventDefault();\n      openWorkbenchPanel(panel);'));
+});
