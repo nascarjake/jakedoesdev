@@ -61,6 +61,8 @@ export type Experience = {
   stack?: string;
 };
 
+// Product years below match the List of Production Products in Jake’s November 2026 résumé.
+// They are product years, not employment start/end dates.
 // This is the single source of truth for the project universe and directory.
 // Screenshots, video, URLs, and richer case studies can be added per record later.
 export const projects: Project[] = [
@@ -72,7 +74,7 @@ export const projects: Project[] = [
     summary:
       "A configurable guided-conversation platform for banks and credit unions, helping teams match customers with relevant financial products across digital and in-branch journeys.",
     role: "Lead Backend Engineer",
-    year: "2020—Now",
+    year: "2023",
     stack: ["Node.js", "React", "AWS", "MongoDB"],
     signal: "DLG",
     accent: "acid",
@@ -99,7 +101,7 @@ export const projects: Project[] = [
     summary:
       "Web and desktop tools for creating conversational guides and data-collection forms with reviewable AI assistance during client onboarding.",
     role: "Lead Backend Engineer",
-    year: "Current",
+    year: "2024",
     stack: ["OpenAI", "Node.js", "React", "Electron"],
     signal: "AIX",
     accent: "amber",
@@ -125,7 +127,7 @@ export const projects: Project[] = [
     summary:
       "A no-code trading automation platform for turning market-data inputs and webhooks into configurable strategy rules, dashboards, and AI-assisted workflows.",
     role: "Founder · Product Engineer",
-    year: "2021—Now",
+    year: "2021",
     stack: ["TypeScript", "Angular", "GCP", "Firebase"],
     signal: "TDL",
     accent: "ice",
@@ -151,7 +153,7 @@ export const projects: Project[] = [
     summary:
       "A cross-platform desktop product that automated recurring creator workflows across Twitch, Facebook, Twitter, and YouTube.",
     role: "Founder · Product Engineer",
-    year: "2018—2021",
+    year: "2018",
     stack: ["Electron", "Angular", "Express", "MongoDB"],
     signal: "STR",
     accent: "acid",
@@ -176,7 +178,7 @@ export const projects: Project[] = [
     summary:
       "An enterprise digital-document platform with a drag-and-drop builder, admin portal, mobile execution, reporting, PDF output, and an integration SDK.",
     role: "Product Lead · Lead Engineer",
-    year: "2013—2020",
+    year: "2015",
     stack: ["Angular", "Node.js", "MongoDB", "Ionic"],
     signal: "EZF",
     accent: "amber",
@@ -203,7 +205,7 @@ export const projects: Project[] = [
     summary:
       "An eight-tool suite for live editing of game assets, particles, UI, atlases, terrain, and character animation against an in-house C++ engine.",
     role: "Lead of Tool Development",
-    year: "2015—2017",
+    year: "2016",
     stack: ["Electron", "WebGL", "Angular", "C++"],
     signal: "ETN",
     accent: "ice",
@@ -229,7 +231,7 @@ export const projects: Project[] = [
     summary:
       "A production application for Baylor Medical Center that correlated 2D biopsy scans with a 3D biopsy model and reconstructed outlined tumor tissue in context.",
     role: "Creative Technologist",
-    year: "Production archive",
+    year: "2011",
     stack: ["TensorFlow.js", "WebGL", "Node.js"],
     signal: "TMR",
     accent: "acid",
@@ -255,7 +257,7 @@ export const projects: Project[] = [
     summary:
       "A healthcare workflow that moved EHR data into imaging-center orders for X-rays and CAT scans, reducing manual re-entry between disconnected systems.",
     role: "Lead Engineer",
-    year: "Product archive",
+    year: "2014",
     stack: ["Angular", "Node.js", "Kotlin", "OCR"],
     signal: "ZIP",
     accent: "amber",
@@ -282,7 +284,7 @@ export const projects: Project[] = [
     summary:
       "Native iOS and Android travel-organizer apps for itineraries and reward programs, with an Android Wear companion for upcoming appointments.",
     role: "Mobile Engineer",
-    year: "Mobile archive",
+    year: "2013",
     stack: ["Kotlin", "Java", "iOS", "Android Wear"],
     signal: "TRX",
     accent: "ice",
@@ -309,7 +311,7 @@ export const projects: Project[] = [
     summary:
       "A hybrid mobile app for Boy Scouts of America popcorn fundraisers to schedule sales events and take card payments in the field.",
     role: "Mobile Product Engineer",
-    year: "Mobile archive",
+    year: "2017",
     stack: ["Ionic", "Kotlin", "Stripe", "Google Maps"],
     signal: "BSA",
     accent: "acid",
@@ -335,7 +337,7 @@ export const projects: Project[] = [
     summary:
       "A cross-platform field-service POS for repair professionals to manage customers and equipment, create orders, and take payment on site.",
     role: "Mobile Engineer",
-    year: "Mobile archive",
+    year: "2014",
     stack: ["PhoneGap", "Cordova", "Kendo UI"],
     signal: "POS",
     accent: "amber",
@@ -360,7 +362,7 @@ export const projects: Project[] = [
     summary:
       "An Android tablet ordering system that let restaurant staff take orders tableside and route them directly to kitchen printers within the existing POS suite.",
     role: "Lead Developer",
-    year: "2011—2012",
+    year: "2012",
     stack: ["Android", "MSSQL", "POS"],
     signal: "FDP",
     accent: "ice",
@@ -387,7 +389,7 @@ export const projects: Project[] = [
     summary:
       "A Windows smooth-voxel sandbox game created with the Nerd Kingdom team, backed by TypeScript scripting and a custom production toolchain.",
     role: "Tools Lead · Engineer",
-    year: "2015—2017",
+    year: "2015",
     stack: ["TypeScript", "C++", "Game Tools"],
     signal: "TUG",
     accent: "acid",
@@ -413,7 +415,7 @@ export const projects: Project[] = [
     summary:
       "A Go-inspired number strategy puzzle with challenge modes and custom-written AI, prototyped natively and rebuilt for production.",
     role: "Game Designer · Engineer",
-    year: "Game archive",
+    year: "2014",
     stack: ["Ionic", "Angular", "Android"],
     signal: "DAH",
     accent: "amber",
@@ -438,7 +440,7 @@ export const projects: Project[] = [
     summary:
       "A Photoshop Cloud Edition plugin that sliced UI layers and programmatically turned them into the foundation of an iPhone application.",
     role: "Creative Developer",
-    year: "Tool archive",
+    year: "2013",
     stack: ["JavaScript", "Adobe Photoshop"],
     signal: "JMP",
     accent: "ice",
@@ -463,7 +465,7 @@ export const projects: Project[] = [
     summary:
       "A web product for discovering where a film or series could be streamed across fragmented media services.",
     role: "Product Engineer",
-    year: "Web archive",
+    year: "2013",
     stack: ["HTML5", "CSS3", "JavaScript", "Bootstrap"],
     signal: "HUB",
     accent: "acid",
@@ -487,7 +489,7 @@ export const projects: Project[] = [
     summary:
       "A native Android application for a Texas auto-leasing business, built in Java and released through the app store.",
     role: "Android Engineer",
-    year: "Mobile archive",
+    year: "2013",
     stack: ["Java", "Android Studio"],
     signal: "DMA",
     accent: "amber",
