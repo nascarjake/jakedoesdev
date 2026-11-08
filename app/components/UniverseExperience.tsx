@@ -162,7 +162,7 @@ export function UniverseExperience() {
         <section className={styles.featured}>
           <header><p className="eyebrow">SELECTED WORK</p><h1>Featured products</h1></header>
           <div className={styles.featuredGrid}>{featuredProjectIds.map((id) => catalog.find((p) => p.id === id)).filter((p): p is Project => !!p).map((project, i) => {
-            const image = project.media?.find((asset) => asset.kind === "image")?.url ?? projectMedia[project.id]?.shots[0]?.src;
+            const image = project.id === "straight-desk" ? projectMedia[project.id]?.shots[0]?.src : project.media?.find((asset) => asset.kind === "image")?.url ?? projectMedia[project.id]?.shots[0]?.src;
             const video = projectMedia[project.id]?.video;
             return <button key={project.id} onClick={() => select(project)} className={styles.featuredCard}>
               <div className={styles.cover}>{image ? <img src={image} alt="" loading="lazy" /> : video ? <img src={`https://i.ytimg.com/vi/${video}/hqdefault.jpg`} alt="" loading="lazy" /> : <span className={styles.signal}>{project.signal}</span>}<span className={styles.number}>0{i + 1}</span></div>
@@ -185,7 +185,7 @@ export function UniverseExperience() {
             <p>{selected.eyebrow}</p>
           </header>
           <div className="project-feature">
-            {selected.id === "tumor-identifier" ? <BiopsyDemo /> : selected.media?.length || projectMedia[selected.id] ? <ProjectMedia media={projectMedia[selected.id]} assets={selected.media} title={selected.title} /> : <ProjectIllustration project={selected} />}
+            {selected.id === "tumor-identifier" ? <BiopsyDemo /> : selected.media?.length || projectMedia[selected.id] ? <ProjectMedia media={projectMedia[selected.id]} assets={selected.id === "straight-desk" ? undefined : selected.media} title={selected.title} /> : <ProjectIllustration project={selected} />}
             {selected.id === "ezforms" && <EzformsClients />}
           </div>
           <div className="project-facts">

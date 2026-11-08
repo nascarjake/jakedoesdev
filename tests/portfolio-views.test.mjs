@@ -16,3 +16,10 @@ test('default portfolio exposes featured products and timeline without prompt le
  assert.ok(html.indexOf('Goose Games Arcade')>html.indexOf('production-directory'));
 });
 test('media reel has human-facing label',()=>assert.doesNotMatch(readFileSync('app/components/ProjectMedia.tsx','utf8'),/VIDEO FIRST/));
+
+test('Straight Desk uses six verified screenshots, excluding private calendar and call-list captures',async()=>{
+ const {projectMedia}=await import('../app/data/project-media.ts');
+ assert.equal(projectMedia['straight-desk'].shots.length,6);
+ for(const shot of projectMedia['straight-desk'].shots){assert.ok(shot.src.startsWith('/projects/straight-desk/'));assert.ok(shot.caption.length>8);assert.ok(readFileSync('out'+shot.src).length>0);}
+ const source=readFileSync('app/components/UniverseExperience.tsx','utf8');assert.match(source,/selected.id === "straight-desk" \? undefined : selected.media/);
+});

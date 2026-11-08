@@ -11,6 +11,11 @@ export const projectMedia: Record<string, ProjectMediaEntry> = {
     shots: [shot('clip-my-screen/library', 'Clip My Screen — searchable local library with illustrative demo captures'), shot('clip-my-screen/dashboard', 'Capture dashboard with recording explicitly paused'), shot('clip-my-screen/settings', 'Replay, display, audio, and sharing settings')],
     note: 'Actual app interface rendered with demo fixtures. No personal recordings or desktop capture were used for these screenshots.',
   },
+  'straight-desk': {
+    shots: [shot('straight-desk/straightdesk-office', 'Straight Desk — AI agent office'), shot('straight-desk/straightdesk-call-preview', 'Maya live call preview'), shot('straight-desk/straightdesk-call-details', 'Roof-inspection demo: conversation and agent actions'), shot('straight-desk/straightdesk-onboarding', 'June guided onboarding'), shot('straight-desk/straightdesk-home', 'Straight Desk public homepage'), shot('straight-desk/straightdesk-use-cases', 'Home-services request workflow')],
+    note: 'Product screenshots supplied by Jake Clark. Call examples illustrate a roof-inspection workflow.',
+    website: 'https://straightdesk.com',
+  },
   luminary: {
     shots: [], video: 'LyOMJq47ASQ', website: 'https://github.com/nascarjake/luminary',
     note: 'Original Luminary walkthrough by JakeDoesDev, documenting the project at the time of recording.',

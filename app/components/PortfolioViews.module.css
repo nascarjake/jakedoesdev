@@ -12,3 +12,5 @@
 @media(max-width:1100px){.featuredGrid{grid-template-columns:1fr}.featuredCard{display:grid;grid-template-columns:35% 1fr}.cover{height:100%;min-height:210px}.eraProducts{grid-template-columns:1fr}}
 @media(max-width:600px){.featured,.timeline{padding:25px 18px 40px}.featuredCard{display:flex}.cover{height:180px;min-height:0}.cardCopy{padding:20px}.era{grid-template-columns:1fr;gap:10px}.eraContent{margin-left:7px;padding-left:18px}.year{font-size:24px}.career,.timelineProduct{padding:18px}.timelineControls{align-items:stretch;gap:18px}.timelineControls nav{gap:16px}.browseLinks{flex-direction:column;gap:20px}}
 @media(prefers-reduced-motion:reduce){.featuredCard{transition:none}.featuredCard:hover{transform:none}}
+
+.timelineTrack{margin-top:34px}
