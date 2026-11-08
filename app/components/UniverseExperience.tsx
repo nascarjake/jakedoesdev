@@ -159,8 +159,15 @@ export function UniverseExperience() {
         </div>
       </WorkspaceToolbar>
       {view === "timeline" ? <PortfolioTimeline catalog={catalog} onSelect={select} /> : view === "featured" ? (
-        <section className={styles.featured}>
-          <header><p className="eyebrow">SELECTED WORK</p><h1>Featured products</h1></header>
+        <section className={styles.featured} data-featured-view>
+          <header className={styles.featuredHeading}>
+            <h1>Featured products</h1>
+            <button className={styles.baylorMilestone} onClick={() => openWorkbenchPanel('tumor-identifier')} aria-label="Explore Tumor Identifier, used at Baylor Medical Center in 2011 during my college internship">
+              <span className={styles.milestoneYear}>2011</span>
+              <span><strong>Baylor Medical Center</strong><small>Tumor Identifier · College internship</small></span>
+              <span aria-hidden="true">↗</span>
+            </button>
+          </header>
           <div className={styles.featuredGrid}>{featuredProjectIds.map((id) => catalog.find((p) => p.id === id)).filter((p): p is Project => !!p).map((project, i) => {
             const image = project.id === "straight-desk" ? projectMedia[project.id]?.shots[0]?.src : project.media?.find((asset) => asset.kind === "image")?.url ?? projectMedia[project.id]?.shots[0]?.src;
             const video = projectMedia[project.id]?.video;
@@ -184,6 +191,7 @@ export function UniverseExperience() {
               <span>.</span>
             </h1>
             <p>{selected.eyebrow}</p>
+            {selected.id === "tumor-identifier" && <p className={styles.clinicalContext}>Used at Baylor Medical Center in 2011 · Built during my college internship.</p>}
           </header>
           <div className="project-feature">
             {selected.id === "tumor-identifier" ? <BiopsyDemo /> : selected.media?.length || projectMedia[selected.id] ? <ProjectMedia media={projectMedia[selected.id]} assets={selected.id === "straight-desk" ? undefined : selected.media} title={selected.title} /> : <ProjectIllustration project={selected} />}
@@ -345,12 +353,12 @@ export function UniverseExperience() {
           )}
         </section>
       )}
-      <div className="project-contact-strip">
+      {view !== "featured" && <div className="project-contact-strip">
         <span>Have a wonderfully difficult problem?</span>
         <Link href="/resume">
           Get to know the builder <Icon name="arrow" size={16} />
         </Link>
-      </div>
+      </div>}
     </WorkbenchShell>
   );
 }

@@ -31,3 +31,11 @@ test('all sidebar panel links use the shared native hash navigation handler',()=
  assert.ok(source.includes('navigatePanel(event, project.id)'));
  assert.ok(source.includes('event.preventDefault();\n      openWorkbenchPanel(panel);'));
 });
+
+test('Baylor milestone is prominent without changing the three featured products',()=>{
+ const source=readFileSync('app/components/UniverseExperience.tsx','utf8');
+ assert.match(source,/Baylor Medical Center/);assert.match(source,/Tumor Identifier · College internship/);
+ assert.match(source,/openWorkbenchPanel\('tumor-identifier'\)/);
+ assert.deepEqual(featuredProjectIds,['straight-desk','ignite-ai','luminary']);
+ const css=readFileSync('app/components/PortfolioViews.module.css','utf8');assert.match(css,/\.baylorMilestone:focus-visible/);
+});
