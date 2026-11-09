@@ -245,7 +245,7 @@ export const projects: Project[] = [
     title: "Tumor Identifier",
     eyebrow: "Baylor Medical Center · College internship",
     summary:
-      "Built during my college internship and used at Baylor Medical Center in 2011. The application correlated 2D biopsy scans with a 3D biopsy model and reconstructed outlined tumor tissue in context.",
+      "Built during my college internship and used at Baylor Medical Center in 2011. It used AI-assisted medical image segmentation to outline tumor regions, then correlated 2D biopsy scans with a 3D biopsy model to reconstruct the outlined tissue in context.",
     role: "College intern · Medical imaging development",
     year: "2011",
     stack: ["WebGL", "Node.js", "JavaScript"],
@@ -253,8 +253,9 @@ export const projects: Project[] = [
     accent: "acid",
     category: "AI + Automation",
     status: "Production application",
-    storyHtml: "<p>I built Tumor Identifier during my college internship. It was used at Baylor Medical Center in 2011, and remains one of the projects I am proudest of: applying software to work that matters to patients.</p>",
+    storyHtml: "<p>I built Tumor Identifier during my college internship. It was used at Baylor Medical Center in 2011, and remains one of the projects I am proudest of: applying software to work that matters to patients.</p><p>The image-processing workflow used AI-assisted segmentation to delineate tumor boundaries in the scans, then mapped the outlined regions into a 3D representation.</p>",
     highlights: [
+      "Used AI-assisted medical image segmentation to outline tumor regions in biopsy scans.",
       "Aligned marked regions from 2D scans with a three-dimensional biopsy model.",
       "Generated an outlined 3D representation of identified tumor tissue.",
       "Used WebGL and browser tooling to make the scan-to-model relationship explorable.",
@@ -262,7 +263,7 @@ export const projects: Project[] = [
     dossier: {
       scope: "A production medical imaging application for aligning 2D biopsy scans with a three-dimensional biopsy model and reconstructing marked regions in context.",
       ownership: ["Worked with 3D and 2D biopsy scan inputs in the application workflow.", "Mapped outlined regions across scan slices into a reconstructed 3D representation.", "Built an explorable browser visualization to communicate the scan-to-model process."],
-      systems: ["WebGL, Node.js, and custom browser JavaScript", "2D/3D scan alignment, contours, and reconstruction"],
+      systems: ["WebGL, Node.js, and custom browser JavaScript", "AI-assisted medical image segmentation and tumor-boundary delineation", "2D/3D scan alignment, contours, and reconstruction"],
       note: "The interactive demo on this site uses synthetic geometry only. It is separate from the production application and is not a diagnostic tool or clinical advice.",
     },
   },
