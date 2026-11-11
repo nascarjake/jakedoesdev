@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { projects, type Project } from "../data/portfolio";
 import { projectMedia } from "../data/project-media";
-import { defaultLabFilters, filterLabProjects, getLabDiscovery, isLabRelease, labNeeds, labSkills, readLabFilters, writeLabFilters, type LabFilters } from "../data/lab-discovery";
+import { defaultLabFilters, isLabProject, filterLabProjects, getLabDiscovery, isLabRelease, labNeeds, labSkills, readLabFilters, writeLabFilters, type LabFilters } from "../data/lab-discovery";
 import { LabPreview } from "./LabPreview";
 import { ProjectMedia } from "./ProjectMedia";
 import { WorkbenchHeader } from "./WorkbenchHeader";
@@ -12,8 +12,8 @@ import { Icon, type IconName } from "./WorkbenchIcons";
 import styles from "./LabExperience.module.css";
 
 const byLabOrder = (a: Project, b: Project) => Number(isLabRelease(b)) - Number(isLabRelease(a)) || (a.sortOrder ?? Number.MAX_SAFE_INTEGER) - (b.sortOrder ?? Number.MAX_SAFE_INTEGER);
-const initialExperiments = projects.filter((project) => project.mode === "lab").sort(byLabOrder);
-const needIcons: IconName[] = ["folder", "sound", "game", "grid"];
+const initialExperiments = projects.filter(isLabProject).sort(byLabOrder);
+const needIcons: IconName[] = ["folder", "sound", "game", "code", "grid"];
 
 export function LabExperience() {
   const [experiments, setExperiments] = useState<Project[]>(initialExperiments);
@@ -31,7 +31,7 @@ export function LabExperience() {
         return await response.json() as { projects?: Project[] };
       })
       .then((payload) => {
-        if (Array.isArray(payload.projects)) setExperiments(payload.projects.filter((project) => project.mode === "lab").sort(byLabOrder));
+        if (Array.isArray(payload.projects)) setExperiments(payload.projects.filter(isLabProject).sort(byLabOrder));
       })
       .catch(() => undefined);
     return () => controller.abort();
@@ -144,8 +144,13 @@ export function LabExperience() {
         <div className={styles.detailToolbar}><span>THE LAB / {active.signal}</span><button type="button" onClick={closeDetails} aria-label="Close experiment details"><Icon name="close" size={18} /></button></div>
         <div className={styles.detailPreview} key={active.id}>{hasMedia ? <ProjectMedia media={media} assets={active.media} title={active.title} /> : <LabPreview project={active} />}</div>
         <div className={styles.detailCopy}><span className={styles.status} data-release={isLabRelease(active)}><i />{active.status}</span><h2 id="lab-tool-title">{active.title}</h2><p>{active.summary}</p>
-          {active.dossier.source && <a className={styles.primaryAction} href={active.dossier.source.url}>{active.dossier.source.label}<Icon name="external" size={15} /></a>}
+          <div className={styles.detailActions}>
+          {active.id === "luminary" && <Link className={styles.primaryAction} href="/luminary/">Watch the Luminary walkthrough<Icon name="arrow" size={15} /></Link>}
+          {active.id === "luminary" && <a className={styles.primaryAction} href="https://github.com/nascarjake/luminary">Get started on GitHub<Icon name="external" size={15} /></a>}
+          {active.id !== "luminary" && active.dossier.source && <a className={styles.primaryAction} href={active.dossier.source.url}>{active.dossier.source.label}<Icon name="external" size={15} /></a>}
+          </div>
           <section><h3>Put it to use</h3><ul>{getLabDiscovery(active).uses.map((item) => <li key={item}>{item}</li>)}</ul></section>
+          {active.storyHtml && <div className="project-rich-story" dangerouslySetInnerHTML={{ __html: active.storyHtml }} />}
           <section><h3>Inside the experiment</h3><ul>{active.highlights.map((item) => <li key={item}>{item}</li>)}</ul></section>
           {active.dossier.note && <p className={styles.note}>{active.dossier.note}</p>}
           <details className={styles.buildNotes}><summary>Under the hood</summary><p>{active.dossier.scope || active.eyebrow}</p><ul>{active.dossier.ownership.map((item) => <li key={item}>{item}</li>)}</ul><div className={styles.stack}>{active.stack.map((item) => <span key={item}>{item}</span>)}</div></details>

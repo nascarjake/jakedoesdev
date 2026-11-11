@@ -1,14 +1,20 @@
 import type { Project } from "./portfolio";
 
+export function isLabProject(project: Project): boolean {
+  return project.mode === "lab" || project.id === "luminary";
+}
+
 // Visitor-facing needs and skills are independent of the portfolio's technical categories.
 export const labNeeds = [
   { id: "capture-explain", label: "Capture & explain", description: "Keep a screen moment. Make an idea easier to share.", symbol: "↙" },
   { id: "audio-music", label: "Create audio & music", description: "Turn notes into voices and recordings into music code.", symbol: "≈" },
   { id: "live-show", label: "Run a live show", description: "Explore requests, DJ voice links, and show programming.", symbol: "◉" },
+  { id: "ai-workflows", label: "Build AI workflows", description: "Connect assistants, data, and custom functions.", symbol: "◇" },
   { id: "everyday-planning", label: "Plan everyday life", description: "Bring household calendars and lists into one place.", symbol: "✳" },
 ] as const;
 
 export const labSkills = [
+  { id: "agent-workflows", label: "Agent workflows" },
   { id: "screen-replay", label: "Screen replay" },
   { id: "voice-generation", label: "Voice generation" },
   { id: "script-writing", label: "Script writing" },
@@ -25,6 +31,12 @@ export const defaultLabFilters: LabFilters = { query: "", need: "all", skill: "a
 
 type Discovery = { outcome: string; needs: LabNeed[]; skills: LabSkill[]; uses: string[]; flow: [string, string] };
 const discovery: Record<string, Discovery> = {
+  "luminary": {
+    outcome: "Build and inspect multi-agent workflows.",
+    needs: ["ai-workflows"], skills: ["agent-workflows"],
+    uses: ["Connect specialized assistants in a visual graph.", "Define schemas and custom functions for a reusable pipeline."],
+    flow: ["Assistants & schemas", "A connected workflow"],
+  },
   "clip-my-screen": {
     outcome: "Save the moment after it happens.",
     needs: ["capture-explain"], skills: ["screen-replay"],

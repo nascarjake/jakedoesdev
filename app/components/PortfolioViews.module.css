@@ -1,0 +1,56 @@
+.featured,.timeline{padding:48px clamp(20px,4vw,64px) 64px;max-width:1500px;margin:auto}
+.featured h1,.timeline h1{font-size:clamp(32px,3.5vw,52px);line-height:1.08;letter-spacing:-.045em;margin:12px 0 30px}
+.featuredGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.featuredCard{text-align:left;background:#fff;border:1px solid #d8d9d2;border-radius:8px;overflow:hidden;cursor:pointer;color:#20251f;transition:transform .18s,box-shadow .18s;padding:0;display:flex;flex-direction:column}
+.featuredCard:hover{transform:translateY(-4px);box-shadow:0 12px 26px #18302412}.featuredCard:focus-visible{outline:3px solid #638a25;outline-offset:4px}
+.cover{height:200px;position:relative;background:linear-gradient(135deg,#192b2a,#405a54);overflow:hidden;display:grid;place-items:center}.cover img{width:100%;height:100%;object-fit:cover;object-position:top}.signal{color:#e0edb4;font-size:48px;letter-spacing:.08em;font-weight:700}.number{position:absolute;left:14px;top:14px;border-radius:4px;background:#fffdf2;color:#273229;padding:5px 9px;font:11px monospace}
+.cardCopy{padding:23px;display:flex;flex-direction:column;flex:1}.cardCopy h2{font-size:25px;letter-spacing:-.025em;margin:10px 0 12px;display:flex;justify-content:space-between;gap:8px}.cardCopy>p:not(:first-child){font-size:14px;line-height:1.65;color:#596158;margin:0 0 24px}.readMore{margin-top:auto;font-size:13px;font-weight:700}.browseLinks{display:flex;gap:28px;flex-wrap:wrap;padding:30px 0}.browseLinks a,.browseLinks button{font:inherit;font-size:14px;font-weight:600;color:#354434;background:none;border:0;padding:0;cursor:pointer}
+.timeline header>p:not(:first-child){color:#596158}.timeline header>a{display:inline-block;margin:10px 0 25px;font-size:14px}
+.timelineControls{display:flex;gap:20px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:16px 0;border-top:1px solid #d5d8cd;border-bottom:1px solid #d5d8cd;margin-bottom:35px}.timelineControls button{padding:9px 13px;background:transparent;border:1px solid #cdd2c5;font-size:12px;cursor:pointer}.timelineControls button[aria-pressed=true]{background:#26392e;color:white}.timelineControls nav{display:flex;gap:14px;flex-wrap:wrap}.timelineControls a{font:12px monospace;color:#56634e;text-decoration:underline;text-underline-offset:4px}
+.era{display:grid;grid-template-columns:75px minmax(0,1fr);gap:26px;scroll-margin-top:20px}.year{font:700 20px monospace;color:#566b3f;padding-top:15px}.eraContent{border-left:2px solid #cbd4be;padding:0 0 48px 30px;position:relative}.eraContent:before{content:"";width:13px;height:13px;background:#95ad60;border:4px solid #f4f4eb;border-radius:50%;position:absolute;left:-8px;top:18px}.career{background:#e8ecdf;border:1px solid #d2dac4;padding:22px 26px;margin-bottom:18px;border-radius:7px}.career>span{font:10px monospace;letter-spacing:.08em;color:#5b6a4d}.career h2{font-size:25px;margin:9px 0}.career strong{font-size:13px}.career p{font-size:14px;line-height:1.6;color:#53604d}.career a{font-size:12px;font-weight:700}
+.eraProducts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.timelineProduct{background:white;border:1px solid #d8dcd2;padding:22px;border-radius:7px;min-width:0}.timelineMeta{display:flex;justify-content:space-between;gap:12px;color:#677260;font-size:10px;text-transform:uppercase;letter-spacing:.04em}.productLink{display:flex;justify-content:space-between;gap:12px;align-items:center;width:100%;background:none;border:0;text-align:left;padding:0;cursor:pointer;color:#273326}.productLink h3{font-size:22px;letter-spacing:-.025em;margin:14px 0}.timelineProduct p,.timelineProduct li{font-size:13px;line-height:1.65;color:#5b6357}.timelineProduct details{border-top:1px solid #e2e5db;margin-top:18px;padding-top:15px}.timelineProduct summary{cursor:pointer;font-size:12px;font-weight:600}.timelineProduct small{display:block;font-size:11px;color:#6d7469;line-height:1.5}.timelineProduct ul{padding-left:18px}.timelineProduct footer{margin-top:18px;display:flex;gap:12px;flex-wrap:wrap;align-items:center;font-size:11px}.status{background:#f0f3e9;padding:5px 8px;border-radius:4px;color:#536445}.archive{border-top:1px solid #d5d8cd;padding-top:30px}.archive>p{font-size:13px;color:#67705f;line-height:1.6;margin-bottom:25px}
+@media(max-width:1100px){.featuredGrid{grid-template-columns:1fr}.featuredCard{display:grid;grid-template-columns:35% 1fr}.cover{height:100%;min-height:210px}.eraProducts{grid-template-columns:1fr}}
+@media(max-width:600px){.featured,.timeline{padding:25px 18px 40px}.featuredCard{display:flex}.cover{height:180px;min-height:0}.cardCopy{padding:20px}.era{grid-template-columns:1fr;gap:10px}.eraContent{margin-left:7px;padding-left:18px}.year{font-size:24px}.career,.timelineProduct{padding:18px}.timelineControls{align-items:stretch;gap:18px}.timelineControls nav{gap:16px}.browseLinks{flex-direction:column;gap:20px}}
+@media(prefers-reduced-motion:reduce){.featuredCard{transition:none}.featuredCard:hover{transform:none}}
+
+.timelineTrack{margin-top:34px}
+
+/* The Baylor milestone is a compact header link, not a fourth featured product. */
+.featured{padding:28px clamp(18px,3vw,48px) 20px}
+.featuredHeading{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:24px}
+.featuredHeading h1{font-size:clamp(26px,3vw,42px);margin:0}
+.baylorMilestone{display:flex;align-items:center;gap:12px;flex-shrink:0;max-width:100%;text-align:left;border:0;border-left:2px solid #a09a83;padding:8px 0 8px 16px;background:none;color:#313e31;cursor:pointer}
+.baylorMilestone:hover strong{text-decoration:underline;text-underline-offset:4px}
+.baylorMilestone:focus-visible{outline:3px solid #638a25;outline-offset:4px}
+.baylorMilestone strong{display:block;font-size:13px;line-height:1.4}
+.baylorMilestone small{display:block;font-size:11px;color:#65695f;line-height:1.5}
+.milestoneYear{font:12px var(--mono);color:#766a53}
+.clinicalContext{font-size:15px!important;font-weight:600;color:#42583b!important;border-left:3px solid #8b9d67;padding-left:14px;margin-top:18px!important}
+.featured .cover{height:clamp(120px,20vh,185px);min-height:0}
+.featured .cardCopy{padding:18px}
+.featured .cardCopy>p:not(:first-child){font-size:13px;line-height:1.5;margin-bottom:18px}
+.featured .browseLinks{padding:20px 0 0;gap:20px}
+@media(max-width:1300px){.featuredHeading{align-items:flex-start;gap:16px}.baylorMilestone{gap:8px;padding-left:10px}.milestoneYear{display:none}}
+@media(max-width:1100px){.featuredHeading{flex-wrap:wrap}.featuredHeading h1{font-size:30px}.baylorMilestone{padding:0 0 0 10px}.featuredGrid{gap:12px}.featured .featuredCard{grid-template-columns:26% 1fr}.featured .cover{height:100%;min-height:100px}.featured .cardCopy{padding:13px 16px}.featured .cardCopy h2{font-size:22px;margin:5px 0 7px}.featured .cardCopy>p:not(:first-child){margin-bottom:7px}.featured .readMore{font-size:11px}}
+@media(max-width:600px){.featured{padding:14px 14px 16px}.featuredHeading{display:block;margin-bottom:14px}.featuredHeading h1{font-size:25px;margin:0 0 10px}.baylorMilestone{padding:0 0 0 10px}.baylorMilestone strong{font-size:12px}.baylorMilestone small{font-size:10px}.milestoneYear{display:block;font-size:11px}.featuredGrid{gap:10px}.featured .featuredCard{display:grid;grid-template-columns:25% 1fr;min-height:84px}.featured .cover{height:100%;min-height:0}.featured .number{display:none}.featured .cardCopy{padding:10px 12px}.featured .cardCopy h2{font-size:19px;margin:3px 0}.featured .cardCopy .eyebrow{font-size:8px;letter-spacing:.4px}.featured .cardCopy>p:not(:first-child){display:none}.featured .readMore{font-size:10px;margin-top:2px}.featured .browseLinks{flex-direction:row;gap:12px 18px;padding-top:14px}.featured .browseLinks a,.featured .browseLinks button{font-size:11px}}
+@media(max-height:650px) and (min-width:1101px){.featured{padding-top:20px}.featuredHeading{margin-bottom:16px}.featured .cover{height:100px}.featured .cardCopy{padding:14px}.featured .cardCopy h2{font-size:22px}.featured .cardCopy>p:not(:first-child){font-size:12px;margin-bottom:10px}.featured .browseLinks{padding-top:14px}}
+
+:global(.workbench-app):has(.featured) :global(.directory-sidebar){max-height:calc(100dvh - 205px)}
+@media(max-width:1100px) and (min-width:621px){.featuredHeading{margin-bottom:16px}.featured .cover{min-height:95px}.featured .cardCopy>p:not(:first-child){display:none}.featured .cardCopy h2{margin:5px 0 8px}}
+@media(max-width:620px){
+ :global(.workbench-app):has(.featured) :global(.intro-strip){display:none}
+ :global(.workbench-app):has(.featured) :global(.site-header){min-height:80px;padding-top:10px}
+ :global(.workbench-app):has(.featured) :global(.top-nav){margin-top:5px;padding-inline:4px}
+ :global(.workbench-app):has(.featured) :global(.top-nav a){padding:9px 0 10px}
+ :global(.workbench-app):has(.featured) :global(.mobile-directory-toggle){margin-top:8px;padding:9px 12px}
+ :global(.workbench-app):has(.featured) :global(.status-bar){padding-block:10px;min-height:0}
+ .featuredHeading{margin-bottom:10px}.featured{padding:12px}.featured .featuredCard{min-height:72px}.featured .cardCopy{padding:7px 10px}.featured .cardCopy h2{font-size:18px}.featured .browseLinks{gap:9px 14px;padding-top:12px}.featured .browseLinks a:last-child{display:none}
+}
+@media(max-height:800px) and (min-width:1101px){.featured .cover{height:110px}.featuredHeading{margin-bottom:18px}}
+@media(max-width:620px) and (max-height:620px){
+ .featured{padding:9px 12px}.featuredHeading h1{font-size:22px;margin-bottom:6px}.featuredHeading{margin-bottom:9px}.featuredGrid{gap:7px}.featured .featuredCard{min-height:60px}.featured .cardCopy{padding:5px 9px}.featured .cardCopy h2{font-size:17px;margin:2px 0}.featured .readMore{font-size:9px}.featured .browseLinks{padding-top:9px;gap:8px}
+ :global(.workbench-app):has(.featured) :global(.site-header){padding-top:6px;min-height:72px}
+ :global(.workbench-app):has(.featured) :global(.workspace-toolbar){padding-block:7px;min-height:42px}
+ :global(.workbench-app):has(.featured) :global(.mobile-directory-toggle){padding-block:7px;margin-top:5px}
+ :global(.workbench-app):has(.featured) :global(.status-bar){padding-block:7px}
+}

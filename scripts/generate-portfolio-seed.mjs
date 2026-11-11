@@ -26,7 +26,7 @@ for (const [sortOrder, project] of portfolio.projects.entries()) {
     project.title,
     project.eyebrow,
     project.summary,
-    "",
+    project.storyHtml ?? "",
     project.role,
     project.year,
     JSON.stringify(project.stack),

@@ -6,7 +6,10 @@ import os from "node:os";
 import path from "node:path";
 import { PROFILE, ROOT, EXPECTED_ACCOUNT_ID, verifyCloudflareAccount } from "./verify-cloudflare-account.mjs";
 
+import { verifyPublicSurface } from "./verify-public-surface.mjs";
+
 try {
+  verifyPublicSurface();
   await verifyCloudflareAccount({ checkZone: true });
   console.log("Verified personal Cloudflare account; building the Worker.");
   const wranglerEnv = { ...process.env };
