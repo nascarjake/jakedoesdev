@@ -1084,6 +1084,9 @@ export async function handleProjectMedia(request: Request, env: Env): Promise<Re
   const url = new URL(request.url);
   const key = decodeURIComponent(url.pathname.slice("/api/media/".length));
   if (!key.startsWith("projects/") || key.includes("..")) return error("Media not found.", 404);
+  const cacheControl = /^projects\/releases\/[a-z0-9-]+\/latest\.json$/.test(key)
+    ? "no-cache, max-age=0, must-revalidate"
+    : "public, max-age=31536000, immutable";
   if (request.method === "HEAD") {
     const metadata = await env.PROJECT_MEDIA.head(key);
     if (!metadata) return error("Media not found.", 404);
@@ -1091,7 +1094,7 @@ export async function handleProjectMedia(request: Request, env: Env): Promise<Re
     metadata.writeHttpMetadata(headers);
     headers.set("etag", metadata.httpEtag);
     headers.set("accept-ranges", "bytes");
-    headers.set("cache-control", "public, max-age=31536000, immutable");
+    headers.set("cache-control", cacheControl);
     headers.set("x-content-type-options", "nosniff");
     headers.set("content-length", String(metadata.size));
     return new Response(null, { headers });
@@ -1104,7 +1107,7 @@ export async function handleProjectMedia(request: Request, env: Env): Promise<Re
   object.writeHttpMetadata(headers);
   headers.set("etag", object.httpEtag);
   headers.set("accept-ranges", "bytes");
-  headers.set("cache-control", "public, max-age=31536000, immutable");
+  headers.set("cache-control", cacheControl);
   headers.set("x-content-type-options", "nosniff");
   let status = 200;
   if (object.range && "offset" in object.range && typeof object.range.offset === "number" && typeof object.range.length === "number") {
