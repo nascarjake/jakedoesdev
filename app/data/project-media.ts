@@ -7,9 +7,28 @@ export type ProjectMediaEntry = {
 const shot = (path: string, caption: string) => ({ src: `/projects/${path}.webp`, caption });
 
 export const projectMedia: Record<string, ProjectMediaEntry> = {
+  'rack-ruin': {
+    shots: [
+      { src: '/arcade/screenshots/rack-ruin-1.webp', caption: 'Rack & Ruin title menu: Ruin Run and Classic Pool' },
+      { src: '/arcade/screenshots/rack-ruin-2.webp', caption: 'Green-felt table with an active pocket multiplier' },
+      { src: '/arcade/screenshots/rack-ruin-3.webp', caption: 'Blue-felt table with glowing modified balls' },
+    ],
+    video: 'https://youtu.be/Qb1iRTERCVA?t=1971',
+    website: 'https://nascarjake.github.io/rack-web/',
+    note: 'Existing arcade screenshots and the Rack & Ruin segment of the recorded showcase. The browser demo and desktop build have different feature sets.',
+  },
   'clip-my-screen': {
     shots: [shot('clip-my-screen/library', 'Clip My Screen — searchable local library with illustrative demo captures'), shot('clip-my-screen/dashboard', 'Capture dashboard with recording explicitly paused'), shot('clip-my-screen/settings', 'Replay, display, audio, and sharing settings')],
     note: 'Actual app interface rendered with demo fixtures. No personal recordings or desktop capture were used for these screenshots.',
+  },
+  'straight-desk': {
+    shots: [shot('straight-desk/straightdesk-office', 'Straight Desk — AI agent office'), shot('straight-desk/straightdesk-call-preview', 'Maya live call preview'), shot('straight-desk/straightdesk-call-details', 'Roof-inspection demo: conversation and agent actions'), shot('straight-desk/straightdesk-onboarding', 'June guided onboarding'), shot('straight-desk/straightdesk-home', 'Straight Desk public homepage'), shot('straight-desk/straightdesk-use-cases', 'Home-services request workflow')],
+    note: 'Product screenshots supplied by Jake Clark. Call examples illustrate a roof-inspection workflow.',
+    website: 'https://straightdesk.com',
+  },
+  luminary: {
+    shots: [shot('luminary/luminary-overview', 'Luminary — overview artwork supplied by JakeDoesDev')], video: 'LyOMJq47ASQ', website: 'https://github.com/nascarjake/luminary',
+    note: 'Original Luminary walkthrough by JakeDoesDev, documenting the project at the time of recording.',
   },
   'markdown-podcast-narrator': {
     shots: [shot('markdown-podcast-studio/studio', 'Markdown Podcast Studio — editable two-host episode with synthetic notes and local voice choices')],
@@ -18,6 +37,11 @@ export const projectMedia: Record<string, ProjectMediaEntry> = {
   'stream-dj': {
     shots: [shot('stream-dj/studio', 'Stream DJ — synthetic Harbor FM station, stopped and ready to plan'), shot('stream-dj/programming', 'Reusable programming blocks with synthetic show participants')],
     note: 'Real desktop interface with isolated synthetic station data. No personal media, live broadcast, recording, or paid AI generation.',
+  },
+  broadsheet: {
+    shots: [shot('broadsheet/broadsheet-preview', 'Broadsheet — spatial reading canvas with NASA stories')],
+    note: 'Actual Broadsheet interface supplied by Jake Clark.',
+    website: 'https://nascarjake.github.io/broadsheet/',
   },
   traxo: {
     shots: [shot('traxo/overview', 'Traxo mobile — archived product overview'), shot('traxo/itinerary', 'The itinerary view'), shot('traxo/flight', 'Flight details and travel alerts')],

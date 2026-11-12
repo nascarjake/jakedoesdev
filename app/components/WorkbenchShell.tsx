@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode, type MouseEvent } from "react";
 import { projects, type ProjectCategory } from "../data/portfolio";
 import { openWorkbenchPanel } from "../lib/workbench-navigation";
 import { Icon, type IconName } from "./WorkbenchIcons";
@@ -109,6 +109,16 @@ export function WorkbenchShell({
       .catch(() => undefined);
     return () => controller.abort();
   }, []);
+  function navigatePanel(event: MouseEvent<HTMLAnchorElement>, panel: string) {
+    setDirectoryOpen(false);
+    if (
+      pathname.replace(/\/$/, "") === "/universe" &&
+      !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey
+    ) {
+      event.preventDefault();
+      openWorkbenchPanel(panel);
+    }
+  }
   const filtered = catalog.filter((project) =>
     `${project.title} ${project.category} ${project.stack.join(" ")}`
       .toLowerCase()
@@ -177,21 +187,11 @@ export function WorkbenchShell({
             />
             <kbd>/</kbd>
           </label>
-          <Link
-            href="/arcade"
-            className={`arcade-directory-link ${section === "arcade" ? "selected" : ""}`}
-            aria-current={section === "arcade" ? "page" : undefined}
-            onClick={() => setDirectoryOpen(false)}
-          >
-            <span className="arcade-link-icon">
-              <Icon name="game" />
-            </span>
-            <span>
-              <strong>Goose Games Arcade</strong>
-              <small>A little more play.</small>
-            </span>
-            <Icon name="arrow" size={16} />
-          </Link>
+          <nav className="portfolio-directory-views" aria-label="Portfolio views">
+            <Link href="/universe#featured" onClick={(event) => navigatePanel(event, "featured")}>Featured products →</Link>
+            <Link href="/universe#directory" onClick={(event) => navigatePanel(event, "directory")}>All products & tools →</Link>
+            <Link href="/universe#timeline" onClick={(event) => navigatePanel(event, "timeline")}>Product & career timeline →</Link>
+          </nav>
           <section className="production-directory" aria-labelledby="production-directory-title">
             <div className="production-directory-heading">
               <h2 id="production-directory-title">Shipped production products</h2>
@@ -220,16 +220,7 @@ export function WorkbenchShell({
                           selectedProject === project.id ? "true" : undefined
                         }
                         key={project.id}
-                        onClick={(event) => {
-                          setDirectoryOpen(false);
-                          if (
-                            pathname.replace(/\/$/, "") === "/universe" &&
-                            !event.metaKey && !event.ctrlKey && !event.shiftKey && !event.altKey
-                          ) {
-                            event.preventDefault();
-                            openWorkbenchPanel(project.id);
-                          }
-                        }}
+                        onClick={(event) => navigatePanel(event, project.id)}
                       >
                         <span className={`project-dot dot-${project.accent}`} />
                         <span>{project.title}</span>
@@ -259,6 +250,21 @@ export function WorkbenchShell({
               </div>
               <p>Experiments and prototypes from the AI Lab.</p>
             </div>
+          </Link>
+          <Link
+            href="/arcade"
+            className={`arcade-directory-link ${section === "arcade" ? "selected" : ""}`}
+            aria-current={section === "arcade" ? "page" : undefined}
+            onClick={() => setDirectoryOpen(false)}
+          >
+            <span className="arcade-link-icon">
+              <Icon name="game" />
+            </span>
+            <span>
+              <strong>Goose Games Arcade</strong>
+              <small>A little more play.</small>
+            </span>
+            <Icon name="arrow" size={16} />
           </Link>
           <div className="sidebar-bottom">
             <Link href="/resume">

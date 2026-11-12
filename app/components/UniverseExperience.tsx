@@ -9,6 +9,9 @@ import { WorkbenchShell, WorkspaceToolbar } from "./WorkbenchShell";
 import dynamic from "next/dynamic";
 import { projectMedia } from "../data/project-media";
 import { ProjectMedia, EzformsClients } from "./ProjectMedia";
+import { PortfolioTimeline } from "./PortfolioTimeline";
+import { featuredProjectIds } from "../data/portfolio-views";
+import styles from "./PortfolioViews.module.css";
 
 const BiopsyDemo = dynamic(() => import("./BiopsyDemo"), { ssr: false, loading: () => <p>Preparing the synthetic biopsy walkthrough…</p> });
 
@@ -130,7 +133,7 @@ export function UniverseExperience() {
     getProjectHash,
     () => "",
   );
-  const view = catalog.some((project) => project.id === hash) ? "preview" : "directory";
+  const view = catalog.some((project) => project.id === hash) ? "preview" : hash === "directory" ? "directory" : hash === "timeline" ? "timeline" : "featured";
   function setView(next: "preview" | "directory") {
     openWorkbenchPanel(next === "directory" ? "directory" : selected.id);
   }
@@ -150,24 +153,34 @@ export function UniverseExperience() {
   }
   return (
     <WorkbenchShell section="projects" selectedProject={view === "preview" ? selected.id : undefined}>
-      <WorkspaceToolbar label="Project archive">
+      <WorkspaceToolbar label="Portfolio">
         <div className="view-switch" role="group" aria-label="Project view">
-          <button
-            aria-pressed={view === "preview"}
-            onClick={() => setView("preview")}
-          >
-            <Icon name="file" size={14} /> Preview
-          </button>
-          <button
-            aria-pressed={view === "directory"}
-            onClick={() => setView("directory")}
-          >
-            <Icon name="grid" size={14} /> All projects
-          </button>
+          {([['featured', 'Featured'], ['directory', 'All projects'], ['timeline', 'Timeline']] as const).map(([id, label]) => <button key={id} aria-pressed={view === id} onClick={() => openWorkbenchPanel(id)}>{label}</button>)}
         </div>
       </WorkspaceToolbar>
-      {view === "preview" ? (
+      {view === "timeline" ? <PortfolioTimeline catalog={catalog} onSelect={select} /> : view === "featured" ? (
+        <section className={styles.featured} data-featured-view>
+          <header className={styles.featuredHeading}>
+            <h1>Featured products</h1>
+            <button className={styles.baylorMilestone} onClick={() => openWorkbenchPanel('tumor-identifier')} aria-label="Explore Tumor Identifier, used at Baylor Medical Center in 2011 during my college internship">
+              <span className={styles.milestoneYear}>2011</span>
+              <span><strong>Baylor Medical Center</strong><small>Tumor Identifier · College internship</small></span>
+              <span aria-hidden="true">↗</span>
+            </button>
+          </header>
+          <div className={styles.featuredGrid}>{featuredProjectIds.map((id) => catalog.find((p) => p.id === id)).filter((p): p is Project => !!p).map((project, i) => {
+            const image = project.id === "straight-desk" ? projectMedia[project.id]?.shots[0]?.src : project.media?.find((asset) => asset.kind === "image")?.url ?? projectMedia[project.id]?.shots[0]?.src;
+            const video = projectMedia[project.id]?.video;
+            return <button key={project.id} onClick={() => select(project)} className={styles.featuredCard}>
+              <div className={styles.cover}>{image ? <img src={image} alt="" loading="lazy" /> : video ? <img src={`https://i.ytimg.com/vi/${video}/hqdefault.jpg`} alt="" loading="lazy" /> : <span className={styles.signal}>{project.signal}</span>}<span className={styles.number}>0{i + 1}</span></div>
+              <div className={styles.cardCopy}><p className="eyebrow">{project.category} · {project.year}</p><h2>{project.title} <span>↗</span></h2><p>{project.summary}</p><span className={styles.readMore}>View product</span></div>
+            </button>;
+          })}</div>
+          <div className={styles.browseLinks}><button onClick={() => openWorkbenchPanel('directory')}>All {catalog.length} products & tools →</button><button onClick={() => openWorkbenchPanel('timeline')}>Explore the timeline →</button><Link href="/resume">Career & résumé →</Link></div>
+        </section>
+      ) : view === "preview" ? (
         <article className="project-detail" key={selected.id}>
+          <div className="project-primary-column">
           <header className="detail-heading">
             <p className="eyebrow">
               {selected.year} <span className="eyebrow-divider">/</span>{" "}
@@ -178,11 +191,33 @@ export function UniverseExperience() {
               <span>.</span>
             </h1>
             <p>{selected.eyebrow}</p>
+            {selected.id === "tumor-identifier" && <p className={styles.clinicalContext}>Used at Baylor Medical Center in 2011 · Built during my college internship.</p>}
           </header>
           <div className="project-feature">
-            {selected.id === "tumor-identifier" ? <BiopsyDemo /> : selected.media?.length || projectMedia[selected.id] ? <ProjectMedia media={projectMedia[selected.id]} assets={selected.media} title={selected.title} /> : <ProjectIllustration project={selected} />}
+            {selected.id === "tumor-identifier" ? <BiopsyDemo /> : selected.media?.length || projectMedia[selected.id] ? <ProjectMedia media={projectMedia[selected.id]} assets={selected.id === "straight-desk" ? undefined : selected.media} title={selected.title} /> : <ProjectIllustration project={selected} />}
             {selected.id === "ezforms" && <EzformsClients />}
           </div>
+          <section className="project-story-copy">
+            <div>
+              <p className="eyebrow">THE SHORT VERSION</p>
+              <h2>
+                From idea to
+                <br />
+                something useful.
+              </h2>
+            </div>
+            <div>
+              <p className="project-summary">{selected.summary}</p>
+              {selected.storyHtml && <div className="project-rich-story" dangerouslySetInnerHTML={{ __html: selected.storyHtml }} />}
+              <ul>
+                {selected.highlights.map((highlight) => (
+                  <li key={highlight}>{highlight}</li>
+                ))}
+              </ul>
+            </div>
+          </section>
+          </div>
+          <div className="project-secondary-column">
           <div className="project-facts">
             <div>
               <span>MY ROLE</span>
@@ -224,25 +259,7 @@ export function UniverseExperience() {
             </div>
             {selected.dossier.note && <p className="project-dossier-note">{selected.dossier.note}</p>}
           </section>
-          <section className="project-story-copy">
-            <div>
-              <p className="eyebrow">THE SHORT VERSION</p>
-              <h2>
-                From idea to
-                <br />
-                something useful.
-              </h2>
-            </div>
-            <div>
-              <p className="project-summary">{selected.summary}</p>
-              {selected.storyHtml && <div className="project-rich-story" dangerouslySetInnerHTML={{ __html: selected.storyHtml }} />}
-              <ul>
-                {selected.highlights.map((highlight) => (
-                  <li key={highlight}>{highlight}</li>
-                ))}
-              </ul>
-            </div>
-          </section>
+          </div>
           <footer className="project-detail-footer">
             <button className="text-link" onClick={() => setView("directory")}>
               <Icon name="grid" size={17} /> See all {catalog.length} projects
@@ -266,10 +283,7 @@ export function UniverseExperience() {
             <h1>
               Things I’ve <em>built.</em>
             </h1>
-            <p>
-              Products, platforms, and shipped work. A few decades of following the
-              interesting problems.
-            </p>
+
           </header>
           <div className="index-tools">
             <label className="index-search">
@@ -339,12 +353,12 @@ export function UniverseExperience() {
           )}
         </section>
       )}
-      <div className="project-contact-strip">
+      {view !== "featured" && <div className="project-contact-strip">
         <span>Have a wonderfully difficult problem?</span>
         <Link href="/resume">
           Get to know the builder <Icon name="arrow" size={16} />
         </Link>
-      </div>
+      </div>}
     </WorkbenchShell>
   );
 }

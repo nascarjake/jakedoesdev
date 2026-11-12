@@ -37,6 +37,7 @@ export function ResumeExperience() {
               people can actually use.
             </p>
             <div className="about-actions">
+              <Link className="text-link" href="/universe#timeline">Explore product timeline →</Link>
               <ContactButton className="button button-ink">
                 Let’s make something <Icon name="arrow" size={16} />
               </ContactButton>

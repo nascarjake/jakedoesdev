@@ -8,9 +8,10 @@ const wave = [14, 25, 17, 37, 49, 27, 58, 39, 20, 46, 62, 31, 50, 23, 41, 57, 33
 // Original editorial illustrations. Only actual project assets are labeled screenshots.
 export function LabPreview({ project }: { project: Project }) {
   const image = project.media?.find((asset) => asset.kind === "image");
-  const shot = image ? { src: image.url, alt: image.altText || image.caption } : projectMedia[project.id]?.shots[0];
+  const suppliedCover = ["luminary", "broadsheet"].includes(project.id) ? projectMedia[project.id]?.shots[0] : undefined;
+  const shot = suppliedCover ?? (image ? { src: image.url, alt: image.altText || image.caption } : projectMedia[project.id]?.shots[0]);
   if (shot) return <div className={styles.capture}>
-    <span className={styles.label}>APP SCREENSHOT</span>
+    <span className={styles.label}>{project.id === "luminary" ? "PROJECT OVERVIEW" : "APP SCREENSHOT"}</span>
     <div className={styles.captureWindow}><Image src={shot.src} alt={"alt" in shot ? shot.alt : shot.caption} width={1100} height={720} unoptimized sizes="(max-width: 700px) 90vw, 60vw" /></div>
     <span className={styles.captureKey}>{project.id === "clip-my-screen" ? "↖ A little late? Right on time." : project.eyebrow}</span>
   </div>;

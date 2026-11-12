@@ -190,3 +190,33 @@ export const updates = sqliteTable(
   },
   (table) => [index("updates_published_date_idx").on(table.published, table.date)],
 );
+
+export const updateProjects = sqliteTable("update_projects", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  excluded: integer("excluded", { mode: "boolean" }).notNull().default(true),
+  createdAt: text("created_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const updateFolders = sqliteTable("update_folders", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  excluded: integer("excluded", { mode: "boolean" }).notNull().default(true),
+  policyLocked: integer("policy_locked", { mode: "boolean" }).notNull().default(true),
+  version: integer("version").notNull().default(1),
+  updatedAt: text("updated_at").notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const updateProjectFolderAliases = sqliteTable("update_project_folder_aliases", {
+  aliasId: text("alias_id").primaryKey().references(() => updateProjects.id),
+  folderId: text("folder_id").notNull().references(() => updateFolders.id),
+}, (table) => [index("update_project_folder_idx").on(table.folderId)]);
+
+export const updateLegacyPublicSnapshots = sqliteTable("update_legacy_public_snapshots", {
+  updateId: text("update_id").primaryKey().references(() => updates.id),
+  title: text("title").notNull(),
+  date: text("date").notNull(),
+  summary: text("summary").notNull(),
+  entriesJson: text("entries_json").notNull(),
+});

@@ -2,8 +2,11 @@
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { resolveProjectIdentity, verifiedProvenance } from "./project-identity.mjs";
 
-const ROOT = process.cwd();
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const SOURCE_WORKSPACE = path.dirname(ROOT);
 const WORKLOG_DIRECTORY = path.join(ROOT, ".worklog");
 const WEEKS_DIRECTORY = path.join(WORKLOG_DIRECTORY, "weeks");
 const CANDIDATES_DIRECTORY = path.join(WORKLOG_DIRECTORY, "candidates");
@@ -77,7 +80,7 @@ function parseEntries(source) {
     const heading = lines.shift() ?? "";
     const fields = Object.fromEntries(
       lines
-        .map((line) => line.match(/^-\s+([a-z]+):\s*(.+)$/i))
+        .map((line) => line.match(/^-\s+([a-z-]+):\s*(.+)$/i))
         .filter(Boolean)
         .map((match) => [match[1].toLowerCase(), match[2].trim()]),
     );
@@ -110,10 +113,12 @@ function commandAppend(args) {
     throw new Error("Private entries cannot be marked for publication.");
   }
 
+  const identity = resolveProjectIdentity(args.get("workspace") || process.cwd(), { workspaceRoot: SOURCE_WORKSPACE });
+  const provenance = identity ? `- folder-id: ${identity.id}\n- folder-name: ${identity.name}\n- folder-root: ${identity.root}\n` : "- identity: unresolved\n";
   const filename = ensureWeek(week);
   writeFileSync(
     filename,
-    `\n### ${today()} · ${project}\n- visibility: ${visibility}\n- publish: ${publish}\n- summary: ${summary}\n`,
+    `\n### ${today()} · ${project}\n- visibility: ${visibility}\n- publish: ${publish}\n- summary: ${summary}\n${provenance}`,
     { flag: "a" },
   );
   console.log(`Added a ${visibility} entry to ${path.relative(ROOT, filename)}`);
@@ -157,7 +162,7 @@ function commandDraft(args) {
   }
 
   const entries = parseEntries(source).filter(
-    (entry) => entry.publish === "yes" && entry.visibility !== "private",
+    (entry) => entry.publish === "yes" && entry.visibility !== "private" && verifiedProvenance(entry, { workspaceRoot: SOURCE_WORKSPACE }),
   );
   if (!entries.length) {
     console.log(`No publish-approved entries for ${week}; no candidate created.`);
