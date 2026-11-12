@@ -6,9 +6,11 @@ import os from "node:os";
 import path from "node:path";
 import { PROFILE, ROOT, EXPECTED_ACCOUNT_ID, verifyCloudflareAccount } from "./verify-cloudflare-account.mjs";
 
+import { verifyDeploySource } from "./verify-deploy-source.mjs";
 import { verifyPublicSurface } from "./verify-public-surface.mjs";
 
 try {
+  verifyDeploySource(ROOT);
   verifyPublicSurface();
   await verifyCloudflareAccount({ checkZone: true });
   console.log("Verified personal Cloudflare account; building the Worker.");
