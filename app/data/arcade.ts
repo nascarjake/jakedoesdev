@@ -29,6 +29,17 @@ const shots = (id: string, captions: string[]) =>
 // screenshots are authentic captures. DAHO's artwork is conceptual.
 export const arcadeGames: ArcadeGame[] = [
   {
+    id: "glitter-doll-studio",
+    title: "Glitter Doll Studio",
+    genre: "Dress-up studio",
+    cover: cover("glitter-doll-studio"),
+    tagline: "Dress up. Shine bright.",
+    description:
+      "Dress three dolls from a sparkly wardrobe, then send them down the runway and into the photo studio.",
+    playUrl: "https://www.spawn.co/@theflying314/glitter-doll-studio/play?c=1qa7jtd",
+    screenshots: [],
+  },
+  {
     id: "demolition-derby",
     title: "Demolition Derby",
     genre: "Arcade racing",

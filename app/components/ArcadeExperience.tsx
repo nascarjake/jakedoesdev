@@ -499,7 +499,9 @@ export function ArcadeExperience() {
                       ? "Video"
                       : game.embedUrl
                         ? "Play here"
-                        : "Concept cover"}
+                        : game.playUrl
+                          ? "Opens in new tab"
+                          : "Concept cover"}
                 </span>
               </div>
             </article>
