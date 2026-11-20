@@ -13,7 +13,7 @@ import styles from "./LabExperience.module.css";
 
 const byLabOrder = (a: Project, b: Project) => Number(isLabRelease(b)) - Number(isLabRelease(a)) || (a.sortOrder ?? Number.MAX_SAFE_INTEGER) - (b.sortOrder ?? Number.MAX_SAFE_INTEGER);
 const initialExperiments = projects.filter(isLabProject).sort(byLabOrder);
-const needIcons: IconName[] = ["folder", "sound", "game", "code", "grid"];
+const needIcons: IconName[] = ["code", "folder", "sound", "game", "code", "grid"];
 
 export function LabExperience() {
   const [experiments, setExperiments] = useState<Project[]>(initialExperiments);

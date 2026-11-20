@@ -6,7 +6,7 @@ import styles from "./LandingExperience.module.css";
 
 // Published catalogue snapshot, verified 2026-11-08; refresh from the same
 // source as Portfolio and AI Lab. These are catalogue counts, not repo totals.
-const initialCounts = { portfolio: 20, lab: 7 };
+const initialCounts = { portfolio: 20, lab: 8 };
 export function LandingExperience() {
   const [counts, setCounts] = useState(initialCounts);
   useEffect(() => {

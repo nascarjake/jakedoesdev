@@ -747,6 +747,30 @@ export const projects: Project[] = [
       note: "The current workspace documents one transcription study; this is research material rather than a released app.",
     },
   },
+  {
+    id: "wrangler-bar",
+    index: "28",
+    sortOrder: 27,
+    title: "Wrangler Bar",
+    eyebrow: "Cloudflare CLI sign-in · macOS",
+    summary: "Sign in to the Cloudflare CLI from the Mac menu bar. A small native utility that delegates browser approval to your installed Wrangler, with tool checks and explicit profile selection.",
+    role: "Creator · Engineer",
+    year: "2026",
+    stack: ["Swift", "AppKit", "Wrangler"],
+    signal: "WBR",
+    accent: "amber",
+    category: "Creative Tools",
+    mode: "lab",
+    status: "Open-source · Early release",
+    highlights: ["Click or right-click the menu-bar cloud to start an explicit device sign-in.", "Check installed Node and Wrangler versions, select a profile, and prevent duplicate sign-ins.", "Keep credentials with Wrangler; the app discards login output and device codes."],
+    dossier: {
+      scope: "Make the official Cloudflare CLI sign-in easy to start from a native Mac menu without a localhost callback.",
+      ownership: ["Built the native AppKit menu and explicit browser-approval handoff.", "Added Finder-friendly tool discovery, manual executable selection, and named profiles.", "Published universal Mac packaging, integrity checksums, and fake-CLI tests."],
+      systems: ["Swift and AppKit without third-party app dependencies", "Installed Wrangler device login with a checked Node runtime", "Universal Apple silicon and Intel Mac bundle"],
+      note: "Requires macOS 13.5+, a supported Node.js runtime, and Wrangler 4.119+. The early download is ad-hoc signed and not notarized. Browser authentication has not been tested against a real account.",
+      source: { label: "View source and Mac release", url: "https://github.com/nascarjake/wrangler-bar" },
+    },
+  },
 ];
 
 export const experiences: Experience[] = [

@@ -6,6 +6,7 @@ export function isLabProject(project: Project): boolean {
 
 // Visitor-facing needs and skills are independent of the portfolio's technical categories.
 export const labNeeds = [
+  { id: "developer-tools", label: "Set up developer tools", description: "Make everyday command-line setup easier.", symbol: "⌘" },
   { id: "capture-explain", label: "Capture & explain", description: "Keep a screen moment. Make an idea easier to share.", symbol: "↙" },
   { id: "audio-music", label: "Create audio & music", description: "Turn notes into voices and recordings into music code.", symbol: "≈" },
   { id: "live-show", label: "Run a live show", description: "Explore requests, DJ voice links, and show programming.", symbol: "◉" },
@@ -14,6 +15,7 @@ export const labNeeds = [
 ] as const;
 
 export const labSkills = [
+  { id: "cli-authentication", label: "CLI authentication" },
   { id: "agent-workflows", label: "Agent workflows" },
   { id: "screen-replay", label: "Screen replay" },
   { id: "voice-generation", label: "Voice generation" },
@@ -31,6 +33,12 @@ export const defaultLabFilters: LabFilters = { query: "", need: "all", skill: "a
 
 type Discovery = { outcome: string; needs: LabNeed[]; skills: LabSkill[]; uses: string[]; flow: [string, string] };
 const discovery: Record<string, Discovery> = {
+  "wrangler-bar": {
+    outcome: "Start Cloudflare CLI sign-in from your Mac menu bar.",
+    needs: ["developer-tools"], skills: ["cli-authentication"],
+    uses: ["Start Wrangler device sign-in and approve the intended account in your browser.", "Check installed tools and choose a named profile without editing shell settings."],
+    flow: ["Menu-bar sign-in", "Cloudflare approval"],
+  },
   "luminary": {
     outcome: "Build and inspect multi-agent workflows.",
     needs: ["ai-workflows"], skills: ["agent-workflows"],
