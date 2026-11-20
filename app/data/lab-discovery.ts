@@ -36,7 +36,7 @@ const discovery: Record<string, Discovery> = {
   "wrangler-bar": {
     outcome: "Start Cloudflare CLI sign-in from your Mac menu bar.",
     needs: ["developer-tools"], skills: ["cli-authentication"],
-    uses: ["Start Wrangler device sign-in for its default profile and approve the intended account in your browser.", "Check installed tools without editing shell settings."],
+    uses: ["Start Wrangler device sign-in for its default profile and approve the intended account in your browser.", "Check installed tools or find the official Terminal setup steps for named profiles."],
     flow: ["Menu-bar sign-in", "Cloudflare approval"],
   },
   "luminary": {
